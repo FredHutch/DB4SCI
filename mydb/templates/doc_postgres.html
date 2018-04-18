@@ -8,55 +8,66 @@
   </div>
   <div class="document">
     <h2>Postgres Notes</h2>
-    If you want to tune your database you can change almost all of the configuration settings in
+    <p>If you want to tune your database you can change almost all of the 
+    configuration settings in
     postgresql.conf via ALTER SYSTEM commands (e.g., ALTER SYSTEM SET max_connections=100)
-    After making any changes, you must restart the database server through the "Restart DB Container"
-    link. To do so requires a superuser login on that database server. <p>
+    After making any changes, you must restart the database server through the
+    "Restart DB Container" link. Restarting requires superuser privilege for
+    container server.
+    </p>
 
     <h2>Users</h2>
-                   You can use the following to connect to your database instance
-                        <li> DB username and password provided when the postgres instance is created.
-                             This user has superuser rights on your database instance. We do not recommend 
-                             you use your hutchnet id so that the password does not change.
+    <p>You can use the following to connect to your database instance from the Linux
+    command line.
+    <code>psql --host mydb -p 320xx -d postres -U myrootuser</code>
+    <p> DB username and password provided when the postgres instance is created.
+    This user has superuser rights on your database instance. We do not recommend 
+    you use your hutchnet id so that the password does not change.
     Keep your credentials for Postgres databaes in .pgpass file in your home directory.
     Create <kbd>.pgpass</kbd> with permissions of <kdb>0600.</kbd>  You can keep credentials for multible
     databases in the file, one entry per line.  Comments are not allowed.  The file format for .pgpass is:
-
     <code> hostname:port:database:username:password </code
+    </p>
 
+    <h2> Postgres commands</h2>
+    <p>If you do not have psql on your local machine, you can use 
+    <code>module load PostgreSQL/9.5.1-foss-2015b</code> to load psql.
+    This loads the entire postgres code base, so other postgres commands 
+    (e.g., pg_dump) are also loaded.
+    </p>
 
-                <h2> Postgres commands</h2>
-                    If you do not have psql on your local machine, you can use 
-                    <code>module load PostgreSQL/9.5.1-foss-2015b</code> to load psql.
-                    This loads the entire postgres code base, so other postgres commands (e.g., pg_dump) are also loaded. <p>
+    <p>Use psql to connect to the database via the following command: <p>
+    <code>psql --host DB4SCIhost -u username -p portnum -d database -U username</code>
+    <p> The port number is provided when you first create the database instance
+    You can issue any psql command from here, including create role, grant,
+    create database, alter system.
+    </p>
 
-                    User psql to connect to the database via the following command: <p>
-                        <code>psql -h mydb -u <i>username</i> -p <i>portnum database </code></i> <p>
-                    The port number is provided when you first create the database instance <p>
-                    You can issue any psql command from here, including create role, grant, create database, alter system.
+    <h4>Common commands include</h4>
+    <code><pre>
+    create user jdoe;
+    create database mybase with owner jdoe;
+    grant all privileges on database mybase to myotheruser;
+    alter user myotheruser with encrypted password 'MyPassword';
+    load psql with database or template: psql template1
+    list databases: \l
+    delete database: drop database mybase;
+    change db owner: alter database mybase owner to myotheruser;
+    quit psql: \q
+    </pre></code>
 
-                    Common commands include
-                    <code>
-                    create user jdoe;<br>
-                    create database mybase with owner jdoe;<br>
-                    grant all privileges on database mybase to myotheruser;<br>
-                    alter user myotheruser with encrypted password 'MyPassword';<br>
-                    load psql with database or template: psql template1<br>
-                    list databases: \l<br>
-                    delete database: drop database mybase;<br>
-                    change db owner: alter database mybase owner to myotheruser;<br>
-                    quit psql: \q <br></code>
-
-                 <h2> Create wrapper for easy access </h2>
-                   To make life easier, create a wrapper script, eg psq: <p>
-                   edit ~/bin/psq and put this content into the file: <p>
-
-                   <code>#! /bin/sh
+    <h2> Create wrapper for easy access </h2>
+    <p>To make life easier for connecting to PostgreSQL instances, 
+    create a wrapper script. Creat a psq command file store your connection
+    commands.  edit ~/bin/psq and put this content into the file: <p>
+    </p>
+    <code>#! /bin/sh
                    PGPASSWORD=<password> psql -h <hostname> -u <username> -p <portnum> <database> $@ </code>
-                   Change the permisions of the psq file to make it executable.<p>
-                   <code>chmod +x ~/bin/psq</code>
-                   Now you'll find it a lot easier to access your postgres instance, 
-                   for example you can now simply use this command to list your databases:<p>
+    <p>Change the permisions of the psq file to make it executable.
+    <code>chmod +x ~/bin/psq</code>
+    Now you'll find it a lot easier to access your postgres instance, 
+    for example you can now simply use this command to list your databases:
+    </p>
 
                    <code>psq --list</code>
 
@@ -80,7 +91,4 @@
                 </ul>
       </div>
     </div>
-    {% endblock %}
-  </body>
-</html>
-
+{% endblock %}

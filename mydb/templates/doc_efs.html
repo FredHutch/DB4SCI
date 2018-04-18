@@ -7,13 +7,13 @@
       <h4>Encrypted File System</h4>
   </div>
   <div class="document">
-    <h2>How to support Encrypted File System with MyDB</h2>
+    <h2>How to support Encrypted File Systems</h2>
 
     <h4>Overview</h4>
-<p>MyDB can provision containerized databases to any storge that is attached to the application server. The use case is to support a varity of storage levels; fast/expensive, slow/cheap, production, development. The application can provision any storage that is mounted to the host and configured in the application. To meet compliance guidlines for Encryption At Rest (EAR) an encrypted file system can be provisioned.
+<p>DB4SCI can provision containerized databases to any storge that is attached to the application server. The use case is to support a varity of storage levels; fast/expensive, slow/cheap, production, development. The application can provision any storage that is mounted to the host and configured in the application. To meet compliance guidlines for Encryption At Rest (EAR) an encrypted file system can be provisioned.
 
 <h4>Application Configuration</h4>
-MyDB is configured from a single configuration file. From the main application directory the configuration file is <tt>mydb/mydb_config.py</tt>.  The configuration file is Python module. The module has three main class definitions; BaseConfig, ProdConfig, DevConfig, TestConfig. Place all configuration variables in the 'BaseConfig.'  If a configuration parameter is different between prod, dev or test, the parameter can be overwritten in the appropriate subclass. Primary storage for databases is defined by the <tt>data_volumes</tt> parameter. The <tt>data_volumes</tt> parameter is a list of lists.  The order of the list defines the storage mount points.  The second order of the list has four elements; Lable, mount point, DB_list, User_list. The DB_list contains which databases are allowed for the mount.  Use the database names that are defined in the <tt>info</tt> section of the configuration file. The User_list contains UIDs of users allowed to provision the storage as defined from the user login.  Both lists support the use of <tt>'ALL'</tt> which allows all databases and or users to provision databases to the volume. Example:</p>
+DB4SCI is configured from a single configuration file. From the main application directory the configuration file is <tt>mydb/mydb_config.py</tt>.  The configuration file is Python module. The module has three main class definitions; BaseConfig, ProdConfig, DevConfig, TestConfig. Place all configuration variables in the 'BaseConfig.'  If a configuration parameter is different between prod, dev or test, the parameter can be overwritten in the appropriate subclass. Primary storage for databases is defined by the <tt>data_volumes</tt> parameter. The <tt>data_volumes</tt> parameter is a list of lists.  The order of the list defines the storage mount points.  The second order of the list has four elements; Lable, mount point, DB_list, User_list. The DB_list contains which databases are allowed for the mount.  Use the database names that are defined in the <tt>info</tt> section of the configuration file. The User_list contains UIDs of users allowed to provision the storage as defined from the user login.  Both lists support the use of <tt>'ALL'</tt> which allows all databases and or users to provision databases to the volume. Example:</p>
 
 <pre>
   <code>
@@ -40,7 +40,7 @@ There are many options for encrypted file systems, and I will not discuss the me
 <pre>
   <code>
 # Pick a location and create the loopback file itself - should be on nvme - and mountpoint.
-# All storage for MyDB should be configured relative to the mount point: /mydb
+# All storage for /DB4SCI should be configured relative to the mount point: /mydb
 
 mkdir /mydb/encrypted
 cd /mydb/encrypted

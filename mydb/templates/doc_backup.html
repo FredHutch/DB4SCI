@@ -7,20 +7,23 @@
       <h4>Postgres Backup Documentation</h4>
   </div>
   <div class="document">
-    <h2>MyDB Postgres Backups</h2>
-      MyDB performs full backups every night.  The full backups are sync'd to
+    <h2>DB4SCI Postgres Backups</h2>
+      DB4SCI performs full backups every night.  The full backups are sync'd to
       Amazon S3 storage where they are kept for up to six months. The local backups
       are only kept for a few days.
 
       <h2>User Backup and Recover</h2>
       Users can perform backups for specific tasks like migrations or
-      upgrades. Backups can be written to local storage.  We recomend using <kbd>/fh/scratch</kbd>
-      for storing backups.
+      upgrades. Backups can be written to local storage.  We recomend using a scratch 
+      file system for storing short term backups. Use a file system that is in
+      co-lacated in the save data center that hosts DB4SCI. Saving localy to your
+      laptop can be very slow!
       
       <p>The backup examples assume that you are using .pgpass file to store your
       Postgres credentials. No passwords are needed on the command line.
-      Use the scratch file system to save a local copy of your database backup. Change directory to /fh/scracth/xx. 
-      Create a new database/container with MyDB to be used for restoring into. The examples utilize the PostgreSQL 
+      Use the scratch file system to save a local copy of your database backup. 
+      Create a new database/container with DB4SCI to be used for restoring into. 
+      The examples utilize the PostgreSQL 
       command line tools. <code>module load PostgreSQL/9.6.1</code>
       
       <p>Create a full backup and save to a local file. <code>
@@ -34,23 +37,23 @@
       <p>Migrate data from one container to another.
       <code>pg_dump -h mydb -p 320xx -d prod_db -U myrootuser | psql  -h mydb --port=320xx -d dev_db -U rootuser</code>
 
-      <p>MyDB creates a single Postgres container with a default database which has the same name. Additional databases can
+      <p>DB4SCI creates a single Postgres container with a default database 
+      which has the same name. Additional databases can
       be created within the Postgres instance. If you want to choose an alternative database 
       name for the recovery; create a new database on the recovery Postgres DB.
+      </p>
       <code>psql -h mydb -p 32034 -d db_name -U myrootuser -c "CREATE DATABASE recoverdb;"</code>
-      Make a new entry in the .pgpass file for each "database".  To recover from an existing database into the
+      <p>Make a new entry in the .pgpass file for each "database".  To recover 
+      from an existing database into the 
       alternative database; just change the connection string.
+      </p>
       <code>pg_dump -h mydb -p 320xx -d db_name -U myrootuser | psql -h mydb --port=32034 -d recoverdb -U rootuser</code>
       
-  
-      <p>
-      pg_dump will not restore any changes you have made with <kbd>ALTER SYSTEM</kbd>. If you have
+      <p>pg_dump will not restore any changes you have made with <kbd>ALTER SYSTEM</kbd>. 
+      If you have
       system changes to Postgres you will have to reaplly the changes to the new container.
-      
-
+      </p> 
   </div>
   </div>
-  {% endblock %}
- </body>
-</html>
+{% endblock %}
 
