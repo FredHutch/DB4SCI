@@ -1,4 +1,4 @@
-digraph DB4Sci_Arch {
+graph DB4Sci_Arch {
  rankdir=LR;
  splines = "line"
  fontname="Helvetica";
@@ -9,41 +9,41 @@ subgraph cluster_0 {
 }
 
 subgraph cluster_1 {
-  fontname="Helvetica";
   adauth [label="AD Auth", style=filled, fillcolor="#8FAADC" ]
 }
 
 subgraph cluster_1 {
-  label="  docker"; lablelloc=t; labeljust=left; fontsize=30;
+  label="docker"; lablelloc=t; labeljust=left; fontsize=30;
   color = black;
   style = "filled,rounded";
   fillcolor = "#E7E6E6";
-  #splines = false
 
   node [shape=box];
-  dbaas [shape=record, label="{<f0> uwsgi|<f2> DB4Sci\nFlask}", style=filled, fillcolor="#89c348"];
+  dbaas [shape=record, label="<f0> uwsgi|<f2> DB4Sci\nFlask",
+         style=filled, fillcolor="#89c348"];
+
   mydb_admin [label="PostgreSQL\nmydb_admin", 
               style=filled, fillcolor=lightblue, color=black];
-  {rank = same; dbaas; mydb_admin; }
+  {rank = same; mydb_admin; dbaas}
+
   db1 [width=1.3,label="PostgreSQL", style=filled, fillcolor="#0399D0", color=black];
   db2 [width=1.3,label="MariaDB", style=filled, fillcolor="#FF7156", color=black];
   db3 [width=1.3,label="Mongo", style=filled, fillcolor="#62bdcf", color=black];
   db4 [width=1.3,label="Neo4j", style=filled, fillcolor="#548235", color=black];
  
-  nginx [label="nginx\nContainer", style=filled, fillcolor="#1f9fa1"];
+  nginx [label="nginx\nContainer", style=filled, fillcolor="#187d80"];
 
-  edge [dir=none]
-  nginx -> dbaas:f0; 
-  dbaas:f0 -> mydb_admin;
+  nginx -- dbaas:f0; 
+  mydb_admin:n -- dbaas:f2;
 
-  dbaas:f2 -> db4:w
-  dbaas:f2 -> db3:w
-  dbaas:f2 -> db2:w
-  dbaas:f2 -> db1:w
+  dbaas:f2 -- db4:w
+  dbaas:f2 -- db3:w
+  dbaas:f2 -- db2:w
+  dbaas:f2 -- db1:w
   }
 
   edge [dir=none]
   {rank = same; Users; adauth; }
-  Users -> nginx; 
-  adauth -> dbaas;
+  Users -- nginx; 
+  adauth -- dbaas;
 }

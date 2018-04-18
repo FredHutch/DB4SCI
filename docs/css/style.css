@@ -1,5 +1,6 @@
 body {
   font-family: Helvetica,Arial,"Calibri","Lucida Grande",sans-serif;
+  margin: 0;
 }
 .logo { padding: 15px 25px 10px 15px;}
 .app_name {font-size: 2.5em; font-weight: bold; margin: 0 10px .5em 20px; }
@@ -9,9 +10,11 @@ body {
   bottom:0%;
   width:100%;
   color: #fff;
-  background-color: #393838;
+  background-color: #123054;   /* Hutch Dark Blue */;
+  padding-left: 1em;
   opacity: 1;
 }
+
 .app_name {
   color: #89c348;  /* Hutch Green */
   font-family: "Calibri",Helvetica,Arial,"Lucida Grande",sans-serif;
@@ -38,3 +41,17 @@ body {
   margin-top: 30px;
 } 
 
+#content {
+    color: #4e5665;
+    font: 300 16px/1.6em Helvetica, Arial, sans-serif;
+    font-style: normal;
+    font-variant-ligatures: normal;
+    font-variant-caps: normal;
+    font-variant-numeric: normal;
+    font-variant-east-asian: normal;
+    font-weight: 300;
+    font-stretch: normal;
+    font-size: 16px;
+    line-height: 1.6em;
+    font-family: Helvetica, Arial, sans-serif;
+}

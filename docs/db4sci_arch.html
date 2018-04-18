@@ -6,7 +6,6 @@
     <title>DB4Sci</title>
     <link rel="stylesheet" type="text/css" href="css/nav.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    </style>
 </head>
 <body>
 <div>
@@ -20,7 +19,7 @@
 </div>
 <nav>
    <ul class="nav">
-     <li><a href="db4sci.html">Home</a></li>
+     <li><a href="index.html">Home</a></li>
      <li><a href="overview.html">Overview</a>
      <li ><a href="db4sci_arch.html">Architecture</a></li>
      <li ><a href="download.html">Download</a></li>
@@ -33,9 +32,9 @@
     <ul style="list-style-type:square">
        <li>Access to DB4SCI requires user authentication. Acitve Directory is used to provide
             authentication.
-       <li>NginX handles http and TSL transports and sends data via WSGI to flash 
+       <li>NginX handles http and TSL transports and sends data via WSGI to Flask 
            on port 5000</li>
-       <li>uWSGI is used as a wrapper for DB4SCI flask application.</li> 
+       <li>uWSGI is used as a wrapper for DB4SCI Flask application.</li> 
        <li>State data for the application is stored in a PostgreSQL 
                 database named mydb_admin.
                 SQLAlchemy for Flask is the API to PostgreSQL for the administrative database.
