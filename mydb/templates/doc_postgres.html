@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+{% block title %} Documentation- {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+{% block content %}
+<div id="container">
+  <div class="title">
+    <h4>Postgres Documentation</h4>
+  </div>
+  <div class="document">
+    <h2>Postgres Notes</h2>
+    If you want to tune your database you can change almost all of the configuration settings in
+    postgresql.conf via ALTER SYSTEM commands (e.g., ALTER SYSTEM SET max_connections=100)
+    After making any changes, you must restart the database server through the "Restart DB Container"
+    link. To do so requires a superuser login on that database server. <p>
+
+    <h2>Users</h2>
+                   You can use the following to connect to your database instance
+                        <li> DB username and password provided when the postgres instance is created.
+                             This user has superuser rights on your database instance. We do not recommend 
+                             you use your hutchnet id so that the password does not change.
+    Keep your credentials for Postgres databaes in .pgpass file in your home directory.
+    Create <kbd>.pgpass</kbd> with permissions of <kdb>0600.</kbd>  You can keep credentials for multible
+    databases in the file, one entry per line.  Comments are not allowed.  The file format for .pgpass is:
+
+    <code> hostname:port:database:username:password </code
+
+
+                <h2> Postgres commands</h2>
+                    If you do not have psql on your local machine, you can use 
+                    <code>module load PostgreSQL/9.5.1-foss-2015b</code> to load psql.
+                    This loads the entire postgres code base, so other postgres commands (e.g., pg_dump) are also loaded. <p>
+
+                    User psql to connect to the database via the following command: <p>
+                        <code>psql -h mydb -u <i>username</i> -p <i>portnum database </code></i> <p>
+                    The port number is provided when you first create the database instance <p>
+                    You can issue any psql command from here, including create role, grant, create database, alter system.
+
+                    Common commands include
+                    <code>
+                    create user jdoe;<br>
+                    create database mybase with owner jdoe;<br>
+                    grant all privileges on database mybase to myotheruser;<br>
+                    alter user myotheruser with encrypted password 'MyPassword';<br>
+                    load psql with database or template: psql template1<br>
+                    list databases: \l<br>
+                    delete database: drop database mybase;<br>
+                    change db owner: alter database mybase owner to myotheruser;<br>
+                    quit psql: \q <br></code>
+
+                 <h2> Create wrapper for easy access </h2>
+                   To make life easier, create a wrapper script, eg psq: <p>
+                   edit ~/bin/psq and put this content into the file: <p>
+
+                   <code>#! /bin/sh
+                   PGPASSWORD=<password> psql -h <hostname> -u <username> -p <portnum> <database> $@ </code>
+                   Change the permisions of the psq file to make it executable.<p>
+                   <code>chmod +x ~/bin/psq</code>
+                   Now you'll find it a lot easier to access your postgres instance, 
+                   for example you can now simply use this command to list your databases:<p>
+
+                   <code>psq --list</code>
+
+                 <h2>Connecting Microsoft Access to a Postgres database</h2>
+
+                 You can build a quick front end in MS Access to a postgres database.
+                 This is preferable to having your data in Access. To connect Access to Postgres, do the following:
+
+                 <ul>
+                 <li>Download the appropriate ODBC driver from https://www.postgresql.org/ftp/odbc/versions/. Install the latest version. </li>
+                 <li>Open access. Go to External Data > ODBC Database > Link to data source by creating a linked table </li>
+                 <li>Enter a DSN name. This is database server and database specific so we recommend a name like mydb_database. Click new. </li>
+                 <li>Select PostgreSQL Unicode </li>
+                 <li>Save the file in a protected location. Note this will contain your password in clear text. </li>
+                 <li>Enter the connection information </li>
+                       database=your database name,
+                       server=mydb,
+                       username=your postgres username,
+                       port=docker port number (e.g., 32002),
+                       password=your postgres password
+                </ul>
+      </div>
+    </div>
+    {% endblock %}
+  </body>
+</html>
+

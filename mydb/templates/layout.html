@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    {% block head %}
+    <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='css/nav.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    </script>
+    <title>{% block title %}{% endblock %} myDB DBaas</title>
+    {% endblock %}
+  </head>
+  <body>
+     {% include 'banner.html' %}
+       <nav>
+       <ul class="nav">
+         <li><a href="{{ url_for('list_containers') }}">List DB Containers</a></li>
+         <li><a href='#'>Create DB Container</a>
+             <ul> 
+                <li><a href="{{ url_for('create_form', dbtype='Postgres') }}">PostgreSQL Container</a></li>
+                <li><a href="{{ url_for('create_form', dbtype='MariaDB') }}">MariaDB (MySQL)</a></li>
+                <li><a href="{{ url_for('create_form', dbtype='MongoDB') }}">MongoDB Container</a></li>
+                <li><a href="{{ url_for('create_form', dbtype='Neo4j') }}">Neo4j</a></li>
+             </ul>
+         </li>
+         <li ><a href="{{ url_for('select_container', action='S3_list') }}">List S3 Backups</a></li>
+         <li ><a href="{{ url_for('restart') }}">Restart DB Container</a></li>
+         <li ><a href="{{ url_for('delete') }}">Delete DB Container</a></li>
+         <li ><a href="{{ url_for('backup') }}">Backup DB Now</a></li>
+         <li ><a href='#'>Documentation</a>
+           <ul>
+             <li><a href="{{ url_for('doc_page', doc='documentation') }}">Overview</a></li>
+             <li><a href="{{ url_for('doc_page', doc='doc_postgres') }}">PostgreSQL Container</a></li>
+             <li><a href="{{ url_for('doc_page', doc='doc_backup') }}">Database Backups</a></li>
+             <li><a href="{{ url_for('doc_page', doc='doc_mariadb') }}">MariaDB Encryption at Rest</a></li>
+             <li><a href="{{ url_for('doc_page', doc='doc_TLS') }}">TLS for MariaDB</a></li>
+             <li><a href="{{ url_for('doc_page', doc='doc_efs') }}">Encrypted File System</a></li>
+             <li><a href="{{ url_for('doc_page', doc='doc_release') }}">Release Notes</a></li>
+           </ul>
+         </li>
+         <li ><a href="{{ url_for('logout') }}">Log Out</a></li>
+       </ul>
+       </nav> <!-- end "nav" -->
+     <div id="content"> {% block content %}{% endblock %} </div>
+  </body>
+</html>

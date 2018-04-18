@@ -1,0 +1,231 @@
+::selection{ background-color: #E13300; color: white; }
+::moz-selection{ background-color: #E13300; color: white; }
+::webkit-selection{ background-color: #E13300; color: white; }
+// dark-blue Hutch font #123054
+
+body {
+    font-family: "Calibri",Helvetica,Arial,"Lucida Grande",sans-serif;
+    color: #888;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 22px;
+}
+
+a {
+    color: black;
+    background-color: transparent;
+    font-weight: normal;
+}
+
+.title {
+    font-family: "Calibri",Helvetica,Arial,"Lucida Grande",sans-serif;
+    padding: 0 20px;
+    background: lightgray;
+    position: relative;
+    height: 50px;
+    line-height: 50px;
+}
+
+.panel-title {
+    color: black;
+}
+
+.logo {
+   padding: 15px 25px 10px 15px;
+}
+
+.app_name {
+    color: #89c348;  /* Hutch Green */
+    font-family: "Calibri",Helvetica,Arial,"Lucida Grande",sans-serif;
+    font-size: 1.5em;
+    margin: 0 10px .5em 20px;
+}
+.banner_title {
+    color: #89c348;
+    font-size: 3em;
+}
+
+h4 {
+    margin: 0;
+}
+
+code {
+    font-family: Consolas, Monaco, Courier New, Courier, monospace;
+    font-size: 12px;
+    background-color: #f9f9f9;
+    border: 1px solid #D0D0D0;
+    color: #002166;
+    display: block;
+    padding: 0px 10px 12px 10px;
+}
+
+content {
+    padding: 5px;
+    zoom: 1;
+}
+
+code {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+div.document {
+    font-family: "Calibri",Helvetica,Arial,"Lucida Grande",sans-serif;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-right: 100px;
+    padding-left: 100px;
+}
+
+#body{
+    margin: 0 15px 0 15px;
+}
+
+p.footer{
+    text-align: right;
+    font-size: 11px;
+    border-top: 1px solid #D0D0D0;
+    line-height: 32px;
+    padding: 0 10px 0 10px;
+    margin: 20px 0 0 0;
+}
+
+#container{
+    margin: 10px;
+    border: 1px solid #D0D0D0;
+    color: black;
+}
+
+/* Create Container Table */
+.create_table td {              /* column one */
+    text-align: right;
+    font-weight: bold;
+}
+.create_table td + td {         /* column two */
+    text-align: left;
+}
+.create_table td + td +td {     /* column three */
+    text-align: right;
+    font-weight: bold;
+}
+.create_table td + td + td +td {/* column four */
+    text-align: left;
+}
+td.linebreak p {
+    width: 50%;
+}
+
+
+/* Form Styles */
+form label{
+    display: block;
+    margin-bottom: 5px;
+}
+form input[type=text]{
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    box-sizing: border-box;
+    padding: 5px;
+    margin-bottom: 20px;
+    outline: 0;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+}
+form input[type=password]{
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    box-sizing: border-box;
+    padding: 5px;
+    margin-bottom: 20px;
+    outline: 0;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+}
+form input[type=submit]{
+    background: #198ad1;
+    color: #fff;
+    display: inline-block;
+    padding: 0 20px;
+    font-size: 16px;
+    line-height: 2.6em;
+    font-family: "Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+    font-weight: 400;
+    -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.1);
+    -moz-box-shadow: inset 0 -1px 0 rgba(0,0,0,.1);
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.1);
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    text-transform: capitalize;
+    border: 0;
+    cursor: pointer;
+    text-align: center;
+} 
+
+
+div#loading {
+    width: 35px;
+    height: 35px;
+    display: none;
+    background: url(/static/ajax-loader.gif) no-repeat;
+    cursor: wait;
+}
+
+/* Style the list */
+ul.tab {
+    list-style-type: none;
+    margin: 15;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Float the list items side by side */
+ul.tab li {float: left;}
+
+/* Style the links inside the list items */
+ul.tab li a {
+    display: inline-block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of links on hover */
+ul.tab li a:hover {background-color: #ddd;}
+
+/* Create an active/current tablink class */
+ul.tab li a:focus, .active {background-color: #ccc;}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

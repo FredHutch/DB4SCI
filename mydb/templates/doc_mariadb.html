@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block title %} Documentation- {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+{% block content %}
+<div id="container">
+  <div class="title">
+    <h4>MariaDB Documentation</h4>
+  </div>
+    <div class="document">
+    <h4>MariaDB Encryption at Rest</h4>
+    <p> MariaDB Data Encryption at Rest can be configured with MariaDB containers and is supported by MyDB.
+      For an overview of how DEAR works with MariaDB see: <a href='https://mariadb.com/kb/en/library/data-at-rest-encryption/'>MairaDB Data Encryption at Rest</a>.</p>
+      
+     <h4>Create a MariaDB with DEAR</h4>
+     <p>Uuse the MariaDB create form. In the lower right of the create screen select 
+      <em>Encryption at Rest</em> 'Yes'. MariaDB encryption is fully supported for the XtraDB and InnoDB storage engines. Additionally the logs are also encrypted.
+
+    <h4>Key Management</h4>
+    <p> MariaDB requires a key file and additional configuration data to enable encryption.
+    The configuration files are mapped to container when the Docker container is started. 
+    MyDB creates a key 128 bit key which is then encrypted. The encrypted key file is stored in
+    the file: <tt>keys.enc</tt>.  The original key is not recoverable and is not saved.
+    Each encrypted MariaDB uses its own private key and cofiguration mapping. MyDB creates a
+    directory for each MariaDB encrypted instance.</p>
+
+    <h4>Recovey for encrypted MariaDB</h4>
+    <p> At present recovery needs to be performed by admin staff.
+    To request a database recovery, send an email to your HPC admin group. 
+  
+     <h4>Recovery Process</h4>
+    <p> Create a new MariaDb
+    container to recover the data to. This new container will have it own unique key.  Backups are only
+    written to AWS S3 using server side encrption on a volume with TLS enforced. The backups are in
+    clear text and do not require the encyption key. Pipe the remote backup to the recovery container.
+    </p>
+    <pre>
+    <code>
+# restore<br>
+aws s3 cp s3://YourBucket/prod/enc1/enc1-2017.12.17/backup.sql - | <br>
+     mysql --host mydb --port 32017 --user tester --password
+    </code>
+    </pre>
+
+    <h4>Implementation Notes</h4>
+    <p> MariaDB Docker image expects the configuration files to be mapped at
+    these locations.
+    </p>
+    <code>
+    Keyfile:  /keys/keys.enc<br>
+    Configuration:  /etc/mysql/conf.d/encrypt.cnf*
+    </code>
+    <p>The source for configuration file mappings is the directory that is used for the database storage. 
+    </p>
+    <pre>
+    <code>
+    Docker Storage Mapping for MariaDB
+    /mydb/db_volume/container_name/data -> /data
+    /mydb/db_volume/container_name/conf.d ->  /etc/mysql/conf.d<br>
+    /mydb/db_volume/container_name/keys ->  /keys<br>
+    </code> 
+    </pre>
+
+    </div>
+  </div>
+{% endblock %}

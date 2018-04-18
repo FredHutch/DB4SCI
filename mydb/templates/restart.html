@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %} Create DB - {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+{% block content %}
+<div id="container">
+  <div class="title">
+          <h4>Restart Postgres Container</h4>
+  </div>
+  <h2> You must be a superuser on the database server to restart it.</h2> 
+  <div id="content">
+          <form method="post" action="{{ url_for('restarted') }}">
+            <label for="dbname">DB/Container Name:</label>
+              <input type="text" list="container_list" name="dbname" />
+              <datalist id="container_list">
+                {% for o in items %}
+                  <option value="{{ o }}">
+                {% endfor %}
+              </datalist><br />
+            <label for="dbuser">DB Username:</label><input type="text" name="dbuser" /><br />
+            <label for="dbuserpass">DB Password:</label><input type="password" name="dbuserpass" /><br />
+          <input type="submit" />
+          </form>
+  </div>
+</div>
+{% endblock %}

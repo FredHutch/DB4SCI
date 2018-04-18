@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="favicon.ico">
+    <title>DB4Sci</title>
+    <link rel="stylesheet" type="text/css" href="css/nav.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    </style>
+</head>
+<body>
+<div>
+  <header class="app_name">
+    <table>
+      <tr>
+        <td class="logo"> <img src="images/DB4SCI_logo_100px.jpg" title="DB4Sci"></td>
+      </tr>
+    </table>
+  </header>
+</div>
+<nav>
+   <ul class="nav">
+     <li><a href="db4sci">Home</a></li>
+     <li><a href="overview">Overview</a>
+     <li ><a href="db4sci_arch">Architecture</a></li>
+     <li ><a href="download">Download</a></li>
+   </ul>
+</nav> <!-- end "nav" -->
+<div class="outerbox">
+        <div id="content" class="boxed-group">
+<br>
+<p>
+<h3>DB4Sci Design Goals</h3>
+  <ul>
+    <li>Fast easy way to create database instances. Zero barriers, no request forms, no ticket system.</li>
+    <li>Container Centric. No software installs, just pull Postgres from Docker hub.</li>
+    <li>Get out of the DBA business.  Give uses full admin rights to manage thier own
+databases. But at the same time provide nightly backups.</li>
+    <li>Encourge database useage for scientfic data and work flow management. Databases can be
+shared and offer current access.  Influence the culture and offer better alterative to spreadsheets.
+</li>
+    <li> DB4Sci is easily extensible. At present MyDB supports four major DB platforms.
+    To add additional platforms just update the configuration file and define the Name, image and version
+    of the DB container.  On the backend you need to write Python code to implement a few methods: 
+    db_create, db_backup, create_user, check_user.
+    </li>
+  </ul>
+<h3>Depolyment</h3>
+   <p>
+   Docker install is the main requirement for DB4SCI. At the Hutch DB4SCI runs on a dedicated
+   physical server with a few hundred teribyes of nVME SSD storage. The system run Ubuntu 16.04 and storage 
+   is configured with ZFS. This configuration is supporting over 50 database instances.
+   DB4SCI could also be deployed in AWS with EC2 instance. 
+<ul>
+</ul>
+  <div id="footer">
+    <p id=text>hand crafted html with vim</p>
+  </div>
+</body>
+</html> 

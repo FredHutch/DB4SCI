@@ -1,0 +1,40 @@
+body {
+  font-family: Helvetica,Arial,"Calibri","Lucida Grande",sans-serif;
+}
+.logo { padding: 15px 25px 10px 15px;}
+.app_name {font-size: 2.5em; font-weight: bold; margin: 0 10px .5em 20px; }
+#footer {
+  height: 40px;
+  position: fixed;
+  bottom:0%;
+  width:100%;
+  color: #fff;
+  background-color: #393838;
+  opacity: 1;
+}
+.app_name {
+  color: #89c348;  /* Hutch Green */
+  font-family: "Calibri",Helvetica,Arial,"Lucida Grande",sans-serif;
+  font-size: 1.5em;
+  margin: 0 10px .5em 20px;
+}
+.banner_title {
+  color: #89c348;
+  font-size: 3em;
+}
+.outerbox { # top, right, bottom, left
+ display: block;
+ padding: 0px 12px 0px 12px;
+}
+.boxed-group {
+  margin-bottom: 10px;
+  max-width: 800px;
+  border: 1px 
+  solid #dfe2e5;
+  border-radius: 8px;
+  position: relative;
+  padding: 0px 1em 1em 12px;
+  margin-bottom: 30px;
+  margin-top: 30px;
+} 
+

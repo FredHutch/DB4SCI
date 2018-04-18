@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %} List DB containers- {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+{% block content %}
+  <div id="container">
+    <div class="title">
+      {% if Error == true %}
+          <h4 style="color:red">{{title}}</h4>
+      {% else %}
+          <h4>{{title}}</h4>
+      {% endif %}
+    </div>
+    <div id="content">
+      <pre>
+        <code>
+{% if dbheader|length > 0 %}
+          <b> 
+{{dbheader}}</b>
+          <hr>
+{% endif %}
+{{dbs}}
+        </code>
+      </pre>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+{% block title %} Documentation- {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+{% block content %}
+<div id="container">
+  <div class="title">
+      <h4>TLS Documentation</h4>
+  </div>
+  <div class="document">
+    <h2>TLS Support for MariaDB</h2>
+
+    <h4>MariaDB Client Configuration</h4>
+<p>Secure TLS communication between client and database server requires the client be configured to use certs.
+Configure your MySQL client to use TLS certificates. Edit the my.cnf configuration file
+on the client. The MariaDB/MyDB client configuration file is typicaly located here: <tt>/etc/mysql/my.cnf</tt>.
+Append the followin in [client] section as follows:
+
+<pre>
+  <code>
+## MySQL Client Configuration ##
+[client]
+ssl-verify-server-cert
+ssl-ca=/etc/mysql/ssl/ca-cert.pem
+ssl-cert=/etc/mysql/ssl/client-cert.pem
+ssl-key=/etc/mysql/ssl/client-key.pem
+  </code>
+</pre>
+
+<h4>Client Certificiates</h4>
+<p>Download all of the following client certs.</p>
+     <ul>
+       <li><a href="{{ url_for('certs', filename='ca-cert') }}">ca-cert.pem</a></li>
+       <li><a href="{{ url_for('certs', filename='client-cert') }}">client-cert.pem</a></li>
+       <li><a href="{{ url_for('certs', filename='client-key') }}">client-key.pem</a></li>
+     </ul>
+
+<p>By default user connections are not protected by TLS. It is best practice to enforce TLS connections by creating accounts that only permit encrypted TLS connections. Example:</p>
+
+<pre>
+  <code>
+CREATE USER  redcap@'%' REQUIRE SSL;
+SET PASSWORD FOR redcap = PASSWORD('secretword');
+GRANT ALL PRIVILEGES ON *.* TO 'redcap'@'%' WITH GRANT OPTION;
+SHOW GRANTS FOR 'redcap'@'%';
+  </code>
+</pre>
+Verify your client connections by using the status command from an interactive session. The SSL field needs to show a Cipher. 
+<pre>
+  <code>
+MariaDB [(none)]> status
+--------------
+mysql  Ver 15.1 Distrib 5.5.58-MariaDB, for debian-linux-gnu (x86_64) using readline 5.2
+
+Connection id:          9
+Current database:
+Current user:           jfdey@gizmof1.fhcrc.org
+SSL:                    Cipher in use is DHE-RSA-AES256-GCM-SHA384
+Current pager:          stdout
+Using outfile:          ''
+Using delimiter:        ;
+Server:                 MariaDB
+Server version:         10.3.4-MariaDB-10.3.4+maria~jessie mariadb.org binary distribution
+Protocol version:       10
+Connection:             mydb-dev via TCP/IP
+Server characterset:    latin1
+Db     characterset:    latin1
+Client characterset:    utf8
+Conn.  characterset:    utf8
+TCP port:               32023
+Uptime:                 21 sec
+</code>
+</pre>
+
+<h4>Certificate Expiration Date</h4>
+<p>Secure connections will no longer be available after the certificates expire. The expirate dates are set to
+five years.  These certificates will expire on <b>notAfter=Mar 13 21:27:42 2023 GMT</b>
+Certificates should only be regenerated after they expire. Run the script TLS-create.sh to regenerate keys. Copy the new keys to all running MariaDB containers. All clients need to download new keys and be updated. Remove ca-cert.pem before running the script. The DBaas container needs to be rebuilt to update the keys.
+</p>
+<h4>Create New Certs</h4>
+<pre>
+<code>
+rm TLS/ca-cert.pem
+./TLS-create.sh
+docker cp TLS/ca-cert.pem      [container_name]:/keys
+docker cp TLS/server-cert.pem  [container_name]:/keys
+docker cp TLS/server-cert.pem  [container_name]:/keys
+docker cp TLS/server-key.pem   [container_name]:/keys
+docker cp TLS/server-req.pem   [container_name]:/keys
+</code>
+</pre>
+
+  </div> <!-- class="document" -->
+</div> <!-- id="container" -->
+{% endblock %}

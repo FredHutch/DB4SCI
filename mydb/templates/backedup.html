@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %} Backup Complete - {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+{% block content %}
+    <body>
+        <div id="container">
+            <div class="title">
+                <h4>Backed Up</h4>
+
+            </div>
+                <code><pre>
+{{result}}
+                </pre></code>
+        </div>
+    </body>
+{% endblock %} 
+</html>

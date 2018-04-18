@@ -1,0 +1,14 @@
+*.pyc
+.aws
+aws.env
+env_setup.sh
+nohup.out
+mydb/local_config.py
+*.key
+*.cert
+*.crt
+*.pem
+prod/nginx/mydb.conf
+.idea/*
+test/*
+requirements.docker-ce

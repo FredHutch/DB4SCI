@@ -1,0 +1,6 @@
+# crontab for mydb backup script goes here
+MAILTO=""
+07 18 * * * root docker exec -t dbaas bash -c 'DOCKER_CLIENT_TIMEOUT=3600; /opt/dbaas/backup_all.py' >/dev/null 2> /mydb/logs/backup.cron
+01 14 * * * root docker exec -t dbaas /opt/dbaas/prune_backups.py   >/dev/null 2>&1 /mydb/logs/backup.cron 
+#04,14,24,34,44,54 * * * * root docker exec -t dbaas /opt/dbaas/update_pgjson.py >/dev/null 2>&1 /mydb/logs/backup.cron
+#06,16,26,36,46,56 * * * * root docker exec -t dbaas /opt/dbaas/update_active.py  >/dev/null 2>&1 /mydb/logs/backup.cron

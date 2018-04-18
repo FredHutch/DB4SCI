@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %} Backup DB- {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+{% block content %}
+    <div id="container">
+            <div class="title">
+                <h4>Backup database</h4>
+            </div>
+            Backup all databases in a container and send backup files to AWS-S3. 
+            If you want the backup to be tagged, add that tag when prompted. Backups will be named: container_database[_tag]_timestamp
+            <br>
+            <div id="content">
+                <form method="post" action="{{ url_for('backedup') }}">
+                  <label for="dbname">Container Name:</label>
+                  <input type="text" name="dbname" list="container_list" placeholder="Container Name" /><br />
+                  <datalist id="container_list">
+                    {% for o in items %}
+                    <option value="{{ o }}">
+                    {% endfor %}
+                  </datalist><br>
+                  <label for="dbuser">DB Username:</label><input type="text" name="dbuser" /><br />
+                  <label for="dbuserpass">DB Password:</label><input type="password" name="dbuserpass" /><br />
+                  <label for="backuptag">Backup tag:</label><input type="text" name="backuptag" /><br />
+                <input type="submit" />
+                </form>
+            </div>
+    </div>
+{% endblock %}

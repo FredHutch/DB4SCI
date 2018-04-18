@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %} Cloud Backups - {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+    <body>
+
+{% block content %}
+        <div id="container">
+            <div class="title">
+                <h4>MyDB Database Cloud Backup Listing</h4>
+            </div>
+                <code><pre>
+{{backups}}
+                </pre></code>
+            {% endblock %}
+        </div>
+    </body>
+</html>

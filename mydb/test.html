@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %} Cloud Backups - {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+
+{% block content %}
+<div id="container">
+  <div class="title">
+    <h4>Selected Container Name</h4>
+  </div>
+  <div id="content">
+    <div class="title">
+    <h4>jQuery Example</h4>
+    </div>
+    <form method="post" action="{{ url_for('tested') }}">
+      <select id="get_containers" name="container_name"></select>
+      <input tabindex=300 type="submit" value="Submit" onclick="loading();">
+    </form>
+  </div id="content">
+</div>
+
+{% endblock %}

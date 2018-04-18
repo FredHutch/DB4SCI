@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="favicon.ico">
+    <title>DB4Sci</title>
+    <link rel="stylesheet" type="text/css" href="css/nav.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    </style>
+</head>
+<body>
+<div>
+  <header class="app_name">
+    <table>
+      <tr>
+        <td class="logo"> <img src="images/DB4SCI_logo_100px.jpg" title="DB4Sci"></td>
+      </tr>
+    </table>
+  </header>
+</div>
+<nav>
+   <ul class="nav">
+     <li><a href="db4sci.html">Home</a></li>
+     <li><a href="overview.html">Overview</a>
+     <li ><a href="db4sci_arch.html">Architecture</a></li>
+     <li ><a href="download.html">Download</a></li>
+   </ul>
+</nav> <!-- end "nav" -->
+<div class="outerbox">
+  <div id="content" class="boxed-group">
+    <img src="arch_diag.svg" alt="DB4SCI Architecture">
+    <p>
+    <ul style="list-style-type:square">
+       <li>Access to DB4SCI requires user authentication. Acitve Directory is used to provide
+            authentication.
+       <li>NginX handles http and TSL transports and sends data via WSGI to flash 
+           on port 5000</li>
+       <li>uWSGI is used as a wrapper for DB4SCI flask application.</li> 
+       <li>State data for the application is stored in a PostgreSQL 
+                database named mydb_admin.
+                SQLAlchemy for Flask is the API to PostgreSQL for the administrative database.
+                Metadata about each database request is kept in the admin database.
+                Information about the requester, backup policiy and container information are kept. 
+       <li>There is enough metadata in the admin database to recreate the Docker container.
+           The admin database knows the location and timestamps for the database backups.
+       </li>
+       <li>Each database created by DB4SCI gives the requester full administrative privileges. 
+           Each database has its own unique storage and network port.   
+  </div>
+</div>
+  <div id="footer">
+    <p id=text>Fred Hutchenson Cancer Research Center</p>
+  </div>
+</body>
+</html> 

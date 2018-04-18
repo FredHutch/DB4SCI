@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+{% block title %} Documentation- {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+{% block content %}
+<div id="container">
+  <div class="title">
+      <h4>Encrypted File System</h4>
+  </div>
+  <div class="document">
+    <h2>How to support Encrypted File System with MyDB</h2>
+
+    <h4>Overview</h4>
+<p>MyDB can provision containerized databases to any storge that is attached to the application server. The use case is to support a varity of storage levels; fast/expensive, slow/cheap, production, development. The application can provision any storage that is mounted to the host and configured in the application. To meet compliance guidlines for Encryption At Rest (EAR) an encrypted file system can be provisioned.
+
+<h4>Application Configuration</h4>
+MyDB is configured from a single configuration file. From the main application directory the configuration file is <tt>mydb/mydb_config.py</tt>.  The configuration file is Python module. The module has three main class definitions; BaseConfig, ProdConfig, DevConfig, TestConfig. Place all configuration variables in the 'BaseConfig.'  If a configuration parameter is different between prod, dev or test, the parameter can be overwritten in the appropriate subclass. Primary storage for databases is defined by the <tt>data_volumes</tt> parameter. The <tt>data_volumes</tt> parameter is a list of lists.  The order of the list defines the storage mount points.  The second order of the list has four elements; Lable, mount point, DB_list, User_list. The DB_list contains which databases are allowed for the mount.  Use the database names that are defined in the <tt>info</tt> section of the configuration file. The User_list contains UIDs of users allowed to provision the storage as defined from the user login.  Both lists support the use of <tt>'ALL'</tt> which allows all databases and or users to provision databases to the volume. Example:</p>
+
+<pre>
+  <code>
+# data volume for provisioning containers
+# col[0] = 'Lable'
+# col[1] = 'Volume path'
+# col[2] = List allowable containers from info section. (see below)
+# col[3] = List of authorized Users. ALL
+    data_volumes = [['Standard', '/mydb/postgres_dbs', ['ALL'], ['ALL']],
+                    ['Admin', '/mydb/admin', ['Postgres'], ['dbadmin', 'psqlUser']],
+                    ['Encrypted', '/mydb/encrypt', ['Postgres'], ['encAdmin']],
+                    ['Example', '/dev/null', ['ALL'], ['nobody']],
+                    ]
+
+  </code>
+</pre>
+
+<h4>Usage</h4>
+<p>At runtime the storage is selected from the "Create DB Container" form.  A user will only be able to choose from the volumes that meet the critera from the configuration.
+
+<h4>Encrypted Volume</h4>
+There are many options for encrypted file systems, and I will not discuss the merits of them in this document, but we ruled out any file system that is based on FuseFS and selected Ext4 since it is available with Ubuntu 16.04. This is the process used to create a LUKS encrypted disk partition. 
+
+<pre>
+  <code>
+# Pick a location and create the loopback file itself - should be on nvme - and mountpoint.
+# All storage for MyDB should be configured relative to the mount point: /mydb
+
+mkdir /mydb/encrypted
+cd /mydb/encrypted
+truncate encrypted_vol.img --size 100G
+mkdir /mydb/encrypted/pgsql_enc_vol
+
+# Set it up as a loopback device
+losetup /dev/loop0 encrypted_vol.img
+
+# Setup the divice and encrypt. Prompts for pass phrase to encrypt the cipher key
+cryptsetup --verbose --verify-passphrase --cipher aes-xts-plain64 --key-size 256 luksFormat /dev/loop0
+
+# Open the device
+# Opening the device prompts for phase phrase. 
+# Note this step needs to be done after a reboot to un-encrypt the cypher key
+cryptsetup luksOpen /dev/loop0 pgsql_env_vol
+Enter passphrase for /mydb/encrypted/encrypted_vol.img:
+
+# Create a file system through the loopback tunnel:
+mke2fs -j /dev/mapper/pgsql_env_vol
+
+# Make sure the device is present: 
+ls -l /dev/mapper/pgsql_enc_vol
+
+# Add device to /etc/crypttab:
+pgsql_enc_vol /dev/loop0 none 
+
+# Append to /etc/fstab:
+cat << EOF >> /etc/fstab
+# encrypted volume for postgresql in mydb
+# /dev/mapper/pgsql_env_vol /mydb/encrypted/pgsql_enc_vol ext4 defaults 0 2
+EOF
+
+# Note: /dev/mapper/pgsql_env_vol is spelled wrong. And the entry in fstab is commented out.
+# If the server were to reboot it would hang at the console waiting for a phasephase to mount the 
+# encrypted volume.  The entry in /etc/fstab is for documentation
+# In the event of a reboot the volume will have to be mounted by hand.
+
+# Test "real" mount:
+
+mount -t ext4 /dev/mapper/pgsql_env_vol /mydb/encrypted/pgsql_enc_vol
+df -h /mydb/encrypted/pgsql_enc_vol/
+#  Expected output:
+#  Filesystem                 Size  Used Avail Use% Mounted on
+#  /dev/mapper/pgsql_enc_vol   99G   60M   94G   1% /mydb/encrypted/pgsql_enc_vol
+
+# Adjust perms:
+chgrp www-data /mydb/encrypted/pgsql_enc_vol
+chmod g+s /mydb/encrypted/pgsql_enc_vol
+chmod g+w /mydb/encrypted/pgsql_enc_vol
+
+# This all has to be done as root.
+  </code>
+</pre>
+
+  </div> <!-- class="document" -->
+</div> <!-- id="container" -->
+  {% endblock %}

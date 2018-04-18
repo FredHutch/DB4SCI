@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+{% block title %} Create DB - {% endblock %}
+{% block head %} {{ super() }}
+<script type="text/javascript">// <![CDATA[
+        function loading(){
+            $("#loading").show();
+            $("#content").hide();       
+        }
+// ]]>
+</script>
+
+
+{% endblock %}
+{% block content %}
+  <div id="container">
+    <div class="title">
+      <h4>Create a new {{ dblabel }} Container</h4>
+    </div>
+            <div id="loading"></div>
+            <div id="content">
+              <p> </p>
+              <form method="post" action="{{ url_for('created') }}">
+                <input type="hidden" name="dbtype" value="{{ dblabel }}">
+                <table class="create_table">
+                  <tr><td><label for="image">{{ dblabel }} Version:</label></td>
+                      <td><select name="image" tabindex=180>
+                            <option value="{{ image_list[0][1] }}" SELECTED
+                                    label="{{ image_list[0][0] }}"
+                                    value="{{ image_list[0][1] }}">{{ image_list[0][0] }}
+                            </option>
+                            {% for o in image_list[1:] %}
+                            <option value="{{ o[1] }}"
+                                    label="{{ o[0] }}"
+                                    value="{{ o[1] }}">{{ o[0] }}
+                            </option>
+                            {% endfor %}
+                          </select>
+                      </td>
+                      <td><label for="support"><strong>Support Level: </strong></label></td>
+                      <td><select tabindex=190 name="support"><strong>
+                          <option>None</option><option selected>Basic</option><option>Full</option> </strong>
+                          </select></td>
+                  </tr>
+
+                  <tr><td> </td><td> </td>
+                      <td><label for="db_vol">Data Volume Type: </label></td>
+                      <td><select name="db_vol" tabindex=180>
+                            <option value="{{ volumes[0][1] }}" SELECTED
+                                    label="{{ volumes[0][0] }}"
+                                    value="{{ volumes[0][1] }}">{{ volumes[0][0] }}
+                            </option>
+                            {% for o in volumes[1:] %}
+                            <option value="{{ o[1] }}"
+                                    label="{{ o[0] }}"
+                                    value="{{ o[1] }}">{{ o[0] }}
+                            </option>
+                            {% endfor %}
+                          </select>
+                      </td>
+                  </tr>
+
+                  <tr><td><label for="dbname">DB/Container Name: </label></td>
+                      <td><input tabindex=100 type="text" name="dbname" required /></td>
+                      <td><label for="PHI">Data includes PHI or PII: </label></td>
+                      <td><select tabindex=180 name="phi">
+                          <option>Yes</option>
+                          <option selected>No</option> </select></td>
+                  </tr>
+
+                  <tr><td><label for="dbuser">DB Username:</label></td>
+                      <td><input tabindex=110 type="text" name="dbuser" required /></td>
+                      <td><label for="life">Expected life of DB:</label></td>
+                      <td><select tabindex=230 name="life">
+                            <option label="Short (1-6 mo)" value="short">Short (1-6 mo)</option>
+                            <option selected label="Medium (6-36 mo)" value="medium">Medium (6-36 mo)</option> 
+                            <option label="Long (36+ mo)" value="long">Long (36+ mo)</option>
+                          </select></td>
+                  </tr>
+
+                  <tr><td><label for="dbuserpass">DB Password:</label></td>
+                      <td><input tabindex=120 type="password" name="dbuserpass" required  /></td>
+                      <td><label for="backup_freq">Frequency of backup:</label></td>
+                      <td><select tabindex=240 name="backup_freq">
+                          <option selected>Daily</option><option>Weekly</option><option>Never</option>
+                          </select></td></tr>
+                  </tr>
+
+                  <tr><td><label for="Container owner">Contact Name:</label></td>
+                      <td><input tabindex=130 type="text" name="owner"  required /></td>
+                      <td><label for="maintain">Maintenance Window (Standard = Office Hours):</label></td>
+                      <td><select tabindex=260 name="maintain">
+                            <option selected value="standard">Standard</option>
+                            <option value="afterhours">After Hours</option>
+                          </select></td>
+                  </tr>
+                  <tr><td><label for="contact">Contact Email:</label></td>
+                      <td><input tabindex=140 type="text" name="contact"  required /> </td>
+                      <td><label for="access">Application Type</label></td>
+                      <td><select tabindex=170 name="access">
+                            <option value="third_party">Third party application</option>
+                            <option selected value="internally_developed">Internally Developed application</option>
+                            <option value="interactive">Interactive</option>
+                            <option value="other">Other</option>
+                          </select></td>
+                  </tr>
+
+                  <tr><td><label for="description of DB">Description:</label></td>
+                      <td><input tabindex=150 type="text" name="description"   required /></td>
+                      <td><label for="backup_window">Preferred time to backup:</label></td>
+                      <td><select tabindex=250 name="backup_window">
+			    <option selected value="any">Any</option>
+                            <option value="afterhours">After Hours (10pm-5am)</option>
+                            <option value="weekend">Weekend</option>
+                          </select></td></tr>
+
+                  <tr><td><label for="app_name">Application name (optional):</label></td>
+                      <td><input tabindex=160 type="text" name="app_name" /></td>
+                      {% if dblabel == "MariaDB" %}
+                      <td><label for="EAR">Encryption at Rest:</label></td>
+                      <td><select tabindex=250 name="EAR">
+			    <option selected>No</option>
+                            <option>Yes</option>
+                          </select></td>
+                      {% endif %}
+                  </tr>
+
+                </table>
+                <p> </p>
+                <input tabindex=300 type="submit" value="Submit" onclick="loading();">
+                </form>
+            </div>
+        </div>
+{% endblock %}

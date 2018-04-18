@@ -1,0 +1,11 @@
+#
+#  dbaas logrotate configuration file
+#
+#  place this file in /etc/logrotate.d
+#
+/mydb/logs/prod/uwsgi.err /mydb/logs/prod/uwsgi.log {
+    su www-data www-data 
+    weekly
+    copytruncate
+    rotate 0
+}
