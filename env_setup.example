@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# setup environment for Flask
+# DBAAS_ENV must be set before docker-compose is run
+
+if [ -z "$1" ]; then
+   echo Usage:  ['prod', 'dev', 'test']
+   exit 1
+fi
+
+export DBAAS_ENV=$1
+
+#  Configure AWS Keys
+export AWS_ACCESS_KEY_ID=aws-access-key-id
+export AWS_SECRET_ACCESS_KEY=aws-secret-access-key
+
+# Configure Hostname (do not use localhost)
+DB4SCI_HOST=localhost
+
+case $DBAAS_ENV in
+"prod")
+    export SQLALCHEMY_DATABASE_URI="postgresql://mydbadmin:db4docker@${DB4SCI_HOST}:32009/mydb_admin"
+    export AWS_BUCKET="s3://your-aws-bucket/prod"
+    export SSL_CERTS="/opt/dbaas/ssl"
+    ;;
+"dev")
+    ;;
+"test")
+    ;;
+*)
+    echo DBAAS_ENV must be set
+    exit 1
+    ;;
+esac

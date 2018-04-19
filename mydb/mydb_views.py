@@ -37,6 +37,9 @@ def login():
         password = request.form['password']
 
         for DC in local_config.var.DCs:
+            if DC == 'demo':
+                auth = 1
+                break
             auth = ad_auth.ad_auth(username, password, DC)
             if auth == 2 or auth == 3:
                 continue

@@ -4,6 +4,10 @@ import local_config
 
 def send_mail(subject, message, to=local_config.var.MAIL_TO):
     """send email """
+    if 'yourOrganization' in local_config.var.MAIL_SERVER:
+        # config is not setup or running in demo mode
+        # return quietly and do not send mail
+        return
     SERVER = local_config.var.MAIL_SERVER
     FROM = local_config.var.MAIL_FROM
     TO = to

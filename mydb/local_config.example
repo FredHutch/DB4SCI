@@ -13,11 +13,15 @@ import os
 import sys
 
 
+
 class BaseConfig():
-    container_host = 'mydb'
+    # container_host use output from uname -n
+    container_host = '172.16.123.1'
     FQDN_host = 'mydb.yourorganization.org'
     # IP address of host that is running Docker
-    container_ip = '192.168.0.1'
+    container_ip = '172.16.123.1'
+    admindb_name = 'mydb_admin'
+    mydb_admin_port = '32009'
 
     # ISID of admin users, Admin uses can view/edit meta data
     admins = ['admin1', 'admin2', 'admin3']
@@ -32,7 +36,8 @@ class BaseConfig():
     TZ = 'America/Los_Angeles'
 
     # Local Active Directory servers and Domain
-    DCs = ['dc10.yourDomain.org', 'dc20.yourDomain.org']
+    # DCs = ['dc10.yourDomain.org', 'dc20.yourDomain.org']
+    DCs = ['demo']
     AD_domain = '@yourDomain.org'
 
     # Data Volumes for Databases
@@ -49,11 +54,12 @@ class BaseConfig():
     #          Database type names are keys from <info>  
     #          ['Postgres', 'MongoDB', 'MariaDB', 'Neo4j']
     # col[3] = List of uses authorized to use the volume.  
-    data_volumes = [['Standard',  '/mydb/data_vol', ['ALL'], ['ALL']],
+    data_volumes = [['Standard',  '/mydb/dbs_data', ['ALL'], ['ALL']],
                     ['Admin',     '/mydb/admin_vol', ['Postgres'], ['admin', 'dbUser']],
                     ['Encrypted', '/mydb/encrypted/', ['Postgres'], ['hippaAdmin']],
                     ['Example',   '/dev/null', ['ALL'], ['nobody']],
                     ]
+    backup_vol = '/mydb/db_backups'
 
     #
     # SECRETS
@@ -136,6 +142,67 @@ class TestConfig(DevConfig):
     dbaas_path = '/mydb/repos/dbaas/'
 
 
+base_port = 32010
+
+# images: List of Docker Images
+# first column is 'Display Name'
+# second column is 'image name'
+# firt row of image is default
+info = {'Postgres': {'pub_ports': [5432],
+                     'backupdir': '/var/lib/postgresql/backup',
+                     'volumes': [
+                            ['DBVOL', '/', '/var/lib/postgresql/data'],
+                            ['BAKVOL', '/', '/var/lib/postgresql/backup'],
+                         ],
+                     'command': 'postgres',
+                     'dbengine': 'Postgres',
+                     'images': [
+                             ['Postgres 9.6.8', 'postgres:9.6.8'],
+                             ['Postgres 10.3', 'postgres:10.3'],
+                          ]},
+        'MongoDB': {'pub_ports': [27017],
+                    'backupdir': '/var/backup',
+                    'volumes': [
+                        ['DBVOL', '/db', '/data/db'],
+                        ['DBVOL', '/configdb', '/data/configdb'],
+                        ['BAKVOL', '/', '/var/backup'],
+                    ],
+                    'command': 'mongod',
+                    'dbengine': 'MongoDB',
+                    'images': [
+                         ['MongoDB 3.4', 'mongo:3.4.1'],
+                    ]},
+        'MariaDB': {'pub_ports': [3306],
+                    'backupdir': '/var/backup',
+                    'volumes': [
+                            ['DBVOL', '/', '/var/lib/mysql'],
+                            ['BAKVOL', '/', '/var/backup'],
+                    ],
+                    'command': 'mysqld',
+                    'dbengine': 'MariaDB',
+                    'images': [
+                             ['MariaDB 10.1', 'fredhutch/mariadb:10.1.21'],
+                        ]},
+        'Neo4j': {'pub_ports': [7473, 7687],  #7473:HTTPS  7687:Bolt
+                  'backupdir': '/backup',
+                  'volumes': [
+                            ['DBVOL', '/data', '/data'],
+                            ['DBVOL', '/logs', '/logs'],
+                            ['BAKVOL', '/', '/backup'],
+                        ],
+                  'command': 'neo4j',
+                  'dbengine': 'Neo4j',
+                  'images': [
+                             ['Neo4j 3.2.1', 'neo4j:3.2.1'],
+                        ],
+                  # <archive> a list of files to ADD to the container
+                  # format: list of tuples (source_file, dest_file)
+                  'archive': [('/ssl/fhcrc.pem.crt', '/var/lib/neo4j/certificates/neo4j.cert'),
+                                  ('/ssl/fhcrc.org.key', '/var/lib/neo4j/certificates/neo4j.key'),
+                                  ]
+                  },
+        }
+dbtypes = info.keys()
 env = os.environ.get('DBAAS_ENV')
 if env == 'dev':
     var = DevConfig(env)

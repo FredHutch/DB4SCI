@@ -19,6 +19,7 @@ def mydb_setup():
     if container_util.container_exists('mydb_admin'):
         print('MyDB Administrative DB is running.\nStarting DBAAS')
         return
+    print('Create Administrative DB')
     params = setup_data()
     dbtype = params['dbtype']
     con_name = params['dbname']
@@ -45,6 +46,7 @@ def setup_data():
               'port': local_config.var.mydb_admin_port,
               'dbuser': local_config.var.accounts['admindb']['admin'],
               'dbuserpass': local_config.var.accounts['admindb']['admin_pass'],
+              'db_vol': '/mydb/dbs_data',
               'support': 'Basic',
               'owner': local_config.var.accounts['admindb']['owner'],
               'description': 'Test the Dev',
