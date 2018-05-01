@@ -18,7 +18,8 @@ if __name__ == "__main__":
         sys.exit(1)
    
     if demo:
-        app.run(host="0.0.0.0", threaded=True, debug=True)
+        print("starting in demo mode")
+        app.run(host="172.16.123.1", threaded=True, debug=True)
 
     if level == 'prod':
         app.logger.setLevel(logging.DEBUG)

@@ -17,7 +17,7 @@ import sys
 class BaseConfig():
     # container_host use output from uname -n
     container_host = '172.16.123.1'
-    FQDN_host = 'mydb.yourorganization.org'
+    FQDN_host = 'mydb.yourOrganization.org'
     # IP address of host that is running Docker
     container_ip = '172.16.123.1'
     admindb_name = 'mydb_admin'
@@ -181,7 +181,7 @@ info = {'Postgres': {'pub_ports': [5432],
                     'command': 'mysqld',
                     'dbengine': 'MariaDB',
                     'images': [
-                             ['MariaDB 10.1', 'fredhutch/mariadb:10.1.21'],
+                             ['MariaDB 10.1', 'mariadb:10.1.21'],
                         ]},
         'Neo4j': {'pub_ports': [7473, 7687],  #7473:HTTPS  7687:Bolt
                   'backupdir': '/backup',
@@ -197,8 +197,8 @@ info = {'Postgres': {'pub_ports': [5432],
                         ],
                   # <archive> a list of files to ADD to the container
                   # format: list of tuples (source_file, dest_file)
-                  'archive': [('/ssl/fhcrc.pem.crt', '/var/lib/neo4j/certificates/neo4j.cert'),
-                                  ('/ssl/fhcrc.org.key', '/var/lib/neo4j/certificates/neo4j.key'),
+                  'archive': [('/ssl/yourOrganization.pem.crt', '/var/lib/neo4j/certificates/neo4j.cert'),
+                                  ('/ssl/yourOrganization.org.key', '/var/lib/neo4j/certificates/neo4j.key'),
                                   ]
                   },
         }
