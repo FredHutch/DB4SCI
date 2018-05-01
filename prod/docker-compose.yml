@@ -1,0 +1,58 @@
+version: '2'
+
+services:
+    dbaas:
+        image: dbaas:1.7.0
+        build:
+            context: .
+        container_name: dbaas
+
+        #  Expose ports without publishing them to the host machine
+        #  they’ll only be accessible to linked services. Only the internal port can be specified.
+        expose: 
+          - "5000"
+
+        environment:
+            - "TZ=America/Los_Angeles"
+            - DBAAS_ENV=${DBAAS_ENV}
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            - SSL_CERTS=${SSL_CERTS}
+            - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /mydb/postgres_dbs:/mydb/postgres_dbs
+            - /mydb/db_backups:/mydb/db_backups
+            - /mydb/mariadb_keys:/mydb/mariadb_keys
+            - /mydb/logs:/mydb/logs
+
+
+        privileged: false
+        restart: always
+
+    web:
+        image: mydb-web:1.0
+        build:
+            context: ${DBAAS_ENV}/nginx
+
+        container_name: mydb-web 
+        ports:
+            - "80:80"
+            - "443:443"
+
+        links:
+            - dbaas:dbaas
+
+        depends_on:
+            - dbaas
+
+        environment:
+            - "TZ=America/Los_Angeles"
+
+        volumes:
+            - /mydb/logs/nginx:/var/log/nginx
+
+        privileged: true
+
+        restart: always

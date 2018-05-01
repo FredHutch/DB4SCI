@@ -12,15 +12,17 @@ mydb_setup()
 
 if __name__ == "__main__":
     level = os.environ.get('DBAAS_ENV')
+    demo = os.environ.get('DEMO')
     if level is None:
         print("DBAAS_ENV environemnt must be set to ['prod'|'dev'|'test']")
         sys.exit(1)
-    
+   
+    if demo:
+        app.run(host="0.0.0.0", threaded=True, debug=True)
+
     if level == 'prod':
-        app.logger.setLevel(logging.WARN)
-        debug = False
+        app.logger.setLevel(logging.DEBUG)
+        app.run(threaded=True, debug=False)
     elif level == 'dev':
         app.logger.setLevel(logging.DEBUG)
-        debug = True
-
-    app.run(threaded=True, debug=debug)
+        app.run(threaded=True,debug=True)
