@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import os
 import time
 import postgres_util
 import container_util
@@ -39,6 +40,7 @@ def mydb_setup():
 def setup_data():
     """ create parameters for admin database
     """
+    mydb_root = demo = os.environ.get('MYDB_ROOT')
     dbtype = 'Postgres'
     params = {'dbname': 'mydb_admin',
               'dbtype': dbtype,
@@ -46,7 +48,8 @@ def setup_data():
               'port': local_config.var.mydb_admin_port,
               'dbuser': local_config.var.accounts['admindb']['admin'],
               'dbuserpass': local_config.var.accounts['admindb']['admin_pass'],
-              'db_vol': '/mydb/dbs_data',
+              'db_vol': mydb_root + 'dbs_data/',
+              'bak_vol': mydb_root + 'db_backups/',
               'support': 'Basic',
               'owner': local_config.var.accounts['admindb']['owner'],
               'description': 'Test the Dev',

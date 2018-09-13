@@ -84,6 +84,7 @@ docker run \
  --volume /private/mydb/db_backups:/mydb/db_backups \
  --volume /private/mydb/mariadb_keys:/mydb/mariadb_keys \
  --volume /private/mydb/logs:/mydb/logs \
+ -e DEMO=1 \
  -e DBAAS_ENV=${DBAAS_ENV} \
  -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
  -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \

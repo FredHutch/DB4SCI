@@ -43,11 +43,11 @@ def create_accounts(params):
     """make changes to running Postgres docker container
     requires restart
     """
-    connections = 10
+    connections = 50
     memnum = 1024
 
     st = "ALTER SYSTEM SET "
-    settings = {'max_connections': 10,
+    settings = {'max_connections': connections,
                 'shared_buffers': "'" + str(int(memnum/4)) + "MB'",
                 'work_mem': "'" + str(int(memnum/connections)) + "MB'",
                 'maintenance_work_mem': "'" + str(int(memnum/8)) + "MB'",
@@ -100,9 +100,13 @@ def create(params):
     con_name = params['dbname']
     config_dat = local_config.info[params['dbtype']]
     volumes = config_dat['volumes']
+    if 'bak_vol' in params:
+        bak_vol = params['bak_vol']
+    else:
+        bak_vol = local_config.var.backup_vol
     for vol in volumes:
         if vol[0] == 'DBVOL': vol[0] = params['db_vol']
-        if vol[0] == 'BAKVOL': vol[0] = local_config.var.backup_vol
+        if vol[0] == 'BAKVOL': vol[0] = bak_vol
     if container_util.container_exists(con_name):
         return "Container name %s already in use" % con_name
     # Ports is a dict of internal too external mappings

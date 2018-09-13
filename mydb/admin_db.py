@@ -11,7 +11,9 @@ import local_config
 import container_util
 from human_uptime import human_uptime
 
-engine = create_engine(local_config.var.SQLALCHEMY_DATABASE_URI, convert_unicode=True)
+engine = create_engine(local_config.var.SQLALCHEMY_DATABASE_URI,
+                       pool_size=20,
+                       convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))

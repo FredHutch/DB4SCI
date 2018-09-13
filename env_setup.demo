@@ -4,7 +4,7 @@
 # DBAAS_ENV must be set before docker-compose is run
 
 if [ -z "$1" ]; then
-   echo Usage:  ['prod', 'dev', 'test']
+   echo Usage:  ['prod', 'dev', 'test', 'demo']
    exit 1
 fi
 
@@ -15,6 +15,7 @@ export AWS_ACCESS_KEY_ID=aws-access-key-id
 export AWS_SECRET_ACCESS_KEY=aws-secret-access-key
 
 # Configure Hostname (do not use localhost)
+DB4SCI_IP=172.16.123.1
 DB4SCI_HOST=localhost
 
 case $DBAAS_ENV in
@@ -26,6 +27,12 @@ case $DBAAS_ENV in
 "dev")
     ;;
 "test")
+    ;;
+"demo")
+    export SQLALCHEMY_DATABASE_URI="postgresql://mydbadmin:db4docker@${DB4SCI_IP}:32009/mydb_admin"
+    export AWS_BUCKET="s3://your-bucket-name/prod"
+    export SSL_CERTS="/opt/dbaas/ssl"
+    export MYDB_ROOT=/private/mydb/
     ;;
 *)
     echo DBAAS_ENV must be set
