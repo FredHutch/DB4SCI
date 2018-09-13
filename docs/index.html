@@ -32,7 +32,7 @@
 DB4SCI is an easy-to-use, web-based, self-service database deployment application. 
 Users can select a database type and version and DB4SCI creates a stand-alone database instance for the user.
 Each deployed database instance is a separate container with its own private data volumes.
-Versions of PostgreSQL, MariaDB, Mongo and Neo4j can be selected. 
+Multiple versions of PostgreSQL, MariaDB, Mongo and Neo4j can be selected. 
 DB4SCI is a fully containerized Flask application.  
 </p>
 
@@ -55,14 +55,14 @@ Neo4j is deployed in secure mode with https enabled.  MongoDB is configured with
 </p>
 
 <p>
-DB4SCI can be very performat if it is deployed on high-end hardware. Why build something that is slow?
-Our local deplyment uses NVMe Storage. DB4SCI can be deplyment on Docker Swarm to provide a highly relable and scalable
+DB4SCI offers high performance if it is deployed on high-end hardware. Why build something that is slow?
+Our local deplyment uses NVMe Storage. DB4SCI can be deployment on Docker Swarm to provide a highly relable and scalable
 database service. DB4SCI could also be depolyed in AWS. 
 </p>
 
 <p>
 DB4SCI supports multiple storage volumes. Databases can be configured on different storage platforms to
-support production or develeopment. 
+support production or development. 
 From the create screen users give users the choice to choose storage types.
 Access to storage types can be managed by database type and user ID.
 Multi volume support has allowed us to offer encryption at rest for
