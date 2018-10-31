@@ -40,7 +40,8 @@ def mydb_setup():
 def setup_data():
     """ create parameters for admin database
     """
-    mydb_root = demo = os.environ.get('MYDB_ROOT')
+    mydb_root = os.environ.get('MYDB_ROOT')
+    print('MYDB_ROOT: %s' % mydb_root)
     dbtype = 'Postgres'
     params = {'dbname': 'mydb_admin',
               'dbtype': dbtype,

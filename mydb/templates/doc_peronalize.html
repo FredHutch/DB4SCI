@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block title %} Documentation- {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+{% block content %}
+<div id="container">
+  <div class="title">
+      <h4>Local Custimazation</h4>
+  </div>
+  <div class="document">
+    <h2>Application Branding</h2>
+
+    <h4>Overview</h4>
+<p>DB4SCI is branded by Fred Hutchinson Cancer Reseach Center. Graphics and
+favicons are in several locations; <kbd>/prod</kbd> and <kbd>/demo</kbd> 
+are used to build nginx with docker-compose.  Docker requires files to be
+local to the build directory. The flask application uses 
+<kbd>./mydb/static/</kbd> for image files. 
+
+<h4>Logos and Favicon Locations</h4>
+<pre>
+  <code>
+prod/nginx/www/favicon.ico
+demo/nginx/www/FredHutch_h_tag_4col_RBG_tm.png
+mydb/static/images/FredHutch_h_tag_4col_RBG_tm.png
+mydb/static/favicon.ico
+  </code>
+</pre>
+
+  </div> <!-- class="document" -->
+</div> <!-- id="container" -->
+  {% endblock %}

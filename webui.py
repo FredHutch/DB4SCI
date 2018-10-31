@@ -15,12 +15,8 @@ if __name__ == "__main__":
     if level is None:
         print("DBAAS_ENV environemnt must be set to ['prod'|'dev'|'test'|'demo']")
         sys.exit(1)
-   
-    if level == 'demo':
-        print("starting in demo mode")
-        #app.run(host="172.16.123.1", threaded=True, debug=True)
-        app.run(host="0.0.0.0", threaded=True, debug=True)
-    elif level == 'prod':
+
+    if level == 'prod' or level == 'demo':
         app.logger.setLevel(logging.DEBUG)
         app.run(threaded=True, debug=False)
     elif level == 'dev':

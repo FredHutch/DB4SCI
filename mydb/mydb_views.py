@@ -1,4 +1,12 @@
 #!/usr/bin/python
+"""mydb_view All Flask routes go here!
+All flask API calls go here.
+"""
+
+__version__ = '1.7.0.1'
+__date__ = 'Oct 30 2018'
+__author__ = 'John Dey'
+
 import os
 import ad_auth
 import json
@@ -17,9 +25,18 @@ import local_config
 import volumes
 
 
-mydb_version = '1.7.0.0'
-__version__ = '1.7.0.0'
-__author__ = 'jfdey@fredhutch.org'
+@app.route('/')
+def first():
+    if 'level' not in session:
+        level = os.environ.get('DBAAS_ENV')
+        session['level'] = "demo"
+    if session['level'] == "demo":
+        session['logged_in'] = True
+        return render_template('demo.html', version=__version__)
+    else:
+        session['logged_in'] = False
+        return redirect(url_for('index'))
+
 
 @app.route('/index')
 def index():
@@ -70,12 +87,6 @@ def login():
 def logout():
     session['logged_in'] = False
     return redirect(url_for('login'))
-
-
-@app.route('/')
-def first():
-    session['logged_in'] = False
-    return redirect(url_for('index'))
 
 
 @app.route('/list_containers/')
@@ -145,26 +156,21 @@ def created():
     return render_template('created.html', **params)
 
 
-@app.route('/select_container/', methods=['GET'])
-def select_container():
-    """ from layout.html general purpose menu to select something """
+@app.manage_container('/manaage_container', methods=['GET'])
+def manage_container():
+    """ select container name, use <action> to render the form"""
     if not session['logged_in']:
         return redirect(url_for('login'))
     action = request.args['action']
-    if action == 'S3_list':
-        container_names = admin_db.list_container_names()
-        container_names.sort()
-        return render_template('select_container.html',
-                           title='Select Container Name',
+    select_title='Select Container Name to %s' % action.capitalize()
+    container_names = admin_db.list_container_names()
+    container_names.sort()
+    return render_template('select_container.html',
+                           title=select_title, 
                            header='',
                            labela='Container Name:',
+                           action = action,
                            items=container_names)
-    elif action == 'restart':
-        pass
-    elif action == 'delete':
-        pass
-    elif action == 'backup':
-        pass
 
 
 @app.route('/cloudbackups/', methods=['GET'])
@@ -180,15 +186,6 @@ def cloudbackups():
     return render_template('cloudbackups.html', con_name=container_name,
                            backups=backups)
 
-@app.route('/restart/')
-def restart():
-    if session['logged_in']:
-        container_names = admin_db.list_container_names()
-        container_names.sort()
-        return render_template('restart.html', items=container_names)
-    else:
-        return redirect(url_for('login'))
-
 
 @app.route('/restarted/', methods=['POST'])
 def restarted():
@@ -201,15 +198,6 @@ def restarted():
     username = session['username']
     result = container_util.restart_con(dbname, dbuser, dbuserpass, username)
     return render_template('restarted.html', result=result)
-
-
-@app.route('/delete/')
-def delete():
-    if not session['logged_in']:
-        return redirect(url_for('login'))
-    container_names = admin_db.list_container_names()
-    container_names.sort()
-    return render_template('delete.html', items=container_names)
 
 
 @app.route('/deleted/', methods=['POST'])

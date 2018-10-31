@@ -46,12 +46,10 @@ RUN useradd -u 999 -g 999 -s /bin/nologin docker
 ADD requirements.txt /opt/dbaas/
 RUN pip install pip==9.0.1 && pip install -r /opt/dbaas/requirements.txt 
 
-
 # Copy files to container
-ENV env prod
+ENV env demo 
 ADD *.py /opt/dbaas/
-ADD ${env}/nginx/ssl /opt/dbaas/ssl
-ADD ${env}/neo4j /opt/dbaas/neo4j
+#ADD ${env}/neo4j /opt/dbaas/neo4j
 ADD TLS /opt/dbaas/TLS
 ADD dbconfig /opt/dbaas/dbconfig
 ADD mydb /opt/dbaas/mydb/

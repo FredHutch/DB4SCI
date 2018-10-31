@@ -22,10 +22,15 @@
                 <li><a href="{{ url_for('create_form', dbtype='Neo4j') }}">Neo4j</a></li>
              </ul>
          </li>
-         <li ><a href="{{ url_for('select_container', action='S3_list') }}">List S3 Backups</a></li>
-         <li ><a href="{{ url_for('restart') }}">Restart DB Container</a></li>
-         <li ><a href="{{ url_for('delete') }}">Delete DB Container</a></li>
-         <li ><a href="{{ url_for('backup') }}">Backup DB Now</a></li>
+         <li><a href='#'>Manage DB Container</a>
+           <ul>
+             <li ><a href="{{ url_for('manage_container', dbaction='S3_list') }}">List S3 Backups</a></li>
+             <li ><a href="{{ url_for('manage_container', dbaction='restart') }}">Restart DB Container</a></li>
+             <li ><a href="{{ url_for('manage_container', dbaction='delete') }}">Delete DB Container</a></li>
+             <li ><a href="{{ url_for('manage_container', dbaction='backup') }}">Backup DB Now</a></li>
+             <li ><a href="{{ url_for('manage_container', dbaction='restore') }}">Restore DB</a></li>
+           </ul>
+         </li>
          <li ><a href='#'>Documentation</a>
            <ul>
              <li><a href="{{ url_for('doc_page', doc='documentation') }}">Overview</a></li>
