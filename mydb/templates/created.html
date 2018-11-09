@@ -2,34 +2,34 @@
 {% block title %} Created DB- {% endblock %}
 {% block head %} {{ super() }}{% endblock %}
 {% block content %}
-        <div id="container">
-            <div class="title">
-                <h4>Created DB Container</h4>
-            </div>
-            <div id="content">
-                DB/Container name: <strong>{{dbname}}</strong><br />
-                DB Username: <strong>{{dbuser}}</strong> <br />
-                Owner:  <strong>{{owner}}</strong><br />
-                Contact: <strong>{{contact}}</strong><br />
-                Description: <strong>{{description}}</strong> <br />
-                Access:  <strong>{{access}}</strong><br />
-                Application:  <strong>{{app_name}}</strong><br />
-                {# Size:  <strong>{{size}}</strong><br /> #}
-                {# Memory Limit: <strong>{{memlimit}}</strong><br /> #}
-                {# Connections:  <strong>{{connections}}</strong><br /> #}
-                Expected Life:  <strong>{{life}}</strong><br />
-                Backup Frequency:  <strong>{{backup_freq}}</strong><br />
-                Backup Window:  <strong>{{backup_window}}</strong><br />
-                Point in time recovery:  <strong>{{pitr}}</strong><br />
-                Maintenance Window:  <strong>{{maintain}}</strong><br />
-                Support level:  <strong>{{support}}</strong><br />
-                {# Phi:  <strong>{{phi}}</strong><br /> #}
-            </div>
-            <div class="title">
-                <h4>Command Output</h4>
-            </div>
-                <code><pre>
+<div id="container">
+  <div class="title">
+    <h4>Created DB Container</h4>
+  </div>
+  <div id="content">
+    DB/Container name: <strong>{{dbname}}</strong><br />
+    DB Username: <strong>{{dbuser}}</strong> <br />
+    Owner:  <strong>{{owner}}</strong><br />
+    Contact: <strong>{{contact}}</strong><br />
+    Description: <strong>{{description}}</strong> <br />
+    Access:  <strong>{{access}}</strong><br />
+    Application:  <strong>{{app_name}}</strong><br />
+    {# Size:  <strong>{{size}}</strong><br /> #}
+    {# Memory Limit: <strong>{{memlimit}}</strong><br /> #}
+    {# Connections:  <strong>{{connections}}</strong><br /> #}
+    Expected Life:  <strong>{{life}}</strong><br />
+    Backup Frequency:  <strong>{{backup_freq}}</strong><br />
+    Backup Window:  <strong>{{backup_window}}</strong><br />
+    Point in time recovery:  <strong>{{pitr}}</strong><br />
+    Maintenance Window:  <strong>{{maintain}}</strong><br />
+    Support level:  <strong>{{support}}</strong><br />
+    {# Phi:  <strong>{{phi}}</strong><br /> #}
+  </div>
+  <div class="title">
+    <h4>Command Output</h4>
+  </div>
+    <code><pre>
 {{result}}
-                </pre></code>
-        </div>
+    </pre></code>
+</div>
 {% endblock %}

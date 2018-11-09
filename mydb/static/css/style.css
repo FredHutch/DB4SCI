@@ -59,7 +59,8 @@ code {
     padding: 0px 10px 12px 10px;
 }
 
-content {
+#content {
+    font-family: "Calibri",Helvetica,Arial,"Lucida Grande",sans-serif;
     padding: 5px;
     zoom: 1;
 }
@@ -68,6 +69,7 @@ code {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
 div.document {
     font-family: "Calibri",Helvetica,Arial,"Lucida Grande",sans-serif;
     padding-top: 15px;
