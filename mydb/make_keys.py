@@ -6,7 +6,7 @@ import stat
 import OpenSSL
 import subprocess
 
-import local_config
+from config import Config
 import shutil
 from hashlib import md5
 from Crypto.Cipher import AES
@@ -42,13 +42,13 @@ def copy_tsl(con_name, db_vol):
     """
     files = ['server-cert.pem', 'server-key.pem', 'server-req.pem',
              'ca-cert.pem']
-    source = local_config.var.dbaas_path + '/TLS/' 
+    source = Config.dbaas_path + '/TLS/' 
     destination = db_vol + '/' + con_name + '/keys/'
     for file in files:
         print("copy %s %s" % (source + file, destination))
         shutil.copy(source + file, destination)
         os.chown(destination + file, 999, 999)
-    source = local_config.var.dbaas_path + '/dbconfig/MariaDB/encrypt.cnf'
+    source = Config.dbaas_path + '/dbconfig/MariaDB/encrypt.cnf'
     destination = db_vol + '/' + con_name + '/conf.d/'
     shutil.copy(source, destination)
                  

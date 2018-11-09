@@ -3,9 +3,13 @@
 {% block head %} {{ super() }}
 {% endblock %}
 {% block content %} 
-<body>        
-  <div id="container">
-    <h4> Overview </h4>
+<div id="container">
+  <div class="title">
+    <h4> Welcome to DB4Sci</h4>
+  </div class="title">
+  <div id="document">
+    <h2> Overview </h2>
+    <p>
         DB4SCI allows faculty and staff to create a stand alone database container instance.
         It may house one database or many. The DB instances are created in docker containers
         on a shared server managed by Scicomp. You will not have direct access to the file system but you will
@@ -13,6 +17,7 @@
         <b>Current support for these database servers is minimal. </b>
         We will back up your databases, allowing for recovery with data loss of up to 24 hours. We
         can assist with tuning your database if performance is an issue. <p>
-  </div>
-  Version: {{version}}
+  </div> <!-- document -->
+</div> <!-- id="container" -->
+Version: {{version}} Mode: {{level}}
 {% endblock %}

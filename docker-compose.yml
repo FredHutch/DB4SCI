@@ -15,17 +15,17 @@ services:
         environment:
             - "TZ=America/Los_Angeles"
             - DBAAS_ENV=${DBAAS_ENV}
-            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-            - SSL_CERTS=${SSL_CERTS}
             - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+            - HOSTNAME=${HOSTNAME}
+            - HOST_IP=${HOST_IP}
+            - MYDB_ROOT=${MYDB_ROOT}
 
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
+            - /var/log/uwsgi:/var/log/uwsgi
+
             - /mydb/postgres_dbs:/mydb/postgres_dbs
             - /mydb/db_backups:/mydb/db_backups
-            - /mydb/mariadb_keys:/mydb/mariadb_keys
-            - /mydb/logs:/mydb/logs
 
 
         privileged: false
@@ -39,7 +39,6 @@ services:
         container_name: mydb-web 
         ports:
             - "80:80"
-            - "443:443"
 
         links:
             - dbaas:dbaas

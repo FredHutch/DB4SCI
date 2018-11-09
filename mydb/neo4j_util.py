@@ -7,7 +7,7 @@ import container_util
 import admin_db
 from send_mail import send_mail
 import pymysql
-import local_config
+from config import Config
 import neo4j.v1 as neo4j
 from neo4j.v1 import GraphDatabase, basic_auth
 
@@ -20,7 +20,7 @@ def auth_check(dbuser, dbpass, port):
     :type port: basestring
     :returns  True/False
     """
-    url = 'bolt://' + local_config.var.container_ip + ':' + str(port)
+    url = 'bolt://' + Config.container_ip + ':' + str(port)
     try:
         driver = GraphDatabase.driver(url, auth=basic_auth(dbuser, dbpass))
     except:
@@ -34,8 +34,8 @@ def reset_neo4j_password(port):
     """This routine only works once on a new instance of neo4j.
     Login with temp pass word of "changeme" and reset neo4j pass word
     """
-    url = 'bolt://' + local_config.var.container_ip + ':' + str(port)
-    password = local_config.var.accounts['Neo4j']['admin_pass']
+    url = 'bolt://' + Config.container_ip + ':' + str(port)
+    password = Config.accounts['Neo4j']['admin_pass']
 
     try:
         driver = GraphDatabase.driver(url, auth=("neo4j", "changeme"))
@@ -56,8 +56,8 @@ def create_account(dbuser, dbuserpass, port):
     """Create Neo4j accounts
     specified in the configure file. Then add the user account.
     """
-    url = 'bolt://' + local_config.var.container_ip + ':' + str(port)
-    password = local_config.var.accounts['Neo4j']['admin_pass']
+    url = 'bolt://' + Config.container_ip + ':' + str(port)
+    password = Config.accounts['Neo4j']['admin_pass']
 
     try:
         driver = GraphDatabase.driver(url, auth=("neo4j", password))
@@ -82,22 +82,22 @@ def create(params):
     :return: Help message for end user
     """
     con_name = params['dbname']
-    config_dat = local_config.info[params['dbtype']]
+    config_dat = Config.info[params['dbtype']]
     volumes = config_dat['volumes']
     for vol in volumes:
         if vol[0] == 'DBVOL': vol[0] = params['db_vol']
-        if vol[0] == 'BAKVOL': vol[0] = local_config.var.backup_vol
+        if vol[0] == 'BAKVOL': vol[0] = Config.backup_vol
     if container_util.container_exists(con_name):
         return "Container name %s already in use" % con_name
     used_ports = container_util.get_ports()
     # find two consecutive ports that are not in usebolt_port
-    for port in range(local_config.base_port, max(used_ports) + 2):
+    for port in range(Config.base_port, max(used_ports) + 2):
         if port not in used_ports and (
            (port + 1) not in used_ports):
             break
     Ports = {}
     for p in config_dat['pub_ports']:
-        Ports[int(p)] = (local_config.var.container_ip, port)
+        Ports[int(p)] = (Config.container_ip, port)
         port += 1
     params['port_bindings'] = Ports
     bolt_port = params['port'] = Ports[7687][1]
@@ -136,12 +136,12 @@ def create(params):
     res += "neo4j HTTPS interface: %d\n" % https_port
     res += "neo4j Bolt interface: %d\n" % bolt_port
     res += '\n'
-    res += 'Web access: https://%s:%d' % (local_config.var.FQDN_host, https_port)
+    res += 'Web access: https://%s:%d' % (Config.container_host, https_port)
     res += '\n\n'
     res += 'Note: Web interface will display the default Bolt port of 7687. '
     res += 'Change the Bolt port number from 7687 to %s ' % bolt_port
     res += 'before loginging in.\n\n'
-    res += 'bolt://%s:%d' % (local_config.var.FQDN_host, bolt_port)
+    res += 'bolt://%s:%d' % (Config.FQDN_host, bolt_port)
     msg = 'Neo4j created: %s\n' % params['dbname']
     msg += 'Created by: %s <%s>\n' % (params['owner'], params['contact'])
     send_mail("MyDB: created neo4j", msg)
@@ -162,9 +162,9 @@ def backup(params):
         backup_type = params['backup_type']
     else:
         backup_type = 'NA'
-    remote_dumppath = local_config.info['Neo4j']['backupdir'] + backupdir
-    local_dumppath = local_config.var.backup_voll + '/' + con_name + backupdir
-    url = local_config.var.bucket + '/' + con_name + backupdir 
+    remote_dumppath = Config.info['Neo4j']['backupdir'] + backupdir
+    local_dumppath = Config.backup_voll + '/' + con_name + backupdir
+    url = Config.bucket + '/' + con_name + backupdir 
     command = "/bin/cp -rp %s %s" % (neo4jDB, remote_dumppath)
     print("DEBUG: neo4j backup command: %s" % command)
     admin_db.backup_log(c_id, con_name, 'start', backup_id, backup_type, url='',

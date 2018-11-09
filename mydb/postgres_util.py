@@ -1,4 +1,4 @@
-
+#!/usr/bin/python
 import os
 import json
 import time
@@ -9,7 +9,7 @@ from shutil import copyfile
 from send_mail import send_mail
 import container_util
 import admin_db
-import local_config
+from config import Config
 
 dbtype = 'Postgres'
 
@@ -27,7 +27,7 @@ def auth_check(dbuser, dbuserpass, port):
     """
     try:
         connect = "dbname=postgres user=%s " % dbuser
-        connect += "host=%s " % local_config.var.container_host
+        connect += "host=%s " % Config.container_host
         connect += "password=%s port=%s" % (dbuserpass, port)
         conn = psycopg2.connect(connect)
         cur = conn.cursor()
@@ -63,7 +63,7 @@ def create_accounts(params):
                 'checkpoint_completion_target': .9}
     msg = json.dumps(settings, indent=4)
     conn_string = "dbname=%s " % params['dbname']
-    conn_string += "host=%s " % local_config.var.container_host
+    conn_string += "host=%s " % Config.container_host
     conn_string += "port=%s " % params['port']
     conn_string += "user=%s " % params['dbuser']
     conn_string += "password=%s" % params['dbuserpass']
@@ -81,8 +81,8 @@ def create_accounts(params):
         except Exception as e:
             print("ERROR: postgres_util; alterDB: %s" % e)
     svcaccount = 'svc_' + params['dbuser']
-    accounts = [[local_config.var.accounts[dbtype]['admin'],
-                 local_config.var.accounts[dbtype]['admin_pass']],
+    accounts = [[Config.accounts[dbtype]['admin'],
+                 Config.accounts[dbtype]['admin_pass']],
                 [svcaccount, params['longpass']]
                 ]
     for (user, passw) in accounts:
@@ -98,15 +98,11 @@ def create_accounts(params):
 def create(params):
     """Create Postgres Container"""
     con_name = params['dbname']
-    config_dat = local_config.info[params['dbtype']]
+    config_dat = Config.info[params['dbtype']]
     volumes = config_dat['volumes']
-    if 'bak_vol' in params:
-        bak_vol = params['bak_vol']
-    else:
-        bak_vol = local_config.var.backup_vol
     for vol in volumes:
-        if vol[0] == 'DBVOL': vol[0] = params['db_vol']
-        if vol[0] == 'BAKVOL': vol[0] = bak_vol
+        if vol[0] == 'DBVOL':
+            vol[0] = params['db_vol']
     if container_util.container_exists(con_name):
         return "Container name %s already in use" % con_name
     # Ports is a dict of internal too external mappings
@@ -115,7 +111,7 @@ def create(params):
     else:
         port = container_util.get_max_port()
         params['port'] = port
-    Ports = {config_dat['pub_ports'][0]: (local_config.var.container_ip, port)}
+    Ports = {config_dat['pub_ports'][0]: (Config.container_ip, port)}
     params['port_bindings'] = Ports
     params['longpass'] = generate_password()
     env = {'POSTGRES_DB': params['dbname'],
@@ -144,7 +140,7 @@ def create(params):
     container_util.restart(con['Id'])
     res = "Your database server has been created. Use the following command "
     res += "to connect from the Linux command line.\n\n"
-    res += "psql -h %s " % local_config.var.container_host
+    res += "psql -h %s " % Config.container_host
     res += "-p %s -d %s " % (str(port), params['dbname'])
     res += "-U %s\n\n" % params['dbuser']
     res += "If you would like to connect to the database without entering a "
@@ -152,7 +148,7 @@ def create(params):
     res += "Set permissions to 600. Format is hostname:port:database:"
     res += "username:password.\n"
     res += "Cut/paste this line and place in your /home/user/.pgpass file.\n\n"
-    res += local_config.var.container_host + ":" + str(port) + ":" + params['dbname']
+    res += Config.container_host + ":" + str(port) + ":" + params['dbname']
     res += ":" + params['dbuser'] + ":" + params['dbuserpass'] + "\n\n"
     res += "To use psql on the linux command line load the PostgreSQL"
     res += " module.\n"
@@ -184,8 +180,8 @@ def backup(params, tag=None):
     db_vol = data['Info']['DBVOL']
 
     # Dump postgres account information
-    localpath = local_config.info[dbtype]['backupdir'] + dirname
-    command = "pg_dumpall -g -w -U %s " % local_config.var.accounts[dbtype]['admin']
+    localpath = Config.info[dbtype]['backupdir'] + dirname
+    command = "pg_dumpall -g -w -U %s " % Config.accounts[dbtype]['admin']
     command += "-f %s/%s.sql" % (localpath, con_name)
     start = time.time()
     result = container_util.exec_command(con_name, command)
@@ -198,14 +194,14 @@ def backup(params, tag=None):
     # copy alter system commands
     dest = '/' + con_name + '/'
     src_file = db_vol + dest + 'postgresql.auto.conf'
-    dest_file = local_config.var.backup_voll + dest + dirname + '/postgresql.auto.conf'
+    dest_file = Config.backup_voll + dest + dirname + '/postgresql.auto.conf'
     print('DEBUG: cp ' + src_file + ' ' + dest_file)
     copyfile(src_file, dest_file)
 
     # Get list of databases to be backed up
-    connect = "dbname='postgres' user='%s' " % local_config.var.accounts[dbtype]['admin']
-    connect += "host=%s " % local_config.var.container_host
-    connect += "password='%s' " % local_config.var.accounts[dbtype]['admin_pass']
+    connect = "dbname='postgres' user='%s' " % Config.accounts[dbtype]['admin']
+    connect += "host=%s " % Config.container_host
+    connect += "password='%s' " % Config.accounts[dbtype]['admin_pass']
     connect += "port=%s" % port
     message = '\nExecuted Postgres dump_all commands:\n'
     try:
@@ -231,7 +227,7 @@ def backup(params, tag=None):
             dumpfile = '/' + con_name + "_" + dbname + ".dump"
         dumppath = localpath + dumpfile
         command = "pg_dump --dbname %s " % dbname 
-        command += "--username %s  -F c -f %s" % (local_config.var.accounts[dbtype]['admin'],
+        command += "--username %s  -F c -f %s" % (Config.accounts[dbtype]['admin'],
                                           dumppath)
         print("DEBUG: dump_now command: %s" % (command))
         result = container_util.exec_command(con_name, command)
@@ -239,7 +235,7 @@ def backup(params, tag=None):
         message += '\nResult: ' + result + '\n'
     admin_db.add_container_log(state_info.c_id, con_name,
                                'GUI backup', 'user: ' + params['username'])
-    url = local_config.var.bucket + '/' + con_name + dirname 
+    url = Config.bucket + '/' + con_name + dirname 
     admin_db.backup_log(c_id, con_name, 'end', backup_id, backup_type, url=url,
                         command=command, err_msg=message)
     return command, message
@@ -249,7 +245,7 @@ def showall(params):
     """Execute Postgres SHOW ALL command """
     try:
         conn_string = "dbname=%s " % params['dbname']
-        conn_string += "host=%s " % local_config.var.container_host
+        conn_string += "host=%s " % Config.container_host
         conn_string += "port=%d " % params['port']
         conn_string += "user=%s " % params['dbuser']
         conn_string += "password=%s" % params['dbuserpass']

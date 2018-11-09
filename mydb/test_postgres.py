@@ -8,7 +8,7 @@ import admin_db
 import volumes
 from send_mail import send_mail
 
-import local_config
+from config import Config
 
 
 def full_test(params):
@@ -19,8 +19,8 @@ def full_test(params):
     if container_util.container_exists(con_name):
         print('  Duplicate container: KILLING')
         result = container_util.kill_con(con_name,
-                                         local_config.var.accounts[dbtype]['admin'],
-                                         local_config.var.accounts[dbtype]['admin_pass'],
+                                         Config.accounts[dbtype]['admin'],
+                                         Config.accounts[dbtype]['admin_pass'],
                                          params['username'])
         time.sleep(5)
         print(result)
@@ -52,10 +52,10 @@ def full_test(params):
     print("\n=========")
     print(" - Test Accounts\n")
     print("=========")
-    admin_user = local_config.var.accounts[dbtype]['admin']
-    admin_pass = local_config.var.accounts[dbtype]['admin_pass']
-    test_user = local_config.var.accounts['test_user']['admin']
-    test_pass = local_config.var.accounts['test_user']['admin_pass']
+    admin_user = Config.accounts[dbtype]['admin']
+    admin_pass = Config.accounts[dbtype]['admin_pass']
+    test_user = Config.accounts['test_user']['admin']
+    test_pass = Config.accounts['test_user']['admin_pass']
     for dbuser, dbuserpass in [[test_user, test_pass],
                                ['svc_'+test_user, params['longpass']],
                                [admin_user, admin_pass]]:
@@ -73,10 +73,10 @@ def populate(params):
     dbTestName = 'testdb'
     dbtype = params['dbtype']
     conn_string = "dbname='%s' " % params['dbname']
-    conn_string += "user='%s' " % local_config.var.accounts[dbtype]['admin']
-    conn_string += "host='%s' " % local_config.var.container_host
+    conn_string += "user='%s' " % Config.accounts[dbtype]['admin']
+    conn_string += "host='%s' " % Config.container_host
     conn_string += "port='%d' " % params['port']
-    conn_string += "password='%s'" % local_config.var.accounts[dbtype]['admin_pass']
+    conn_string += "password='%s'" % Config.accounts[dbtype]['admin_pass']
     print(' - Populate with test data: ')
     try:
         conn = psycopg2.connect(conn_string)
@@ -110,19 +110,19 @@ def delete_test_container(dbtype, con_name):
     print(" - Removing Container")
     print("=========")
     result = container_util.kill_con(con_name,
-                                     local_config.var.accounts[dbtype]['admin'],
-                                     local_config.var.accounts[dbtype]['admin_pass'])
+                                     Config.accounts[dbtype]['admin'],
+                                     Config.accounts[dbtype]['admin_pass'])
     print(result)
 
 def setup(dbtype, con_name):
     params = {'dbname': con_name,
-              'dbuser': local_config.var.accounts['test_user']['admin'],
+              'dbuser': Config.accounts['test_user']['admin'],
               'dbtype': dbtype,
-              'dbuserpass': local_config.var.accounts['test_user']['admin_pass'],
+              'dbuserpass': Config.accounts['test_user']['admin_pass'],
               'support': 'Basic',
-              'owner': local_config.var.accounts['test_user']['owner'],
+              'owner': Config.accounts['test_user']['owner'],
               'description': 'Test the Dev',
-              'contact': local_config.var.accounts['test_user']['contact'],
+              'contact': Config.accounts['test_user']['contact'],
               'life': 'medium',
               'backup_type': 'User',
               'backup_freq': 'Daily',
@@ -132,8 +132,8 @@ def setup(dbtype, con_name):
               'maintain': 'standard',
               'phi': 'No',
               'pitr': 'n',
-              'username': local_config.var.accounts['test_user']['admin'],
-              'image': local_config.info[dbtype]['images'][1][1],
+              'username': Config.accounts['test_user']['admin'],
+              'image': Config.info[dbtype]['images'][1][1],
               'db_vol': '/mydb/dbs_data',
               }
     return params

@@ -2,7 +2,7 @@
 import ldap
 import getpass
 import random
-import local_config
+from config import Config
 
 def ad_auth(username, password, server):
     """Athenticate <username>, <password> with AD
@@ -16,7 +16,7 @@ def ad_auth(username, password, server):
         auth = 0
         return auth
 
-    if not password.replace(local_config.var.AD_domain,'').strip():
+    if not password.replace(Config.AD_domain,'').strip():
         auth = 0
         return auth
 
@@ -37,10 +37,10 @@ def ad_auth(username, password, server):
     return auth
 
 if __name__ == "__main__":
-    user = raw_input("username: ") + local_config.var.AD_domain 
+    user = raw_input("username: ") + Config.AD_domain 
     password = getpass.getpass("Password: ")
 
-    dc_list = local_config.var.DCs
+    dc_list = Config.DCs
     random.shuffle(dc_list)
 
     for DC in dc_list:

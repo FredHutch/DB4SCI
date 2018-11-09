@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import datetime
 import dateutil
 from dateutil import parser
@@ -51,3 +53,12 @@ def human_uptime(started):
     else:
         msg = "about a second ago"
     return msg
+
+if __name__ == "__main__":
+    timestamps = ["2017-03-14T20:40:41.605600023Z",
+                 "2017-02-16T20:40:41.605600023Z",
+                 "2017-03-03T20:40:41.605600023Z",
+                 "2017-03-07T20:40:41.605600023Z",
+                 "2017-03-14T04:44:09.976331599Z"]
+    for ts in timestamps:
+        print("TS: %s  Human: %s" % (ts, human_uptime(ts)))

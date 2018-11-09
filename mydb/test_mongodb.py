@@ -8,17 +8,17 @@ import container_util
 import admin_db
 import volumes
 
-import local_config
+from config import Config
 
 def setup(dbtype, con_name):
     params = {'dbname': con_name,
-              'dbuser': local_config.var.accounts['test_user']['admin'],
-              'dbuserpass': local_config.var.accounts['test_user']['admin_pass'],
-              'username': local_config.var.accounts['test_user']['admin'],
+              'dbuser': Config.accounts['test_user']['admin'],
+              'dbuserpass': Config.accounts['test_user']['admin_pass'],
+              'username': Config.accounts['test_user']['admin'],
               'support': 'Basic',
-              'owner': local_config.var.accounts['test_user']['owner'],
+              'owner': Config.accounts['test_user']['owner'],
               'description': 'Test the Mongo',
-              'contact': local_config.var.accounts['test_user']['contact'],
+              'contact': Config.accounts['test_user']['contact'],
               'life': 'medium',
               'backup_freq': 'Daily',
               'backup_life': '6',
@@ -31,7 +31,7 @@ def setup(dbtype, con_name):
               }
     params['dbtype'] = dbtype
     params['port'] = container_util.get_max_port()
-    params['image'] = local_config.info[dbtype]['images'][0][1]
+    params['image'] = Config.info[dbtype]['images'][0][1]
     return params
 
 def full_test(params):
@@ -40,8 +40,8 @@ def full_test(params):
     if container_util.container_exists(params['dbname']):
         print('  Duplicate container: KILLING')
         result = container_util.kill_con(params['dbname'],
-                                         local_config.var.accounts[dbtype]['admin'],
-                                         local_config.var.accounts[dbtype]['admin_pass'],
+                                         Config.accounts[dbtype]['admin'],
+                                         Config.accounts[dbtype]['admin_pass'],
                                          params['username'])
         time.sleep(5)
         print(result)
@@ -52,7 +52,7 @@ def full_test(params):
     res = mongodb_util.create_mongodb(params)
     print(res)
 
-    bck_path = local_config.var.backup_voll + '/' + params['dbname']
+    bck_path = Config.backup_voll + '/' + params['dbname']
     print('  Test user account')
     if mongodb_util.auth_mongodb(params['dbuser'], params['dbuserpass'],
                                  params['port']):
@@ -65,8 +65,8 @@ def full_test(params):
 def delete_test_container(params):
     dbtype = params['dbtype']
     result = container_util.kill_con(params['dbname'],
-                                     local_config.var.accounts[dbtype]['admin'],
-                                     local_config.var.accounts[dbtype]['admin_pass'],
+                                     Config.accounts[dbtype]['admin'],
+                                     Config.accounts[dbtype]['admin_pass'],
                                      params['username'])
     print(result)
 

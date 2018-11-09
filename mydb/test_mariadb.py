@@ -7,7 +7,7 @@ import mariadb_util
 import container_util
 import admin_db
 import volumes
-import local_config
+from config import Config
 
 
 def full_test(params):
@@ -17,8 +17,8 @@ def full_test(params):
     if container_util.container_exists(params['dbname']):
         print('  Duplicate container: KILLING')
         result = container_util.kill_con(params['dbname'],
-                                         local_config.var.accounts[dbtype]['admin'],
-                                         local_config.var.accounts[dbtype]['admin_pass'],
+                                         Config.accounts[dbtype]['admin'],
+                                         Config.accounts[dbtype]['admin_pass'],
                                          params['username'])
         time.sleep(5)
         print(result)
@@ -41,8 +41,8 @@ def full_test(params):
 
 def delete_con(params):
     result = container_util.kill_con(params['dbname'],
-                                     local_config.var.accounts['test_user']['admin'],
-                                     local_config.var.accounts['test_user']['admin_pass'],
+                                     Config.accounts['test_user']['admin'],
+                                     Config.accounts['test_user']['admin_pass'],
                                      params['username'])
     print(result)
 
@@ -51,11 +51,11 @@ if __name__ == "__main__":
     con_name = 'mariadb-test'
     dbtype = 'MariaDB'
     params = {'dbname': con_name,
-              'dbuser': local_config.var.accounts['test_user']['admin'],
+              'dbuser': Config.accounts['test_user']['admin'],
               'support': 'Basic',
-              'owner': local_config.var.accounts['test_user']['owner'],
+              'owner': Config.accounts['test_user']['owner'],
               'description': 'Test the Dev',
-              'contact': local_config.var.accounts['test_user']['contact'],
+              'contact': Config.accounts['test_user']['contact'],
               'life': 'medium',
               'backup_type': 'User',
               'backup_freq': 'Daily',
@@ -64,13 +64,13 @@ if __name__ == "__main__":
               'maintain': 'standard',
               'phi': 'No',
               'pitr': 'n',
-              'username': local_config.var.accounts['test_user']['admin'],
+              'username': Config.accounts['test_user']['admin'],
               'db_vol': '/mydb/dbs_data',
               }
-    params['dbuserpass'] = unicode(local_config.var.accounts['test_user']['admin_pass'])
+    params['dbuserpass'] = unicode(Config.accounts['test_user']['admin_pass'])
     params['dbtype'] = dbtype
     params['port'] = container_util.get_max_port()
-    params['image'] = local_config.info[dbtype]['images'][0][1]
+    params['image'] = Config.info[dbtype]['images'][0][1]
 
     parser = argparse.ArgumentParser(prog='mariadb_test.py',
                                      description='Test MariaDB routines')

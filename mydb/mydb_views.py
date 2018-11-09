@@ -21,39 +21,52 @@ import mongodb_util
 import mariadb_util
 import neo4j_util
 import admin_db
-import local_config
+from config import Config
 import volumes
 
 
-@app.route('/')
-def first():
-    if 'level' not in session:
-        level = os.environ.get('DBAAS_ENV')
-        session['level'] = "demo"
+@app.before_first_request
+def activate_job():
+    level = os.environ.get('DBAAS_ENV')
+    if level:
+        session['level'] = level
+    else:
+        print("DEBUG: level not set. DBAAS_ENV must be set") 
     if session['level'] == "demo":
         session['logged_in'] = True
-        return render_template('demo.html', version=__version__)
-    else:
-        session['logged_in'] = False
-        return redirect(url_for('index'))
+        session['username'] = 'demo'
+    return
 
 
+@app.route('/')
 @app.route('/index')
-def index():
-    if 'logged_in' in session and session['logged_in']:
-        return render_template('index.html', version=__version__)
+@app.route('/demo')
+def root():
+    if session['level'] == "demo":
+        session['logged_in'] = True
+        session['username'] = 'demo' 
+        return render_template('demo.html',
+                               level=session['level'],
+                               version=__version__)
+    elif 'logged_in' in session and session['logged_in']:
+        return render_template('index.html',
+                               level=session['level'],
+                               version=__version__)
     else:
         return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if session['level'] == 'demo':
+        session['logged_in'] = True
+        return redirect(url_for('root'))
     session['logged_in'] = False
     if request.method == 'POST':
         username = request.form['username'] + '@fhcrc.org'
         password = request.form['password']
 
-        for DC in local_config.var.DCs:
+        for DC in Config.DCs:
             if DC == 'demo':
                 auth = 1
                 break
@@ -113,7 +126,7 @@ def get_container_names():
 def create_form():
     """called from layout.html
        dbtype has to be passed as an arg
-       Value of dbtype has to match <info> data from local_config.py
+       Value of dbtype has to match <info> data from Config.py
        Example: "Postgres", "MongoDB", "MariaDB"...
     """
     if not session['logged_in']:
@@ -124,7 +137,7 @@ def create_form():
         volumes_lst = volumes.volumes(dbtype, session['username']) 
         return render_template('general_form.html', dblabel=dbtype,
                                volumes=volumes_lst,
-                               image_list=local_config.info[dbtype]['images'])
+                               image_list=Config.info[dbtype]['images'])
     else:
         message = "ERROR: create_form: url argument dbtype is incorrect. "
         message += "check index.html template"
@@ -156,20 +169,21 @@ def created():
     return render_template('created.html', **params)
 
 
-@app.manage_container('/manaage_container', methods=['GET'])
+@app.route('/manage_container', methods=['GET'])
 def manage_container():
     """ select container name, use <action> to render the form"""
     if not session['logged_in']:
         return redirect(url_for('login'))
-    action = request.args['action']
-    select_title='Select Container Name to %s' % action.capitalize()
+    print('lets manage\n')
+    dbaction = request.args['bbaction']
+    select_title='Select Container Name to %s' % dbaction.capitalize()
     container_names = admin_db.list_container_names()
     container_names.sort()
-    return render_template('select_container.html',
+    return render_template('manage_container.html',
                            title=select_title, 
                            header='',
                            labela='Container Name:',
-                           action = action,
+                           dbaction = dbaction,
                            items=container_names)
 
 
@@ -179,8 +193,8 @@ def cloudbackups():
         return redirect(url_for('login'))
     container_name = request.args['container_name']
     print('cloudbackups: container: %s' % container_name)
-    cmd = "%s s3 ls --recursive %s/%s" % (local_config.var.aws,
-                                          local_config.var.bucket,
+    cmd = "%s s3 ls --recursive %s/%s" % (Config.aws,
+                                          Config.bucket,
                                           container_name)
     backups = os.popen(cmd).read().strip()
     return render_template('cloudbackups.html', con_name=container_name,
@@ -259,7 +273,7 @@ def backedup():
 
 
 def admin_help():
-        body = 'MyDB administrators must be added to local_config.admins.\n'
+        body = 'MyDB administrators must be added to Config.admins.\n'
         body += 'append admin commands to URL\n'
         body += '/admin/help/   Your reading it.\n'
         body += '/admin/state/  Display all records in State table\n'
@@ -282,9 +296,9 @@ def admin_help():
 def admin(cmd):
     if not session['logged_in']:
         return redirect(url_for('login'))
-    elif session['username'] not in local_config.var.admins:
+    elif session['username'] not in Config.admins:
         title = 'User ' + session['username']
-        title += ' not in list of admins. Update local_config.admins'
+        title += ' not in list of admins. Update Config.admins'
         return render_template('dblist.html', Error=True, title=title,
                                dbheader='', dbs='')
     username = session['username']
@@ -365,7 +379,7 @@ def admin(cmd):
 
 @app.route('/certs/<filename>', methods=['GET'])
 def certs(filename):
-    return send_from_directory(directory=local_config.var.dbaas_path + '/TLS',
+    return send_from_directory(directory=Config.dbaas_path + '/TLS',
                                as_attachment=True, 
                                filename=filename + '.pem')
 

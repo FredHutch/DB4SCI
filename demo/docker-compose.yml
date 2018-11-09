@@ -15,10 +15,8 @@ services:
         environment:
             - "TZ=America/Los_Angeles"
             - DBAAS_ENV=${DBAAS_ENV}
-            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-            - SSL_CERTS=${SSL_CERTS}
             - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+            - MYDB_ROOT=${MYDB_ROOT}
 
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock

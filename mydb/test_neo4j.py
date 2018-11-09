@@ -7,7 +7,7 @@ import neo4j_util
 import container_util
 import admin_db
 import volumes
-import local_config
+from config import Config
 import neo4j.v1 as neo4j
 from neo4j.v1 import GraphDatabase, basic_auth
 
@@ -34,8 +34,8 @@ def test_create(params):
     if container_util.container_exists(params['dbname']):
         print('  Duplicate container: KILLING')
         result = container_util.kill_con(params['dbname'],
-                                         local_config.var.accounts[dbtype]['admin'],
-                                         local_config.var.accounts[dbtype]['admin_pass'],
+                                         Config.accounts[dbtype]['admin'],
+                                         Config.accounts[dbtype]['admin_pass'],
                                          params['username'])
         time.sleep(5)
         print(result)
@@ -65,8 +65,8 @@ def test_create(params):
 def test_popluate(params):
     """Write data to Neo4j"""
     bolt_port = params['port_bindings'][7687][1]
-    url = 'bolt://' + local_config.var.container_ip + ':' + str(bolt_port)
-    password = local_config.var.accounts['Neo4j']['admin_pass']
+    url = 'bolt://' + Config.container_ip + ':' + str(bolt_port)
+    password = Config.accounts['Neo4j']['admin_pass']
 
     try:
         driver = GraphDatabase.driver(url, auth=basic_auth("neo4j", password))
@@ -90,20 +90,20 @@ def test_popluate(params):
     
 def test_delete(dbtype, dbname):
     result = container_util.kill_con(dbname,
-                                     local_config.var.accounts[dbtype]['admin'],
-                                     local_config.var.accounts[dbtype]['admin_pass'])
+                                     Config.accounts[dbtype]['admin'],
+                                     Config.accounts[dbtype]['admin_pass'])
     print(result)
 
 
 def setup(dbtype, con_name):
     params = {'dbname': con_name,
               'dbtype': dbtype,
-              'dbuser': local_config.var.accounts['test_user']['admin'],
-              'dbuserpass': local_config.var.accounts['test_user']['admin_pass'],
+              'dbuser': Config.accounts['test_user']['admin'],
+              'dbuserpass': Config.accounts['test_user']['admin_pass'],
               'support': 'Basic',
-              'owner': local_config.var.accounts['test_user']['owner'],
+              'owner': Config.accounts['test_user']['owner'],
               'description': 'Test the Dev',
-              'contact': local_config.var.accounts['test_user']['contact'],
+              'contact': Config.accounts['test_user']['contact'],
               'life': 'medium',
               'backup_type': 'User',
               'backup_freq': 'Daily',
@@ -112,8 +112,8 @@ def setup(dbtype, con_name):
               'maintain': 'standard',
               'phi': 'No',
               'pitr': 'n',
-              'username': local_config.var.accounts['test_user']['admin'],
-              'image': local_config.info[dbtype]['images'][0][1],
+              'username': Config.accounts['test_user']['admin'],
+              'image': Config.info[dbtype]['images'][0][1],
               'db_vol': '/mydb/dbs_data',
               }
     return params

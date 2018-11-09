@@ -3,7 +3,7 @@
 from argparse import ArgumentParser
 import admin_db
 
-import local_config
+from config import Config
 
 """Test admin_db fucntions.
 """

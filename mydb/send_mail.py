@@ -1,15 +1,15 @@
 import smtplib
-import local_config
+from config import Config
 
 
-def send_mail(subject, message, to=local_config.var.MAIL_TO):
+def send_mail(subject, message, to=Config.MAIL_TO):
     """send email """
-    if 'yourOrganization' in local_config.var.MAIL_SERVER:
+    if 'yourOrganization' in Config.MAIL_SERVER:
         # config is not setup or running in demo mode
         # return quietly and do not send mail
         return
-    SERVER = local_config.var.MAIL_SERVER
-    FROM = local_config.var.MAIL_FROM
+    SERVER = Config.MAIL_SERVER
+    FROM = Config.MAIL_FROM
     TO = to
 
     message = """\

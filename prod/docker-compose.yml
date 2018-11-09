@@ -25,7 +25,6 @@ services:
             - /mydb/postgres_dbs:/mydb/postgres_dbs
             - /mydb/db_backups:/mydb/db_backups
             - /mydb/mariadb_keys:/mydb/mariadb_keys
-            - /mydb/logs:/mydb/logs
 
 
         privileged: false
@@ -51,7 +50,7 @@ services:
             - "TZ=America/Los_Angeles"
 
         volumes:
-            - /mydb/logs/nginx:/var/log/nginx
+            - /var/log/nginx:/var/log/nginx
 
         privileged: true
 

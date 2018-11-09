@@ -10,11 +10,11 @@ from pymongo import MongoClient
 import container_util
 import admin_db
 from send_mail import send_mail
-import local_config
+from config import Config
 
 
 def auth_mongodb(dbuser, dbpass, port):
-    client = MongoClient(local_config.var.container_host + ':' + str(port))
+    client = MongoClient(Config.container_host + ':' + str(port))
     try:
         status = client.admin.authenticate(dbuser, dbpass)
     except (pymongo.errors.ServerSelectionTimeoutError,
@@ -27,10 +27,10 @@ def auth_mongodb(dbuser, dbpass, port):
 def mongodb_create_account(params):
     """ Create admin roles and user account
     """
-    root = local_config.var.accounts[params['dbtype']]['admin']
-    password = local_config.var.accounts[params['dbtype']]['admin_pass']
+    root = Config.accounts[params['dbtype']]['admin']
+    password = Config.accounts[params['dbtype']]['admin_pass']
     print("DEBUG: create root account: %s:%s" % (root, password))
-    client = MongoClient(local_config.var.container_host + ':' + str(params['port']))
+    client = MongoClient(Config.container_host + ':' + str(params['port']))
     client.admin.add_user(root, password, roles=[{'role': 'root',
                                                   'db': 'admin'}])
     client.admin.add_user(params['dbuser'], params['dbuserpass'],
@@ -42,16 +42,16 @@ def mongodb_create_account(params):
 def create_mongodb(params):
     dbtype = params['dbtype']
     con_name = params['dbname']
-    config_dat = local_config.info[dbtype]
+    config_dat = Config.info[dbtype]
     volumes = config_dat['volumes']
     for vol in volumes:
         if vol[0] == 'DBVOL': vol[0] = params['db_vol']
-        if vol[0] == 'BAKVOL': vol[0] = local_config.var.backup_vol
+        if vol[0] == 'BAKVOL': vol[0] = Config.backup_vol
     if container_util.container_exists(con_name):
         return "Container name %s already in use" % (con_name)
     port = container_util.get_max_port()
     params['port'] = port
-    Ports = {config_dat['pub_ports'][0]: (local_config.var.container_ip, port)}
+    Ports = {config_dat['pub_ports'][0]: (Config.container_ip, port)}
     params['port_bindings'] = Ports
     env = {'DB_USER': params['dbuser']}
 
@@ -64,8 +64,8 @@ def create_mongodb(params):
     mongodb_create_account(params)
 
     print("DEBUG: stop and remove container")
-    root = local_config.var.accounts[params['dbtype']]['admin']
-    password = local_config.var.accounts[params['dbtype']]['admin_pass']
+    root = Config.accounts[params['dbtype']]['admin']
+    password = Config.accounts[params['dbtype']]['admin_pass']
     result = container_util.kill_con(params['dbname'],
                                      root, password, params['username'])
     print("DEBUG: mongodb_util kill: %s" % result)
@@ -79,7 +79,7 @@ def create_mongodb(params):
     res = "Your MongoDB container has been created; %s\n\n" % con_name
     res += 'Mongo URI: "mongodb://%s:%s@%s:%s"' % (params['dbuser'],
                                                    params['dbuserpass'],
-                                                   local_config.var.container_host,
+                                                   Config.container_host,
                                                    port)
     message = 'MongoDB created\n'
     message += res
@@ -90,9 +90,9 @@ def create_mongodb(params):
 def backup_mongodb(dbname, type, tag=None):
     (backupdir, backup_id) = container_util.create_backupdir(dbname)
     (c_id, dbengine) = admin_db.get_container_type(dbname)
-    url = l = local_config.var.bucket + '/' + dbname + backupdir 
-    cmd = 'mongodump --username %s ' % local_config.var.accounts['MongoDB']['admin']
-    cmd += '--password %s ' % local_config.var.accounts['MongoDB']['admin_pass']
+    url = l = Config.bucket + '/' + dbname + backupdir 
+    cmd = 'mongodump --username %s ' % Config.accounts['MongoDB']['admin']
+    cmd += '--password %s ' % Config.accounts['MongoDB']['admin_pass']
     cmd += '--out /var/backup' + backupdir  # OR --archive >filename
     admin_db.backup_log(c_id, dbname, 'start', backup_id, type, url='',
                         command=cmd, err_msg='')

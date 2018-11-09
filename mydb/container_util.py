@@ -13,7 +13,7 @@ import mongodb_util
 import mariadb_util
 import neo4j_util
 import admin_db
-import local_config
+from config import Config
 from human_uptime import human_uptime
 
 
@@ -113,7 +113,7 @@ def exec_command(dbname, command):
 def get_ports():
     """ return list of ports that are in use
     """
-    p = [local_config.base_port]
+    p = [Config.base_port]
     containers = client.containers()
     for con in containers:
         if 'Ports' in con and len(con['Ports']) > 0:
@@ -126,7 +126,7 @@ def get_max_port():
     """ return highest port number that is NOT in use
         WARNING: port is integer
     """
-    p = [local_config.base_port]
+    p = [Config.base_port]
 
     containers = client.containers()
     for con in containers:
@@ -303,7 +303,7 @@ def create_backupdir(con_name):
     dirname += "%s-%02d-%02d_" % (t[0], t[1], t[2]) # Year, Mon, Day
     dirname += "%02d-%02d-%02d" % (t[3], t[4], t[5]) # Hour Min Sec
     # create dirctory to hold all files for backup
-    path = local_config.var.backup_vol + '/' + con_name + '/' + dirname
+    path = Config.backup_vol + '/' + con_name + '/' + dirname
     os.makedirs(path)
     return dirname, backup_id
 
@@ -312,7 +312,7 @@ def build_arguments(params, labels, volumes, bindings):
     con_name = params['dbname']
     dbtype = params['dbtype']
     db_vol = params['db_vol']
-    for dir in local_config.info[dbtype]['volumes']:
+    for dir in Config.info[dbtype]['volumes']:
         volumes.append(dir[2])
         if not dir[0]:
             vol = dir[1]
@@ -356,7 +356,7 @@ def create_con(params, env, args=None):
     bindings = {}
     con_labels = {}
     build_arguments(params, con_labels, volumes, bindings)
-    env['TZ'] = local_config.var.TZ
+    env['TZ'] = Config.TZ
     msg = json.dumps(env, indent=4)
     print("DEBUG: container_util; create_con: env=%s" % msg)
     msg = json.dumps(params, indent=4)
@@ -377,7 +377,7 @@ def create_con(params, env, args=None):
                                command=args,
                                environment=env,
                                labels=con_labels,
-                               ports=local_config.info[dbtype]['pub_ports'],
+                               ports=Config.info[dbtype]['pub_ports'],
                                volumes=volumes,
                                host_config=host_conf,
                                )

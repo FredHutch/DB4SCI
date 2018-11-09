@@ -6,7 +6,7 @@ import time
 import container_util
 import admin_db
 
-import local_config
+from config import Config
 
 
 def test_display():

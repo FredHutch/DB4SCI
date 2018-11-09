@@ -3,6 +3,7 @@
 aws.env
 env_setup.sh
 nohup.out
+mydb/config.py
 mydb/local_config.py
 *.key
 *.cert
@@ -12,3 +13,4 @@ prod/nginx/mydb.conf
 .idea/*
 test/*
 requirements.docker-ce
+admin_db

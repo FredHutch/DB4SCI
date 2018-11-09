@@ -7,11 +7,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import desc
-import local_config
+from config import Config
 import container_util
 from human_uptime import human_uptime
 
-engine = create_engine(local_config.var.SQLALCHEMY_DATABASE_URI,
+engine = create_engine(Config.SQLALCHEMY_DATABASE_URI,
                        pool_size=20,
                        convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
@@ -51,10 +51,10 @@ def du_all():
     adm_list = list_active_containers()
     (cid, names) = zip(*adm_list)
     output = {}
-    db_vol = local_config.var.data_volumes[0][1]  # this is a hack, 'Standard'
-    for d in os.listdir(local_config.var.backup_vol):
+    db_vol = Config.data_volumes[0][1]  # this is a hack, 'Standard'
+    for d in os.listdir(Config.backup_vol):
         output[d] = {}
-        backup_path = local_config.var.backup_vol + '/' + d
+        backup_path = Config.backup_vol + '/' + d
         data_path = db_vol + '/' + d
 	output[d]['backup'] = du(backup_path)
 	output[d]['data'] = du(data_path)

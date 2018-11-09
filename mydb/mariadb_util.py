@@ -7,7 +7,7 @@ import admin_db
 import make_keys
 from send_mail import send_mail
 import pymysql
-import local_config
+from config import Config
 
 
 def auth_mariadb(dbuser, dbpass, port):
@@ -20,7 +20,7 @@ def auth_mariadb(dbuser, dbpass, port):
     """
     iport = int(port)
     try:
-        conn = pymysql.connect(host=local_config.var.container_host,
+        conn = pymysql.connect(host=Config.container_host,
                                port=iport,
                                user=dbuser,
                                password=dbpass)
@@ -37,10 +37,10 @@ def maria_create_account(params):
     """
     error_msg = 'ERROR: mariadb_util; maria_create_account; '
     error_msg += 'action: %s user: %s error: %s'
-    password = local_config.var.accounts[params['dbtype']]['admin_pass']
+    password = Config.accounts[params['dbtype']]['admin_pass']
     iport = int(params['port'])
     try:
-        conn = pymysql.connect(host=local_config.var.container_host, port=iport,
+        conn = pymysql.connect(host=Config.container_host, port=iport,
                                user='root',
                                password=password)
     except pymysql.err.OperationalError as e:
@@ -79,12 +79,12 @@ def create_mariadb(params):
     """
     dbtype = params['dbtype'] 
     con_name = params['dbname']
-    config_dat = local_config.info[params['dbtype']]
+    config_dat = Config.info[params['dbtype']]
     volumes = config_dat['volumes']
     print('DEBUG: DBVOL: %s' % params['db_vol'])
     for vol in volumes:
         if vol[0] == 'DBVOL': vol[0] = params['db_vol']
-        if vol[0] == 'BAKVOL': vol[0] = local_config.var.backup_vol
+        if vol[0] == 'BAKVOL': vol[0] = Config.backup_vol
     if container_util.container_exists(con_name):
         return "Container name %s already in use" % con_name
     container_util.make_dirs(con_name, volumes)
@@ -97,8 +97,8 @@ def create_mariadb(params):
     port = container_util.get_max_port()
     params['port'] = port
     pub_port = config_dat['pub_ports'][0]
-    params['port_bindings'] = {pub_port: (local_config.var.container_ip,str(port))}
-    env = {'MYSQL_ROOT_PASSWORD': local_config.var.accounts[dbtype]['admin_pass'],
+    params['port_bindings'] = {pub_port: (Config.container_ip,str(port))}
+    env = {'MYSQL_ROOT_PASSWORD': Config.accounts[dbtype]['admin_pass'],
            'DB_USER': params['dbuser']}
 
     # create container
@@ -123,7 +123,7 @@ def create_mariadb(params):
         res += "Container name: %s\n\n" % con_name
         res += "Use mysql command line tools to access your new MariaDB.\n"
         res += "mysql --host %s --port %s --user %s --password\n\n" % (
-               local_config.var.container_host,
+               Config.container_host,
                params['port'],
                params['dbuser'])
         res += 'Leave the password argument blank. You will be prompted to enter '
@@ -142,7 +142,7 @@ def backup_mariadb(params):
     object. Requires AWS S3 tools on dbaas.
     """
     con_name = params['dbname']
-    passwd = local_config.var.accounts['MariaDB']['admin_pass']
+    passwd = Config.accounts['MariaDB']['admin_pass']
     (c_id, dbengine) = admin_db.get_container_type(con_name)
     data = admin_db.get_container_data('', c_id)
     port = data['Info']['Port']
@@ -151,13 +151,13 @@ def backup_mariadb(params):
         backup_type = params['backup_type']
     else:
         backup_type = 'NA'
-    s3_url = local_config.var.bucket + '/' + con_name + backupdir
+    s3_url = Config.bucket + '/' + con_name + backupdir
     s3_filename = s3_url + '/dump' + backup_id + '.sql'
     s3_infopath = s3_url + '/infoschema' + backup_id + '.sql'
 
     # mysqldump to S3 Backups
     template = "/usr/bin/mysqldump --host %s --port %s --user=root " % (
-                local_config.var.container_ip, port)
+                Config.container_ip, port)
     template += "--password=%s "
     dump_cmd = template + "--all-databases"
     cmd = dump_cmd % passwd
