@@ -37,7 +37,8 @@ if [[ -s ${docker_path} ]] && [[ -x ${docker_path} ]] ; then
 else
     echo "Can't find Docker. Is it installed?"
     echo "Please follow these instructsions to install Docker CE"
-    echo "and docker-compose"
+    echo "and install docker-compose. Be sure the docker daemon is up."
+    echo "daemon: systemctl status docker"
     echo "https://docs.docker.com/install/linux/docker-ce/ubuntu/"
     echo "https://docs.docker.com/compose/install/"
     exit 1
