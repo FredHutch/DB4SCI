@@ -11,10 +11,8 @@
 #  John Dey jfdey@fredhutch.org
 #  Oct 2018
 
-set -e -x
-
 if [[ `uname -s` = "Linux" ]]; then
-   echo "-- Linux Detected"
+   echo "-- Linux detected"
 else
    echo "DB4Sci Demo only works with Linux"
    exit 1
@@ -22,7 +20,7 @@ fi
 if [[ -f /etc/os-release ]]; then
    . /etc/os-release
    if [[ ${NAME} = "Ubuntu" ]]; then
-       echo "-- Ubuntu Detected"
+       echo "-- Ubuntu detected"
    else
        echo "DB4Sci has only been tested with Ubuntu"
        exit 1
@@ -32,14 +30,16 @@ else
     exit 1
 fi
 
-echo 'check for Docker'
+echo 'Checking for Docker'
 docker_path=$(which docker)
-if [ -x "$docker_path" ] ; then
+if [[ -s ${docker_path} ]] && [[ -x ${docker_path} ]] ; then
     echo " -- Docker Installed"
 else
     echo "Can't find Docker. Is it installed?"
     echo "Please follow these instructsions to install Docker CE"
+    echo "and docker-compose"
     echo "https://docs.docker.com/install/linux/docker-ce/ubuntu/"
+    echo "https://docs.docker.com/compose/install/"
     exit 1
 fi
 
@@ -52,15 +52,20 @@ else
     exit 1
 fi
 
-echo 'check for docker-compose'
-compose_ver=`docker-compose --version`
-if [[ $? -ne 0 ]]; then
-    echo 'Is docker-compose installed?'
-    exit 1
+echo 'Checking for docker-compose'
+docker_path=$(which docker-compose)
+if [[ -s $docker_path} ]] && [[ -x ${docker_path} ]]; then
+    compose_ver=`docker-compose --version`
+    if [[ $? -ne 0 ]]; then
+        echo 'Is docker-compose installed?'
+        exit 1
+    fi
+else
+    echo " -- docker-compose detected"
 fi
 
 
-echo 'Check for DB4Sci clone'
+echo 'Checking for DB4Sci git clone'
 if [[ ! -d '/opt/DB4SCI/.git' ]]; then
     echo ' - Cloning DB4Sci'
     cd /opt
