@@ -30,13 +30,13 @@
     <div id="content" class="boxed-group">
         <h4>Install</h4>
         <p>To install DB4Sci at your site start with the demo install script.
-        The demo install script installs the source code to /opt/DB4SCI and 
-        creates the administrative database in <kbd>/opt/DB4SCI/admindb</kbd>.</p>
+        The demo install script installs the source code to <kbd>/opt/DB4SCI</kbd>
+        and creates the administrative database in <kbd>/opt/DB4SCI/admindb</kbd>.</p>
         <h4>Host and Storage</h4>
         <p>DB4Sci is developed on Ubuntu.  Other Linuxes might work but have
            not been tested.  Docker CE and docker-compose need to be
            pre-installed on the host. Build a host system with storage to
-           support production databases; memory, core counts, storage capacity,
+           support production databases; memory, core sizes, storage capacity,
            and storage throughput all affect the performance of databases.
            DB4Sci deploys databases to the same host which it runs on. Chose
            your hardware to match the capacity and the performance required
@@ -46,7 +46,7 @@
            Active Directory need to be configured. Use your favorite text
            editor to complete the configuration of DB4Sci. The configuration
            file is located at /opt/DB4SCI/mydb/config.py. You will need to know
-           how a few things about your local environment. 
+           a few things about your local environment to complete the configuration.
         <ul>
             <li>Database admin accounts. A list of username and passwords for
              administrative access. These accounts are independent of the accounts
@@ -59,7 +59,6 @@
             <li>Email address for Backup admin<li>
             <li>TSL Certs</li>
             <li>TimeZone</li>
-        <a id=content href='https://raw.githubusercontent.com/FredHutch/DB4SCI/master/install.sh'>Download and Install</a>
     </div>
 </div>
 
