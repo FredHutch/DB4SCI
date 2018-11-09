@@ -23,21 +23,15 @@
      <li><a href="overview.html">Overview</a>
      <li ><a href="db4sci_arch.html">Architecture</a></li>
      <li ><a href="download.html">Download</a></li>
+     <li><a href="install.html">Install</a></li>
    </ul>
 </nav> <!-- end "nav" -->
 <div class="outerbox">
     <div id="content" class="boxed-group">
         <h3>Demo Install</h3>
-        <p>DB4SCI requires a lot of configuration. To get the application up and running quickly,
-        a demo mode is available for Mac OSX. Demo mode removes Nginx, uWSGI, and https from
-        the software stack. Demo mode also removes authentication.  Demo mode is intended for
-        personal use on your Mac and should not be used in production. 
+        <p>DB4SCI requires a lot of configuration. To get the application up and running quickly, a demo mode is available for Linux. Demo mode functions just like a production instance but is not secure for production use.  Demo mode removes TLS encryption and authentication.  Demo mode requires a Docker CE version 18 and docker-compose to be installed.
+Install can take 20 minutes or longer depending on your internet connection.  The install script downloads all the Docker containers needed. 
         </p>
-        <p>
-        Install Docker CE native on your Mac. https://store.docker.com/editions/community/docker-ce-desktop-mac
-        Download and run the install script.  Install can take 20 minutes or longer depending on your internet connection.  The install script downloads all the Docker containers needed.  When the install script is complete browse to this location: 172.16.123.1
-        </p>
-
         <a id=content href='install_demo.sh' download="install_demo.sh">Demo Install</a>
     </div>
 </div>
