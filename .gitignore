@@ -6,6 +6,7 @@ nohup.out
 mydb/config.py
 mydb/config.prod
 mydb/local_config.py
+build_run.sh
 *.key
 *.cert
 *.crt

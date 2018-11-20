@@ -15,7 +15,9 @@ container.
 
 To access **dbaas** become root on your application host. Access
 the container shell with docker command. 
-```docker exec -ti dbaas bash```
+```
+docker exec -ti dbaas bash
+```
 The shell environment of **dbaas** has the AWS access keys defined in
 the shell environment and the AWS software awscli is installed. The bucket name
 is also configured in the environment and can be accessed with `${AWS_BUCKET}`
@@ -58,7 +60,8 @@ use the DR documentation to recreate a running environment.
 
  * [DR Procedures](DR.md)
 
- * [PostgreSQL Restore]PostgreSQL-restore.md
+ * [PostgreSQL Restore](PostgreSQL-restore.md)
+ * [MariaDB Restore](MariaDB-restore.md)
 
 # from a rhino host
 ml PostgreSQL
