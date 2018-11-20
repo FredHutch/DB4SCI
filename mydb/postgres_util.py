@@ -25,10 +25,10 @@ def auth_check(dbuser, dbuserpass, port):
     :type boolean
     port: int
     """
+    connect = "dbname=postgres user=%s " % dbuser
+    connect += "host=%s " % Config.container_host
+    connect += "password=%s port=%s" % (dbuserpass, port)
     try:
-        connect = "dbname=postgres user=%s " % dbuser
-        connect += "host=%s " % Config.container_host
-        connect += "password=%s port=%s" % (dbuserpass, port)
         conn = psycopg2.connect(connect)
         cur = conn.cursor()
         cur.execute("SELECT rolsuper FROM pg_roles WHERE rolname ='" +
@@ -235,7 +235,8 @@ def backup(params, tag=None):
         message += '\nResult: ' + result + '\n'
     admin_db.add_container_log(state_info.c_id, con_name,
                                'GUI backup', 'user: ' + params['username'])
-    url = Config.bucket + '/' + con_name + dirname 
+    bucket = os.environ.get('AWS_BUCKET')
+    url = bucket + '/' + con_name + dirname 
     admin_db.backup_log(c_id, con_name, 'end', backup_id, backup_type, url=url,
                         command=command, err_msg=message)
     return command, message

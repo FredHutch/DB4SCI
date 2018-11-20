@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import os
 import time
 import json
 import subprocess
@@ -151,7 +152,8 @@ def backup_mariadb(params):
         backup_type = params['backup_type']
     else:
         backup_type = 'NA'
-    s3_url = Config.bucket + '/' + con_name + backupdir
+    bucket = os.environ.get('AWS_BUCKET')
+    s3_url = bucket + '/' + con_name + backupdir
     s3_filename = s3_url + '/dump' + backup_id + '.sql'
     s3_infopath = s3_url + '/infoschema' + backup_id + '.sql'
 

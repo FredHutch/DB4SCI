@@ -47,7 +47,7 @@ ADD requirements.txt /opt/dbaas/
 RUN pip install pip==9.0.1 && pip install -r /opt/dbaas/requirements.txt 
 
 # Copy files to container
-ENV env demo 
+ENV env dev 
 ADD *.py /opt/dbaas/
 #ADD ${env}/neo4j /opt/dbaas/neo4j
 ADD TLS /opt/dbaas/TLS

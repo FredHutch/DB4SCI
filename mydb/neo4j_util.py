@@ -164,7 +164,8 @@ def backup(params):
         backup_type = 'NA'
     remote_dumppath = Config.info['Neo4j']['backupdir'] + backupdir
     local_dumppath = Config.backup_voll + '/' + con_name + backupdir
-    url = Config.bucket + '/' + con_name + backupdir 
+    bucket = os.environ.get('AWS_BUCKET')
+    url = bucket + '/' + con_name + backupdir 
     command = "/bin/cp -rp %s %s" % (neo4jDB, remote_dumppath)
     print("DEBUG: neo4j backup command: %s" % command)
     admin_db.backup_log(c_id, con_name, 'start', backup_id, backup_type, url='',

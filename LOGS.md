@@ -1,25 +1,24 @@
 ## DBaaS Logs 
 
 ### Overview
-Application logs are written to /mydb/logs/prod. uwsgi writes the Flask WEB logs. Messages written from the
-Flask application are also written to uwsgi.log.  From python use app.logging.error("message")
-Log file location is defined in uwsig.ini 
+The Flask application is run from a Uwsgi wrapper. The
+Flask application logs and error messages are written to 
+`/var/log/uwsgi/uwsgi.log`
+along with the WEB logs.
+From python use app.logging.error("message") or just print to stdout.
+Log file location is defined in uwsgi.ini 
 
 ```bash
-cat /mydb/logs/prod/uwsgi/uwsgi.log
+cat /var/log/uwsgi/uwsgi.log
 ```
 
-***syslog***
-The mydb_setup.sh installs the syslog configuration file. With syslog configured the WEB logs are
-written to /var/log/messages and logged remotely to copycat via rsyslog. 
-
 ### Debugging
-Debuging has to be turned on at the flash application.  The log level is set in webui.py.
+Debuging has to be turned on at the flash application.  The log level
+is set in webui.py.
 
 ***webui.py***
 ```
     app.run(host='0.0.0.0',
-            port=5000,
             threaded=True,
             debug=True
     ) 

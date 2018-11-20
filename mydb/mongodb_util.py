@@ -90,7 +90,8 @@ def create_mongodb(params):
 def backup_mongodb(dbname, type, tag=None):
     (backupdir, backup_id) = container_util.create_backupdir(dbname)
     (c_id, dbengine) = admin_db.get_container_type(dbname)
-    url = l = Config.bucket + '/' + dbname + backupdir 
+    bucket = os.environ.get('AWS_BUCKET')
+    url = l = bucket + '/' + dbname + backupdir 
     cmd = 'mongodump --username %s ' % Config.accounts['MongoDB']['admin']
     cmd += '--password %s ' % Config.accounts['MongoDB']['admin_pass']
     cmd += '--out /var/backup' + backupdir  # OR --archive >filename

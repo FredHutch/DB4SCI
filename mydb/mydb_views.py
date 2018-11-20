@@ -3,7 +3,7 @@
 All flask API calls go here.
 """
 
-__version__ = '1.7.0.1'
+__version__ = '1.7.1.0'
 __date__ = 'Oct 30 2018'
 __author__ = 'John Dey'
 
@@ -27,28 +27,25 @@ import volumes
 
 @app.before_first_request
 def activate_job():
+    session['logged_in'] = False
     level = os.environ.get('DBAAS_ENV')
     if level:
         session['level'] = level
     else:
         print("DEBUG: level not set. DBAAS_ENV must be set") 
     if session['level'] == "demo":
+        print("DEBUG: dbaas running in demo mode.") 
         session['logged_in'] = True
         session['username'] = 'demo'
     return
 
 
-@app.route('/')
 @app.route('/index')
-@app.route('/demo')
+@app.route('/')
 def root():
     if session['level'] == "demo":
-        session['logged_in'] = True
-        session['username'] = 'demo' 
-        return render_template('demo.html',
-                               level=session['level'],
-                               version=__version__)
-    elif 'logged_in' in session and session['logged_in']:
+        return redirect(url_for('demo'))
+    if session['logged_in']:
         return render_template('index.html',
                                level=session['level'],
                                version=__version__)
@@ -56,12 +53,17 @@ def root():
         return redirect(url_for('login'))
 
 
+@app.route('/demo')
+def demo():
+    return render_template('demo.html',
+                           level=session['level'],
+                           version=__version__)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if session['level'] == 'demo':
-        session['logged_in'] = True
-        return redirect(url_for('root'))
-    session['logged_in'] = False
+        return redirect(url_for('demo'))
     if request.method == 'POST':
         username = request.form['username'] + '@fhcrc.org'
         password = request.form['password']
@@ -79,7 +81,7 @@ def login():
         if auth == 1:
             session['logged_in'] = True
             session['username'] = request.form['username']
-            return redirect(url_for('index'))
+            return redirect(url_for('root'))
 
         elif auth == 0:
             session['logged_in'] = False

@@ -27,8 +27,21 @@ def mydb_setup():
     result = postgres_util.create(params)
     # wait for container to startup
     print('Container Id: %s' % params['con']['Id'] )
-    print('wait for container to start')
-    time.sleep(12)
+    print('Waiting for mydb_admin to start')
+    time.sleep(5)
+    badness = 0
+    status = False
+    while (not status) and (badness < 6):
+        badness += 1
+        status = postgres_util.auth_check(params['dbuser'], 
+                                          params['dbuserpass'], 
+                                          params['port'])
+        print('mydb_admin setup status: %s count: %d' % (status, badness))
+        time.sleep(3)
+    if not status:
+        print('mydb_admin restart error. Could not setup db')
+        return
+    print('Setup mydb_admin tables')
     admin_db.init_db()
     inspect = container_util.inspect_con(params['con']['Id'])
     c_id = admin_db.add_container(inspect, params)

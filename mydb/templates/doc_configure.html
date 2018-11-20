@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block title %} Documentation- {% endblock %}
+{% block head %} {{ super() }}{% endblock %}
+{% block content %}
+<div id="container">
+  <div class="title">
+      <h4>DB4Sci Configure</h4>
+  </div>
+  <div class="document">
+    <h2>Configuration</h2>
+
+<p>You have successfully downloaded and installed DB4Sci! Thanks for downing DB4Sci we hope you find this software helpful. This is a demo install and not indented for production use.  DB4Sci should be used with SSL. Your site SSL certificates need to be made part of your local instance.   After you completed local configurations for your site this instance can be put into production.
+
+<h4>Configure for Production</h4>
+<p>Use your favorite text editor to complete the configuration of DB4Sci.  The configuration file is located at <kbd>/opt/DB4SCI/mydb/config.demo</kbd>. You will need to know how a few things aboutyour local environment.
+</p>
+
+<h4>Edit config.py</h4>
+<ul>
+  <li>Create a new configuration file. Copy config.demo config.py.  Keep a copy of config.py in a save place.
+  <li>Adminitrative Users - Provide a list of ISIDs for staff who will have admin rights to the application. 
+<li>Active Director - A list of domain controllers and your domain name 
+<li>Email Config - SMTP server, Email alias for users to recieve DB4Sci events; like new container creation and backup notices.
+<li>Data Volumes - Path to data volumes which will be used to store the database data. More than one volume can be specified. Your site can provide users with multiple options for storage based on performance and cost. Volumes can be filtered by user and database types. Example a volume with limited capacity for administrative users which is separate from a high-performance volume for production databases. 
+<li>Database admin accounts.  A list of username and passwords for administrative access.  These accounts are independent of the accounts created by users for the purpose of backups.
+<li>AWS S3 Bucket 
+<li>TimeZone - Your local time
+</ul>
+
+<h4>Configure Scripts and Certs</h4>
+<ul>
+  <li><strong>Create</strong> db_data and db_backup sub directories in each data volume that is defined in config.py
+  <li><strong>Run</strong> mydb_setup.sh
+  <li><strong>Run</strong> TSL-create.sh This script creates a selfsigned client server certs for MariaDB TSL
+  <li><strong>Edit</strong> build_run.sh - Add AWS credentails 
+  <li><strong>Copy</strong> Certs to prod/nginx/ssl 
+  <li><strong>Edit</strong> docker-compose.yml - Add volumes to volumes section. 
+<pre>
+  <code>
+    volumes:
+        - /mydb/db_data:/mydb_data
+        - /mydb/db_backups:/mydb/db_backups
+  </code>
+</pre> 
+  <li><strong>Edit</strong> <kbd>prod/nginx/mydb.conf</kbd> Add the names of your server and certs to the Nginx
+ conf file. <kbd>server_name</kbd>, <kbd>ssl_certificate</kbd>, <kbd>ssl_certificate_key</kbd>,
+<kbd>return 302</kbd>
+</ul>
+
+<h4>Start DB4sci</h4>
+<ul>
+  <li><strong>Run</strong> build_run.sh prod
+</ul>
+
+
+  </div> <!-- class="document" -->
+</div> <!-- id="container" -->
+Version: {{version}} Mode: {{level}}
+{% endblock %}
