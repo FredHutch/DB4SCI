@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# This might be needed is your are using Zfs
+# This might be needed if you are using Zfs
 #echo "Installing docker systemd service config..."
 #cp docker.service /lib/systemd/system/docker.service
 #systemctl restart docker

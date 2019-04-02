@@ -34,10 +34,10 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
 # Create the sttrweb user and data directory
 RUN mkdir /opt/dbaas && \
     mkdir /mydb && \
-    mkdir /mydb/postgres_dbs && \
+    mkdir /mydb/db_data && \
     mkdir /mydb/db_backups && \
     mkdir -p /var/run/postgresdb
-# RUN echo "140.107.170.124 loghost" >>/etc/hosts
+
 RUN groupadd -f --gid 999 dbaas 
 RUN useradd -u 999 -g 999 -s /bin/nologin docker
 

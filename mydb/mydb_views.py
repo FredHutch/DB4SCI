@@ -27,18 +27,19 @@ import volumes
 
 @app.before_first_request
 def activate_job():
+    if 'level' in session:
+        print("DEBUG: before_first_request, level is set: {}".format(session['level']))
     session['logged_in'] = False
-    level = os.environ.get('DBAAS_ENV')
+    level = os.environ.get('DB4SCI_MODE')
+    print("DEBUG: before_first_request: {}".format(level))
     if level:
         session['level'] = level
     else:
-        print("DEBUG: level not set. DBAAS_ENV must be set") 
+        print("DEBUG: level not set. DB4SCI_MODE must be set") 
     if session['level'] == "demo":
-        print("DEBUG: dbaas running in demo mode.") 
+        print("DEBUG: DB4Sci running in demo mode.") 
         session['logged_in'] = True
         session['username'] = 'demo'
-    return
-
 
 @app.route('/index')
 @app.route('/')
@@ -64,6 +65,8 @@ def demo():
 def login():
     if session['level'] == 'demo':
         return redirect(url_for('demo'))
+    if session['logged_in']:
+        return redirect(url_for('index'))
     if request.method == 'POST':
         username = request.form['username'] + '@fhcrc.org'
         password = request.form['password']
@@ -109,7 +112,7 @@ def list_containers():
     if session['logged_in']:
         (db_header, db_list) = container_util.display_containers()
         return render_template('dblist.html',
-                               title='MyDB Database Containers',
+                               title='DB4SCI Database Containers',
                                dbheader=db_header, dbs=db_list)
     else:
         return redirect(url_for('login'))
@@ -275,7 +278,7 @@ def backedup():
 
 
 def admin_help():
-        body = 'MyDB administrators must be added to Config.admins.\n'
+        body = 'DB4SCI administrators must be added to Config.admins.\n'
         body += 'append admin commands to URL\n'
         body += '/admin/help/   Your reading it.\n'
         body += '/admin/state/  Display all records in State table\n'
@@ -306,7 +309,7 @@ def admin(cmd):
     username = session['username']
     if cmd == 'help':
         body = admin_help()
-        title = 'MyDB Administrative Features\n'
+        title = 'DB4SCI Administrative Features\n'
         return render_template('dblist.html', title=title,
                                dbheader='', dbs=body)
     elif cmd == 'state':
@@ -389,4 +392,7 @@ def certs(filename):
 def doc_page():
     doc_name = request.args['doc']
     doc_name += '.html'
-    return render_template(doc_name)
+    return render_template(doc_name,
+                           level=session['level'],
+                           version=__version__
+                           )

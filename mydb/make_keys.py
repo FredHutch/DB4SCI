@@ -5,7 +5,6 @@ import errno
 import stat
 import OpenSSL
 import subprocess
-
 from config import Config
 import shutil
 from hashlib import md5
@@ -39,16 +38,17 @@ file_key_management_filekey = secret
 def copy_tsl(con_name, db_vol):
     """Copy TLS server keys to mairadb keys volume
     Copy MariaDB encrypt.cnf to /etc/mysql/conf.d volume
+       code is run from dbaas container 
     """
     files = ['server-cert.pem', 'server-key.pem', 'server-req.pem',
              'ca-cert.pem']
-    source = Config.dbaas_path + '/TLS/' 
+    source = '/opt/dbaas/TLS/' 
     destination = db_vol + '/' + con_name + '/keys/'
     for file in files:
         print("copy %s %s" % (source + file, destination))
         shutil.copy(source + file, destination)
         os.chown(destination + file, 999, 999)
-    source = Config.dbaas_path + '/dbconfig/MariaDB/encrypt.cnf'
+    source = '/opt/dbaas/dbconfig/MariaDB/encrypt.cnf'
     destination = db_vol + '/' + con_name + '/conf.d/'
     shutil.copy(source, destination)
                  

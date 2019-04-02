@@ -2,7 +2,7 @@
 import os
 from config import Config
 
-"""MyDB can depoly containers on different storge volumes.
+"""DB4SCI can depoly containers on different storge volumes.
 Access to Volumes can be assigned to users.
 Create a new list of volumes based on username.  
 used by mydb_views to generate general_form.html
