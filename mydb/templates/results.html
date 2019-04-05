@@ -1,14 +1,18 @@
 {% extends "layout.html" %}
-{% block title %} Create DB - {% endblock %}
+{% block title %} results {% endblock %}
 {% block head %} {{ super() }}{% endblock %}
 {% block content %}
     <body>
         <div id="container">
             <div class="title">
-                <h4>Deleted Postgres Container</h4>
-
+		    <h4>{{ title }} : {{ container_name }}</h4>
             </div>
                 <code><pre>
+{% if dbheader|length > 0 %}
+                  <b> 
+{{header}}</b>
+	          <hr>
+{% endif %}
 {{result}}
                 </pre></code>
         </div>

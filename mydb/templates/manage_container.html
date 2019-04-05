@@ -8,7 +8,7 @@
     <h4>{{ title }}</h4>
   </div>
   <div id="content">
-    <form method="get" action="{{ url_for( dbaction ) }}">
+    <form method="post" action="{{ url_for( dbaction ) }}">
       <br>
       {{ header }} 
       <label for="dbuser">{{ labela }}<label>
@@ -19,10 +19,11 @@
         {% endfor %}
       </datalist><br>
       {% if dbaction == "delete" or dbaction == "restart" %}
-          <h2> You must be a superuser on the database to {{ dbaction }} it. </h2>
+          <h4> You must be a superuser on the database to {{ dbaction }} it. </h4>
           <label for="dbuser">DB Username:</label><input type="text" name="dbuser" /><br />
           <label for="dbuserpass">DB Password:</label><input type="password" name="dbuserpass" /><br />
       {% endif %}
+      <input type="submit" />
     </form>
   </div id="content">
 </div>

@@ -180,7 +180,7 @@ def manage_container():
     if not session['logged_in']:
         return redirect(url_for('login'))
     print('lets manage\n')
-    dbaction = request.args['bbaction']
+    dbaction = request.args['dbaction']
     select_title='Select Container Name to %s' % dbaction.capitalize()
     container_names = admin_db.list_container_names()
     container_names.sort()
@@ -192,60 +192,66 @@ def manage_container():
                            items=container_names)
 
 
-@app.route('/cloudbackups/', methods=['GET'])
-def cloudbackups():
+@app.route('/S3_list/', methods=['POST'])
+def S3_list():
     if not session['logged_in']:
         return redirect(url_for('login'))
-    container_name = request.args['container_name']
-    print('cloudbackups: container: %s' % container_name)
+    container_name = request.form['container_name']
+    print('S3_list: level: %s container: %s' % (
+          session['level'],container_name))
     cmd = "%s s3 ls --recursive %s/%s" % (Config.aws,
                                           Config.bucket,
                                           container_name)
-    backups = os.popen(cmd).read().strip()
-    return render_template('cloudbackups.html', con_name=container_name,
-                           backups=backups)
+    if session['level'] == "demo":
+        result = "Unable to run AWS commands in demo mode.\n"
+        result = cmd
+    else:
+        result = os.popen(cmd).read().strip()
+    return render_template('results.html', title='S3 Backup',
+                           container_name=container_name,
+                           result=result)
 
 
-@app.route('/restarted/', methods=['POST'])
-def restarted():
+@app.route('/restart/', methods=['POST'])
+def restart():
     if not session['logged_in']:
         return redirect(url_for('login'))
-    dbname = request.form['dbname'].replace(';', '').replace('&', '').strip()
+    dbname = request.form['container_name']
     dbuser = request.form['dbuser'].replace(';', '').replace('&', '').strip()
     dbuserpass = request.form['dbuserpass'].replace(';', '').\
         replace('&', '').strip()
     username = session['username']
     result = container_util.restart_con(dbname, dbuser, dbuserpass, username)
-    return render_template('restarted.html', result=result)
+    return render_template('results.html', title='Restarted Container',
+                           container_name=dbname,
+                           result=result)
 
-
-@app.route('/deleted/', methods=['POST'])
-def deleted():
+@app.route('/delete/', methods=['POST'])
+def delete():
     if not session['logged_in']:
         return redirect(url_for('login'))
-    dbname = request.form['dbname'].replace(';', '').replace('&', '').strip()
+    dbname = request.form['container_name']
     dbuser = request.form['dbuser'].replace(';', '').replace('&', '').strip()
     dbuserpass = request.form['dbuserpass'].replace(';', '').\
         replace('&', '').strip()
     username = session['username']
     result = container_util.kill_con(dbname, dbuser, dbuserpass, username)
-    return render_template('deleted.html', result=result)
+    return render_template('results.html', title='Delete Container',
+                           container_name=dbname,
+                           result=result)
 
-
-@app.route('/backup/')
+@app.route('/backup/', methods=['POST'])
 def backup():
-    if session['logged_in']:
-        container_names = admin_db.list_container_names()
-        container_names.sort()
-        return render_template('backup.html', items=container_names)
-    else:
-        return redirect(url_for('login'))
-
-
-@app.route('/backedup/', methods=['POST'])
-def backedup():
     if not session['logged_in']:
         return redirect(url_for('login'))
+    dbname = request.form['container_name']
+    if session['level'] == "demo":
+        result = "Backup not supported in demo mode."
+        return render_template('results.html',
+                               title='Database Backup',
+                               container_name=dbname,
+                               result=result)
+
     # backtag
     params = {}
     for item in request.form:
@@ -274,8 +280,24 @@ def backedup():
     else:
         (cmd, mesg) = postgres_util.backup(params, params['backuptag'])
         result = "Postgres dump comand:\n" + cmd + "\nResult: %s" % mesg
-    return render_template('backedup.html', result=result)
+    return render_template('results.html',
+                           title='Database Backup',
+                           result=result)
 
+@app.route('/restore/', methods=['POST'])
+def restore():
+    if not session['logged_in']:
+        return redirect(url_for('login'))
+    dbname = request.form['container_name']
+    if session['level'] == "demo":
+        result = "Restore not supported in demo mode."
+    else:
+        pass
+        # TODO
+    return render_template('results.html',
+                           title='Database Restore',
+                           container_name=dbname,
+                           result=result)
 
 def admin_help():
         body = 'DB4SCI administrators must be added to Config.admins.\n'
