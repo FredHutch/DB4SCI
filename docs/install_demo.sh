@@ -10,8 +10,9 @@
 #
 #  John Dey jfdey@fredhutch.org
 #  Oct 2018
+#  Apr 2019 - rewrite for local demo mode
 
-set -e -x
+set -e
 
 if [[ `uname -s` = "Linux" ]]; then
    echo "-- Linux Detected"
@@ -100,14 +101,13 @@ if [[ $? -ne 0 ]]; then
 fi
 
 echo 'Pull Docker database images'
-docker pull ubuntu:16.04@sha256:1dfb94f13f5c181756b2ed7f174825029aca902c78d0490590b1aaa203abc052
-# docker pull ubuntu:18.04@sha256:017eef0b616011647b269b5c65826e2e2ebddbe5d1f8c1e56b3599fb14fabec8
-docker pull mariadb:10.3.11@sha256:12e32f8d1e8958cd076660bc22d19aa74f2da63f286e100fb58d41b740c57006
-docker pull mariadb:10.4@sha256:e7490991d0919097ed671700d41425047fd3c2329c69cbc517c3c1c60ffd3515
-docker pull postgres:10.7@sha256:3a397af7ca5b55994a7635f0a9ca6126ef5f8bb0bb5e21d3e6ed267399601238
-docker pull postgres:9.6.12@sha256:78890d2b9c6a8eb312b1c4f4ee460da1d1d16d27f94312b910fbf43a30230ba4
-docker pull mongo:4.1.5@sha256:cf0e229c2b615d9d4bd46e74140e49a0b86a1e31ac602780730ccb475c69b6e6
-docker pull nginx:1.13.8@sha256:0ffc09487404ea43807a1fd9e33d9e924d2c8b48a7b7897e4d1231a396052ff9
+docker pull ubuntu:16.04
+# docker pull ubuntu:18.04
+docker pull mariadb:10.4
+docker pull postgres:9.6.12
+docker pull postgres:10.7
+docker pull mongo:4.1.9
+docker pull nginx:1.15.10
 
 # Setup Environment 
 # In production mode the script env_setup.sh is used to setup the environment.
@@ -118,7 +118,7 @@ export AWS_ACCESS_KEY_ID=aws-access-key-id
 export AWS_SECRET_ACCESS_KEY=aws-secret-access-key
 
 export DB4SCI_HOST=localhost
-export DB4SCI_MOD=demo
+export DB4SCI_MODE=demo
 export SQLALCHEMY_DATABASE_URI="postgresql://mydbadmin:db4docker@${DB4SCI_HOST}:32009/mydb_admin"
 export AWS_BUCKET="s3://your-aws-bucker/prod"
 export SSL_CERTS="/opt/DB4SCI/ssl"
@@ -131,4 +131,4 @@ if [[ ! -f /opt/DB4SCI/mydb/conif.py ]]; then
 fi
 
 echo "Start the Flask App..."
-./webgui.py
+python /opt/DB4SCI/webgui.py
