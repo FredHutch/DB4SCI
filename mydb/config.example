@@ -17,8 +17,7 @@ class BaseConfig():
     base_port = 32010
 
     # container_host use output from uname -n
-    container_host = os.environ.get('HOSTNAME') 
-    container_ip = os.environ.get('HOST_IP') 
+    container_host = os.environ.get('DB4SCI_HOST') 
 
     # ISID of admin users, Admin uses can view/edit meta data
     admins = ['demo', 'admin1', 'admin2', 'admin3']
@@ -118,7 +117,7 @@ class BaseConfig():
                          'dbengine': 'Postgres',
                          'images': [
                                  ['Postgres 9.6.10', 'postgres:9.6.10'],
-                                 ['Postgres 10.5', 'postgres:10.5'],
+                                 ['Postgres 10.7', 'postgres:10.7'],
                               ]},
             'MongoDB': {'pub_ports': [27017],
                         'backupdir': '/var/backup',
@@ -164,14 +163,14 @@ class BaseConfig():
             }
 
 class ProdConfig(BaseConfig):
-    def __init__(self, env):
+    def __init__(self, mode):
         BaseConfig()
-        self.env = env
+        self.mode = mode 
 
 
 class DevConfig(BaseConfig):
-    def __init__(self, env):
-        self.env = env
+    def __init__(self, mode):
+        self.mode = mode 
 
     # Mail stuff
     MAIL_FROM = "valid_user@yourDomain.org"
@@ -182,8 +181,8 @@ class DevConfig(BaseConfig):
 
 
 class TestConfig(DevConfig):
-    def __init__(self, env):
-        self.env = env
+    def __init__(self, mode):
+        self.mode = mode 
         self.info['Neo4j']['volumes'][3] = [
                 '', '/mydb/repos/dbaas/dev/neo4j/ssl', '/ssl']
 
@@ -191,14 +190,14 @@ class TestConfig(DevConfig):
 
 
 
-env = os.environ.get('DBAAS_ENV')
-if env == 'dev':
-    Config = DevConfig(env)
-elif env == 'prod' or env == 'demo':
-    Config = ProdConfig(env)
-elif env == 'test':
-    Config = TestConfig(env)
+mode = os.environ.get('DB4SCI_MODE')
+if mode == 'dev':
+    Config = DevConfig(mode)
+elif mode == 'prod' or mode == 'demo':
+    Config = ProdConfig(mode)
+elif mode == 'test':
+    Config = TestConfig(mode)
 else:
-    print('Error: The environment varaible DBAAS_ENV must be set to one of'),
+    print('Error: The environment varaible DB4SCI_MODE must be set to one of'),
     print("these values: ['prod', 'dev', 'test', 'demo']")
     sys.exit(1)
