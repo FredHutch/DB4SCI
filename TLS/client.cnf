@@ -1,7 +1,7 @@
 # For the CA policy
 
 [ req ]
-default_bits				= 1024			# Size of keys
+default_bits				= 4096			# Size of keys
 default_days				= 365000 
 default_md				= md5				# message digest algorithm
 string_mask				= nombstr		# permitted characters

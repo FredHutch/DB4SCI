@@ -28,7 +28,8 @@ import volumes
 @app.before_first_request
 def activate_job():
     if 'level' in session:
-        print("DEBUG: before_first_request, level is set: {}".format(session['level']))
+        print("DEBUG: before_first_request, level is set: {}".format(
+            session['level']))
     session['logged_in'] = False
     level = os.environ.get('DB4SCI_MODE')
     print("DEBUG: before_first_request: {}".format(level))
@@ -40,6 +41,7 @@ def activate_job():
         print("DEBUG: DB4Sci running in demo mode.") 
         session['logged_in'] = True
         session['username'] = 'demo'
+
 
 @app.route('/index')
 @app.route('/')
@@ -68,19 +70,16 @@ def login():
     if session['logged_in']:
         return redirect(url_for('index'))
     if request.method == 'POST':
-        username = request.form['username'] + '@fhcrc.org'
+        username = request.form['username']
+        username += Config.AD_domain
         password = request.form['password']
-
+        auth = None
         for DC in Config.DCs:
-            if DC == 'demo':
-                auth = 1
-                break
             auth = ad_auth.ad_auth(username, password, DC)
             if auth == 2 or auth == 3:
                 continue
             elif auth == 1 or auth == 0:
                 break
-
         if auth == 1:
             session['logged_in'] = True
             session['username'] = request.form['username']
@@ -181,30 +180,29 @@ def manage_container():
         return redirect(url_for('login'))
     print('lets manage\n')
     dbaction = request.args['dbaction']
-    select_title='Select Container Name to %s' % dbaction.capitalize()
+    select_title = 'Select Container Name to %s' % dbaction.capitalize()
     container_names = admin_db.list_container_names()
     container_names.sort()
     return render_template('manage_container.html',
                            title=select_title, 
                            header='',
                            labela='Container Name:',
-                           dbaction = dbaction,
+                           dbaction=dbaction,
                            items=container_names)
 
 
-@app.route('/S3_list/', methods=['POST'])
-def S3_list():
+@app.route('/s3_list/', methods=['POST'])
+def s3_list():
     if not session['logged_in']:
         return redirect(url_for('login'))
     container_name = request.form['container_name']
     print('S3_list: level: %s container: %s' % (
-          session['level'],container_name))
+          session['level'], container_name))
     cmd = "%s s3 ls --recursive %s/%s" % (Config.aws,
                                           Config.bucket,
                                           container_name)
     if session['level'] == "demo":
         result = "Unable to run AWS commands in demo mode.\n"
-        result = cmd
     else:
         result = os.popen(cmd).read().strip()
     return render_template('results.html', title='S3 Backup',
@@ -226,6 +224,7 @@ def restart():
                            container_name=dbname,
                            result=result)
 
+
 @app.route('/delete/', methods=['POST'])
 def delete():
     if not session['logged_in']:
@@ -239,6 +238,7 @@ def delete():
     return render_template('results.html', title='Delete Container',
                            container_name=dbname,
                            result=result)
+
 
 @app.route('/backup/', methods=['POST'])
 def backup():
@@ -259,10 +259,6 @@ def backup():
                                           replace('&', '').strip()
     params['username'] = session['username']
     params['backup_type'] = 'User'
-    if 'backuptag' in params:
-        backuptag = params['backuptag']
-    else:
-        backuptag = None
 
     (c_id, dbengine) = admin_db.get_container_type(params['dbname'])
     if c_id is None:
@@ -406,7 +402,7 @@ def admin(cmd):
 
 @app.route('/certs/<filename>', methods=['GET'])
 def certs(filename):
-    return send_from_directory(directory=Config.dbaas_path + '/TLS',
+    return send_from_directory('/opt/DB4SCI/TLS',
                                as_attachment=True, 
                                filename=filename + '.pem')
 

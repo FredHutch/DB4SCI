@@ -183,16 +183,6 @@ class DevConfig(BaseConfig):
     bucket = "s3://yourOrg-DB4Sci-backups/dev"
 
 
-class TestConfig(DevConfig):
-    def __init__(self, mode):
-        self.mode = mode 
-        self.info['Neo4j']['volumes'][3] = [
-                '', '/mydb/repos/dbaas/dev/neo4j/ssl', '/ssl']
-
-    dbaas_path = '/mydb/repos/dbaas/'
-
-
-
 mode = os.environ.get('DB4SCI_MODE')
 if mode == 'dev':
     Config = DevConfig(mode)
