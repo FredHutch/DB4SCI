@@ -69,9 +69,9 @@ apt-get -y -qq update && apt-get -y -qq install \
     curl \
     software-properties-common
 
+# pip install --quiet --upgrade pip
 echo "-- Install Python packages"
-pip install --quiet --upgrade pip
-pip install --quiet -r /opt/DB4SCI/requirements.txt
+pip2 install --quiet -r /opt/DB4SCI/requirements.txt
 
 echo "-- Checking for Docker"
 if [[ -x "$(command -v docker)" ]]; then

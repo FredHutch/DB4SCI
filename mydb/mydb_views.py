@@ -3,7 +3,7 @@
 All flask API calls go here.
 """
 
-__version__ = '1.7.3'
+__version__ = '1.7.4'
 __date__ = 'Apr 6 2019'
 __author__ = 'John Dey'
 

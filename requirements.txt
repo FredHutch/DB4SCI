@@ -1,10 +1,10 @@
 awscli
 backports.ssl-match-hostname
 botocore
+pyOpenSSL
 chardet
 click
 colorama
-cryptography
 DateTime
 decorator
 #docker-compose --install-option="--no-cache-dir"
@@ -26,7 +26,6 @@ ipaddress
 itsdangerous
 Jinja2
 jmespath
-jsonschema
 ldap3
 Mako
 MarkupSafe
@@ -46,7 +45,6 @@ pyasn1
 pycrypto
 pymongo
 PyMySQL
-pyOpenSSL
 python-dateutil
 python-editor
 python-ldap
@@ -58,7 +56,6 @@ s3transfer
 simplegeneric
 six
 SQLAlchemy
-texttable
 urllib3
 websocket-client
 Werkzeug
