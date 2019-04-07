@@ -144,7 +144,7 @@ def create(params):
     res += 'bolt://%s:%d' % (Config.FQDN_host, bolt_port)
     msg = 'Neo4j created: %s\n' % params['dbname']
     msg += 'Created by: %s <%s>\n' % (params['owner'], params['contact'])
-    send_mail("MyDB: created neo4j", msg)
+    send_mail("DB4SCI: created neo4j", msg)
     return res
 
 

@@ -9,7 +9,7 @@ import admin_db
 """
 
 def add_info_field(key, value):
-    """ Add key value to all existing MyDB containers
+    """ Add key value to all existing DB4SCI containers
     """
     containers = admin_db.list_containers() 
     for [cid, name] in containers:

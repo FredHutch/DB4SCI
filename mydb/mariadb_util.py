@@ -89,12 +89,8 @@ def create_mariadb(params):
     if container_util.container_exists(con_name):
         return "Container name %s already in use" % con_name
     container_util.make_dirs(con_name, volumes)
-    encrypt_msg = ''
-    if 'EAR' in params and params['EAR'].lower() == 'yes':
-        encrypt_msg = 'Encryption at Rest was selected and TLS support is '
-        encrypt_msg += 'enabled. Download TLS keys from Documentation -> TLS.'
-        #  Add key volume, encrypt.cnf file
-        result = make_keys.create_mariadb_key(con_name, params)
+    #  Add key volume, encrypt.cnf file
+    result = make_keys.create_mariadb_key(con_name, params)
     port = container_util.get_max_port()
     params['port'] = port
     pub_port = config_dat['pub_ports'][0]
@@ -117,23 +113,25 @@ def create_mariadb(params):
     if status != 'ok':
         res = 'This is embarrassing. Your MariaDB container; %s ' % params['dbname']
         res += 'has been created but I was unable to create your account.\n'
-        res += 'This unfortunate incident will be reported to the MyDB admin staff.'
-        send_mail("MyDB: Error creating account", res)
+        res += 'This unfortunate incident will be reported to the DB4SCI admin staff.'
+        send_mail("DB4SCI: Error creating account", res)
     else:
         res = "Your MariaDB container has been created. "
         res += "Container name: %s\n\n" % con_name
-        res += "Use mysql command line tools to access your new MariaDB.\n"
+        res += "Use mysql command line tools to access your new MariaDB.\n\n"
         res += "mysql --host %s --port %s --user %s --password\n\n" % (
                Config.container_host,
                params['port'],
                params['dbuser'])
         res += 'Leave the password argument blank. You will be prompted to enter '
-        res += 'the password.\n'
-        res += encrypt_msg
+        res += 'the password.\n\n'
+        res += 'Encryption at Rest is enabled and TLS support is enabled.'
+        res += 'Download TLS keys from the Documentation tab. Select "TLS '
+        res += 'for MariaDB."'
 
         msg = 'MariaDB created: %s\n' % params['dbname']
         msg += 'Created by: %s <%s>\n' % (params['owner'], params['contact'])
-        send_mail("MyDB: created MariaDB", msg)
+        send_mail("DB4SCI: created MariaDB", msg)
     return res
 
 
@@ -174,7 +172,7 @@ def backup_mariadb(params):
         message = "MariaDB Backup error.  Container: %s" % con_name
         message += "Error message: %s" % processed 
         print(message)
-        send_mail("MyDB: MariaDB backup", message)
+        send_mail("DB4SCI: MariaDB backup", message)
     else:         
         message = '\nExecuted MariaDB dump comand:\n    '
         message += dump_cmd % 'xxxxx'

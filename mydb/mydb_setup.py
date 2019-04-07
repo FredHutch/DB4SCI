@@ -15,10 +15,10 @@ mydb_setup.mydb_setup()
 
 def mydb_setup():
     """Create mydb_admin database if it does not exist.
-    DBAAS depends on mydb_admin database.
+    DB4SCI depends on mydb_admin database.
     """
     if container_util.container_exists('mydb_admin'):
-        print('MyDB Administrative DB is running.\nStarting DBAAS')
+        print('Administrative DB is running.\nStarting DB4Sci')
         return
     print('Create Administrative DB')
     params = setup_data()

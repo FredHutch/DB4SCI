@@ -83,7 +83,7 @@ def create_mongodb(params):
                                                    port)
     message = 'MongoDB created\n'
     message += res
-    send_mail("MyDB: created MongoDB", message)
+    send_mail("DB4SCI: created MongoDB", message)
     return res
 
 

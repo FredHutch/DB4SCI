@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import ldap
+import ldap3
 import getpass
 import random
 from config import Config

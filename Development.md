@@ -8,12 +8,12 @@ uWSGI is installed in the same container as the DBaas flask application. The lin
 The dbaas Flask application listens on port 5000 using the uWSGI protocol.
 
 ### Prodution and Development
-Production and development instance run on seperate systems. The differances between production and development effect the Nginx web interface and not the application code.  Nginx configurations are defined in two subdirectories <prod> and <dev>.  The environment variable DBAAS_ENV must be set to [prod, dev, demo] for docker build to work.
+Production and development instance run on seperate systems. The differances between production and development effect the Nginx web interface and not the application code.  Nginx configurations are defined in two subdirectories <prod> and <dev>.  The environment variable DB4SCI_MODE must be set to [prod, dev, demo] for docker build to work.
 
 ```bash
-export DBAAS_ENV=prod
+export DB4SCI_MODE=prod
 # OR
-export DBAAS_ENV=dev
+export DB4SCI_MODE=dev
 ```
 
 ### SSL
