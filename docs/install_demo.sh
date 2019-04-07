@@ -33,21 +33,21 @@ else
     exit 1
 fi
 
-echo 'Check for DB4Sci clone'
+echo "-- Check for DB4Sci clone"
 if [[ ! -d '/opt/DB4SCI/.git' ]]; then
     echo ' - Cloning DB4Sci'
     cd /opt
     git clone https://github.com/FredHutch/DB4SCI.git
 fi
 
-echo 'Create directories'
+echo "-- Create directories"
 basedir=/opt/DB4SCI
 sudo mkdir -p ${basedir}
 mkdir -p ${basedir}{backup,data,logs}
 mkdir -p ${basedir}{uwsgi,nginx}
 sudo mkdir -p /var/log/uwsgi
 
-echo "Install OS packages"
+echo "-- Install OS packages"
 apt-get -y -qq update && apt-get -y -qq install \
     python \
     python-dev \
@@ -69,38 +69,36 @@ apt-get -y -qq update && apt-get -y -qq install \
     curl \
     software-properties-common
 
-echo "Install Python packages"
+echo "-- Install Python packages"
 pip install --upgrade pip
 pip install -r /opt/DB4SCI/requirements.txt
 
-echo 'check for Docker'
-docker_path=$(which docker)
-if [ -x "$docker_path" ] ; then
-    echo " -- Docker Installed"
-    docker_ver=(`${docker_path} --version`)
+echo "-- Checking for Docker"
+if [[ -x "$(command -v docker)" ]]; then
+    echo "-- Docker Installed"
+    docker_ver=(`docker --version`)
     ver=${docker_ver[2]}
     if [[ $ver == "18."* ]]; then
-        echo "Docker version ${ver} is good"
+        echo "-- Docker version ${ver} is good"
     else
         echo "Don't like your Docker version.  Did you install Docker CE?"
         exit 1
     fi
 else
-    echo "Can't find Docker. I'll install it for you."
-    echo "Using Docker get-docker install script"
-    ${basedir}/get-docker.sh
-    echo "Install docker-compose"
+    echo "-- Can't find Docker. I'll install it for you."
+    echo "-- Using Docker get-docker install script"
+    /bin/bash ${basedir}/get-docker.sh
+fi
+
+echo "-- Check for docker-compose"
+if [[ -x "$(command -v docker-compose)" ]]; then
+    echo "-- Docker-compose install"
+else
+    echo "-- Installing docker-compose"
     curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 fi
 
-echo 'check for docker-compose'
-compose_ver=`docker-compose --version`
-if [[ $? -ne 0 ]]; then
-    echo 'Is docker-compose installed?'
-    exit 1
-fi
-
-echo 'Pull Docker database images'
+echo "-- Pull Docker database images"
 docker pull ubuntu:16.04
 # docker pull ubuntu:18.04
 docker pull mariadb:10.4
@@ -122,13 +120,12 @@ export DB4SCI_MODE=demo
 export SQLALCHEMY_DATABASE_URI="postgresql://mydbadmin:db4docker@${DB4SCI_HOST}:32009/mydb_admin"
 export AWS_BUCKET="s3://your-aws-bucker/prod"
 export SSL_CERTS="/opt/DB4SCI/ssl"
-export DEMO=1
 
 cd /opt/DB4SCI
 if [[ ! -f /opt/DB4SCI/mydb/conif.py ]]; then
-    echo Copy Config from example
+    echo "-- Copy Config from example"
     cp mydb/config.example mydb/config.py
 fi
 
-echo "Start the Flask App..."
-python /opt/DB4SCI/webgui.py
+echo "-- Start the Flask App..."
+exec python /opt/DB4SCI/webui.py

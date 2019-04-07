@@ -31,6 +31,9 @@ class BaseConfig():
     # Time Zone
     TZ = 'America/Los_Angeles'
 
+    # AWS CLI
+    aws = '/usr/local/bin/aws'
+
     # Local Active Directory servers and Domain
     # DCs = ['dc10.yourDomain.org', 'dc20.yourDomain.org']
     DCs = ['dc1.yourdomain.org','dc2.yourdomain.org']
@@ -116,7 +119,7 @@ class BaseConfig():
                          'command': 'postgres',
                          'dbengine': 'Postgres',
                          'images': [
-                                 ['Postgres 9.6.10', 'postgres:9.6.10'],
+                                 ['Postgres 9.6.10', 'postgres:9.6.12'],
                                  ['Postgres 10.7', 'postgres:10.7'],
                               ]},
             'MongoDB': {'pub_ports': [27017],
@@ -129,7 +132,7 @@ class BaseConfig():
                         'command': 'mongod',
                         'dbengine': 'MongoDB',
                         'images': [
-                             ['MongoDB 3.4', 'mongo:3.4.1'],
+                             ['MongoDB 4.1.9', 'mongo:4.1.9'],
                         ]},
             'MariaDB': {'pub_ports': [3306],
                         'backupdir': '/var/backup',
@@ -140,7 +143,7 @@ class BaseConfig():
                         'command': 'mysqld',
                         'dbengine': 'MariaDB',
                         'images': [
-                                 ['MariaDB 10.1', 'mariadb:10.1.21'],
+                                 ['MariaDB 10.4', 'mariadb:10.4'],
                             ]},
             'Neo4j': {'pub_ports': [7473, 7687],  #7473:HTTPS  7687:Bolt
                       'backupdir': '/backup',
