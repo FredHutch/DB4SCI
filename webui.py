@@ -8,6 +8,7 @@ from mydb.mydb_setup import mydb_setup
 """Flask start script for DB4SCI 
 """
 
+
 mydb_setup()
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ fi
 
 echo "-- Check for DB4Sci clone"
 if [[ ! -d '/opt/DB4SCI/.git' ]]; then
-    echo ' - Cloning DB4Sci'
+    echo "-- Cloning DB4Sci"
     cd /opt
     git clone https://github.com/FredHutch/DB4SCI.git
 fi
@@ -70,8 +70,8 @@ apt-get -y -qq update && apt-get -y -qq install \
     software-properties-common
 
 echo "-- Install Python packages"
-pip install --upgrade pip
-pip install -r /opt/DB4SCI/requirements.txt
+pip install --quiet --upgrade pip
+pip install --quiet -r /opt/DB4SCI/requirements.txt
 
 echo "-- Checking for Docker"
 if [[ -x "$(command -v docker)" ]]; then
