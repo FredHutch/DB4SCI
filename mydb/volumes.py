@@ -2,7 +2,7 @@
 import os
 from config import Config
 
-"""DB4SCI can depoly containers on different storge volumes.
+"""DB4SCI can depoly containers on different storage volumes.
 Access to Volumes can be assigned to users.
 Create a new list of volumes based on username.  
 used by mydb_views to generate general_form.html
@@ -32,7 +32,7 @@ def cleanup_dirs(con_name):
     """
     db_vol = Config.data_volumes[0][1]
     for top in ["%s/%s" % (db_vol, con_name),
-                "%s/%s" % (Config.backup_vol, con_name)]:
+                "%s/%s" % (Config.backupvol, con_name)]:
         for root, dirs, files in os.walk(top, topdown=False):
             for name in files:
                 os.remove(os.path.join(root, name))

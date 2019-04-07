@@ -1,5 +1,6 @@
 awscli
 backports.ssl-match-hostname
+boto3
 botocore
 pyOpenSSL
 chardet

@@ -78,13 +78,7 @@ if __name__ == "__main__":
                         help='Delete test container')
     parser.add_argument('--backup', '-b', action='store_true', default=False,
                         help='backup %s' % params['dbname'])
-    parser.add_argument('--encrypt', '-e', action='store_true', default=False,
-                        help='enable encryption at rest')
     args = parser.parse_args()
-
-    if args.encrypt:
-        params['dbname'] = 'mariadb-enc'
-        params['EAR'] = 'Yes'
 
     if args.purge:
         delete_con(params)

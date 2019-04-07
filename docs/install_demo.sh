@@ -71,7 +71,7 @@ apt-get -y -qq update && apt-get -y -qq install \
 
 # pip install --quiet --upgrade pip
 echo "-- Install Python packages"
-pip2 install --quiet -r /opt/DB4SCI/requirements.txt
+pip2 install -q -r /opt/DB4SCI/requirements.txt
 
 echo "-- Checking for Docker"
 if [[ -x "$(command -v docker)" ]]; then
@@ -116,6 +116,7 @@ export AWS_ACCESS_KEY_ID=aws-access-key-id
 export AWS_SECRET_ACCESS_KEY=aws-secret-access-key
 
 export DB4SCI_HOST=localhost
+export DB4SCI_IP=`ip route get 8.8.8.8 | head -1 | sed 's/^.*src \([0-9\.]*\).*/\1/'`
 export DB4SCI_MODE=demo
 export SQLALCHEMY_DATABASE_URI="postgresql://mydbadmin:db4docker@${DB4SCI_HOST}:32009/mydb_admin"
 export AWS_BUCKET="s3://your-aws-bucker/prod"

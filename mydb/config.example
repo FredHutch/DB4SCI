@@ -17,7 +17,8 @@ class BaseConfig():
     base_port = 32010
 
     # container_host use output from uname -n
-    container_host = os.environ.get('DB4SCI_HOST') 
+    container_host = os.environ.get('DB4SCI_HOST')
+    container_ip = os.environ.get('DB4SCI_IP')
 
     # ISID of admin users, Admin uses can view/edit meta data
     admins = ['demo', 'admin1', 'admin2', 'admin3']
@@ -55,7 +56,7 @@ class BaseConfig():
     #          Database types are the keys from <info> dict:
     #          ['Postgres', 'MongoDB', 'MariaDB', 'Neo4j']
     # col[3] = List of uses authorized to use the volume.  
-    data_volumes = [['Standard',  '/mydb/dbs_data', ['ALL'], ['ALL']],
+    data_volumes = [['Standard',  '/mydb/db_data', ['ALL'], ['ALL']],
                     ['Admin',     '/mydb/admin_vol', ['Postgres'], ['Admin', 'dbUser']],
                     ['Encrypted', '/mydb/encrypted/', ['Postgres'], ['hippaAdmin']],
                     ['Example',   '/dev/null', ['ALL'], ['nobody']],
@@ -119,8 +120,8 @@ class BaseConfig():
                          'command': 'postgres',
                          'dbengine': 'Postgres',
                          'images': [
-                                 ['Postgres 9.6.10', 'postgres:9.6.12'],
-                                 ['Postgres 10.7', 'postgres:10.7'],
+                                 ['PostgreSQL 9.6.10', 'postgres:9.6.12'],
+                                 ['PostgreSQL 10.7', 'postgres:10.7'],
                               ]},
             'MongoDB': {'pub_ports': [27017],
                         'backupdir': '/var/backup',
@@ -138,6 +139,8 @@ class BaseConfig():
                         'backupdir': '/var/backup',
                         'volumes': [
                                 ['DBVOL', '/', '/var/lib/mysql'],
+                                ['DBVOL', '/keys', '/etc/mysql/keys'],
+                                ['DBVOL', '/conf.d', '/etc/mysql/conf.d'],
                                 [backupvol, '/', '/var/backup'],
                         ],
                         'command': 'mysqld',
