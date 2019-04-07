@@ -1,11 +1,8 @@
 *.pyc
 .aws
 aws.env
-env_setup.sh
 nohup.out
 mydb/config.py
-mydb/config.prod
-mydb/local_config.py
 build_run.sh
 *.key
 *.cert
@@ -15,5 +12,5 @@ prod/nginx/mydb.conf
 .idea/*
 test/*
 requirements.docker-ce
-admin_db
+admin_db/*
 aws_buckets.py
