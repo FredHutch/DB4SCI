@@ -27,17 +27,24 @@ def volumes(dbtype, username):
     return new_vols
 
 def cleanup_dirs(con_name):
-    """ remove old directories used by a container
-       this is dangerous only use with testing or debug
+    """remove old directories used by a container
+       this is dangerous only use with testing or debugging
     """
-    db_vol = Config.data_volumes[0][1]
-    for top in ["%s/%s" % (db_vol, con_name),
-                "%s/%s" % (Config.backupvol, con_name)]:
-        for root, dirs, files in os.walk(top, topdown=False):
-            for name in files:
-                os.remove(os.path.join(root, name))
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))
+    db_vol = None
+    backup_vol = "{}/{}".format(Config.backupvol, con_name)
+    for vol in Config.data_volumes:
+        db_vol = "{}/{}".format(vol, con_name)
+        if os.path.isdir(db_vol):
+            break
+    if db_vol:
+        for top in [db_vol, backup_vol]:
+            for root, dirs, files in os.walk(top, topdown=False):
+                for name in files:
+                    os.remove(os.path.join(root, name))
+                for name in dirs:
+                    os.rmdir(os.path.join(root, name))
+    else:
+        print("DEBUG: Data Volume for {} not found".format(con_name))
 
 if __name__ == '__main__':
     vol_lst = volumes('Postgres', 'admin')

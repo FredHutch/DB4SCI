@@ -50,7 +50,7 @@ cat server-cert.pem client-cert.pem > ca.pem
 chown 999:999 *
 
 # Copy client cert to static area for download
-echo Copy certs to static
+echo "-- Copy certs to website"
 cp ca-cert.pem    ../mydb/static
 cp client-cert.pem ../mydb/static
 cp client-key.pem  ../mydb/static

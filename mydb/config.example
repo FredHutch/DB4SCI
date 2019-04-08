@@ -136,11 +136,10 @@ class BaseConfig():
                              ['MongoDB 4.1.9', 'mongo:4.1.9'],
                         ]},
             'MariaDB': {'pub_ports': [3306],
-                        'backupdir': '/var/backup',
                         'volumes': [
-                                ['DBVOL', '/', '/var/lib/mysql'],
+                                ['DBVOL', '/data', '/var/lib/mysql'],
                                 ['DBVOL', '/keys', '/etc/mysql/keys'],
-                                ['DBVOL', '/conf.d', '/etc/mysql/conf.d'],
+                                ['DBVOL', '/conf.d/encrypt.cnf', '/etc/mysql/conf.d/encrypt.cnf'],
                                 [backupvol, '/', '/var/backup'],
                         ],
                         'command': 'mysqld',

@@ -50,23 +50,24 @@ def delete_con(params):
 if __name__ == "__main__":
     con_name = 'mariadb-test'
     dbtype = 'MariaDB'
-    params = {'dbname': con_name,
-              'dbuser': Config.accounts['test_user']['admin'],
-              'support': 'Basic',
-              'owner': Config.accounts['test_user']['owner'],
-              'description': 'Test the Dev',
-              'contact': Config.accounts['test_user']['contact'],
-              'life': 'medium',
-              'backup_type': 'User',
-              'backup_freq': 'Daily',
-              'backup_life': '6',
-              'backup_window': 'any',
-              'maintain': 'standard',
-              'phi': 'No',
-              'pitr': 'n',
-              'username': Config.accounts['test_user']['admin'],
-              'db_vol': '/mydb/dbs_data',
-              }
+    params = dict(
+        dbname=con_name,
+        dbuser=Config.accounts['test_user']['admin'],
+        support='Basic',
+        owner=Config.accounts['test_user']['owner'],
+        description='Test the Dev',
+        contact=Config.accounts['test_user']['contact'],
+        life='medium',
+        backup_type='User',
+        backup_freq='Daily',
+        backup_life='6',
+        backup_window='any',
+        maintain='standard',
+        phi='No',
+        pitr='n',
+        username=Config.accounts['test_user']['admin'],
+        db_vol='/mydb/db_data',
+    )
     params['dbuserpass'] = unicode(Config.accounts['test_user']['admin_pass'])
     params['dbtype'] = dbtype
     params['port'] = container_util.get_max_port()

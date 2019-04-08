@@ -44,17 +44,17 @@ def copy_tsl(con_name, db_vol):
              'ca-cert.pem']
     source = '/opt/DB4SCI/TLS/'
     destination = db_vol + '/' + con_name + '/keys/'
-    for file in files:
-        print("copy %s %s" % (source + file, destination))
-        shutil.copy(source + file, destination)
-        os.chown(destination + file, 999, 999)
+    for file_name in files:
+        print("copy %s %s" % (source + file_name, destination))
+        shutil.copy(source + file_name, destination)
+        os.chown(destination + file_name, 999, 999)
     source = '/opt/DB4SCI/dbconfig/MariaDB/encrypt.cnf'
     destination = db_vol + '/' + con_name + '/conf.d/'
     shutil.copy(source, destination)
                  
 
 def encrypt_key_file(key_file, enc_file, password):
-    ''' Encrypt contents of <key_file> and write to <enc_file> '''
+    """Encrypt contents of <key_file> and write to <enc_file>"""
     cmd_template = 'openssl enc -aes-256-cbc -md sha1 -k %s -in %s -out %s'
     cmd = cmd_template % (password, key_file, enc_file)
     print('encrypting keys: %s' % cmd)
@@ -68,7 +68,7 @@ def derive_key_and_iv(password):
     salt = Random.new().read(iv_length - len('Salted__'))
     d = d_i = ''
     while len(d) < key_length + iv_length:
-        d_i = md5(d_i + password.encode('ascii','ignore') + salt).digest()
+        d_i = md5(d_i + password.encode('ascii', 'ignore') + salt).digest()
         d += d_i
     return salt, d[:key_length], d[key_length:key_length+iv_length]
 

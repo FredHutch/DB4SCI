@@ -1,4 +1,5 @@
 [mariadb]
+bind-address=0.0.0.0
 innodb-encrypt-tables = FORCE
 innodb-encrypt-log
 innodb-encryption-threads = 1

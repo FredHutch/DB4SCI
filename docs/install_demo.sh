@@ -47,6 +47,9 @@ mkdir -p ${basedir}{backup,data,logs}
 mkdir -p ${basedir}{uwsgi,nginx}
 sudo mkdir -p /var/log/uwsgi
 
+echo "-- Generate Selfsigned TLS Certs"
+/opt/DB4SCI/TLS-create.sh
+
 echo "-- Install OS packages"
 apt-get -y -qq update && apt-get -y -qq install \
     python \
