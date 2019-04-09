@@ -33,8 +33,13 @@ else
     exit 1
 fi
 
-groupadd -f --gid 999 docker
-useradd -u 999 -g 999 -s /bin/nologin docker
+echo "-- Create docker user"
+if [[ stat=`groupadd -f --gid 999 docker` ]]; then
+    echo group docker exists
+fi
+if [[ stat=`useradd -u 999 -g 999 -s /bin/nologin docker` ]]; then
+    echo user docker exists
+fi
 
 echo "-- Create directories"
 basedir=/opt/DB4SCI

@@ -103,7 +103,7 @@ def create_mariadb(params):
     cmd = config_dat['command'] + ' --ft_min_word_len=3'
     (c_id, con) = container_util.create_con(params, env, cmd)
     print("DEBUG: MariaDB created. ID=%s\n" % con['Id'])
-    time.sleep(5)
+    time.sleep(20)
     status = maria_create_account(params)
     badness = 0
     while status == 'connect error' and badness < 6:
