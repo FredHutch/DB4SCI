@@ -6,6 +6,7 @@
     <link rel="icon" type="image/png" href="images/fredhutch.ico">
     <link rel="stylesheet" type="text/css" href="css/nav.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
 </head>
 <body>
 <div>
@@ -24,6 +25,9 @@
      <li ><a href="db4sci_arch.html">Architecture</a></li>
      <li ><a href="download.html">Download</a></li>
      <li><a href="install.html">Install</a></li>
+    <li possition="bottom">
+       <a class="github-button" href="https://github.com/ntkme/github-buttons/fork" data-size="large" aria-label="Fork ntkme/github-buttons on GitHub">Fork</a>
+    </li>
    </ul>
 </nav> <!-- end "nav" -->
 <div class="outerbox">
@@ -33,17 +37,31 @@
             and running quickly, a demo mode is available for Linux. Demo mode
             functions just like a production instance but is not secure for
             production use. Demo mode removes TLS encryption and authentication.
-            Run the install script on Ubuntu 16.04 or 18.04 virtual machine.
+            Run the install script on Ubuntu 16.04 or 18.04.
             Install can take 20 minutes or longer depending on your internet
             connection. The install script downloads all needed Docker
-            container.
+            containers and clones the Git repo. Production and demo use the
+            code.  To configure for production use the application needs to be
+            made configured and made secure. See: <a href="install.html">Install</a>
         </p>
-        <a id=content href='install_demo.sh' download="install_demo.sh">Demo Install</a>
+        <p>
+        <a id=content href='install_demo.sh' download="install_demo.sh">
+            Download Install Script</a>
+        </p>
+        <code><pre>
+Install dbi4sci demo on a Ubuntu host as root.
+curl http://db4sci.org/install_demo.sh | bash
+        </pre>
+        </code>
     </div>
 </div>
 
-<div id="footer">
-  <p id=text>Fred Hutchinson Cancer Research Center | 1100 Fairview Ave. N., Seattle, WA 98109</p>
+<div class="footer">
+    <p>Fred Hutchinson Cancer Research Center | 1100 Fairview Ave. N., Seattle, WA 98109</p>
+    <div class="right_footer">
+        <a href="https://github.com/FredHutch/DB4SCI">GitHub Repo</a></li>
+    </div>
+    </ul>
 </div>
 </body>
 </html>

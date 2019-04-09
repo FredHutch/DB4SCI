@@ -47,12 +47,11 @@ nav ul {
   ::border-radius: 4px 0 0 0;
 }
 .nav > li:last-child { 
-  ::border-radius: 0 0 4px 0; 
-  ::margin-right: 0;
+  ::border-radius: 0 0 0px 0;
+  ::margin: 0 30 -5 0;
+  ::margin-right: .5em;
 } 
-.nav > li:last-child > a { 
-  ::border-radius: 0 4px 0 0;
-}
+
 .nav li li a { 
   color: white;
   background-color: #123054;   /* Hutch Dark Blue */

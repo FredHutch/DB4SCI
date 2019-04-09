@@ -6,7 +6,7 @@
 #
 # Demo Mode 
 # install DB4SCI for demo purposes. TSL and authentication
-# are not configured. Requires local install of Docker CE >18.0
+# are not configured.
 #
 #  John Dey jfdey@fredhutch.org
 #  Oct 2018
@@ -41,11 +41,12 @@ if [[ stat=`useradd -u 999 -g 999 -m -s /bin/nologin docker` ]]; then
     echo user docker exists
 fi
 
-echo "-- Create directories"
+echo "-- Create SourceDir"
 basedir=/opt/DB4SCI
-sudo mkdir -p ${basedir}
-chown 999:999 ${basedir}
-sudo mkdir -p /var/log/uwsgi
+if [[ ! -d ${basedir} ]]; then
+    mkdir -p ${basedir}
+    chown 999:999 ${basedir}
+fi
 
 echo "-- Check for DB4Sci clone"
 if [[ ! -d '/opt/DB4SCI/.git' ]]; then
@@ -54,6 +55,14 @@ if [[ ! -d '/opt/DB4SCI/.git' ]]; then
     su -s /bin/bash docker -c "git clone https://github.com/FredHutch/DB4SCI.git"
 fi
 
+echo "-- Create directories"
+mkdir -p ${basedir}/admin_db
+mkdir -p ${basedir}/admin_db/{data,backup}
+chown -R 999:999 ${basedir}/admin_db
+
+mkdir -p /mydb/{db_data,db_backups,logs}
+mkdir -p /mydb/logs/{uwsgi,nginx}
+chown -R 999:999 /mydb
 
 echo "-- Install OS packages"
 apt-get -y -qq update && apt-get -y -qq install \
@@ -100,7 +109,7 @@ fi
 
 echo "-- Check for docker-compose"
 if [[ -x "$(command -v docker-compose)" ]]; then
-    echo "-- Docker-compose install"
+    echo "-- Docker-compose is installed"
 else
     echo "-- Installing docker-compose"
     curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -115,27 +124,25 @@ docker pull postgres:10.7
 docker pull mongo:4.1.9
 docker pull nginx:1.15.10
 
-# Setup Environment
-su -s /bin/bash - docker
-
-echo "-- Generate Selfsigned TLS Certs"
-/opt/DB4SCI/TLS/TLS-create.sh
-cd /opt/DB4SCI
+echo "-- Generate Selfsigned TLS Certs (https)"
+sudo -u docker /opt/DB4SCI/TLS/TLS-create.sh
 
 # In production mode the script env_setup.sh is used to setup the environment.
 # edit env_setup.sh
 # source ./env_setup.sh prod
+sudo -u docker bash <<EOF
+cd /opt/DB4SCI
+
+echo "-- Setup Environment"
 export AWS_ACCESS_KEY_ID=aws-access-key-id
 export AWS_SECRET_ACCESS_KEY=aws-secret-access-key
-
 export DB4SCI_HOST=localhost
 export DB4SCI_IP=`ip route get 8.8.8.8 | head -1 | sed 's/^.*src \([0-9\.]*\).*/\1/'`
 export DB4SCI_MODE=demo
-export SQLALCHEMY_DATABASE_URI="postgresql://mydbadmin:db4docker@${DB4SCI_HOST}:32009/mydb_admin"
+export SQLALCHEMY_DATABASE_URI="postgresql://mydbadmin:db4docker@${DB4SCI_IP}:32009/mydb_admin"
 export AWS_BUCKET="s3://your-aws-bucker/prod"
-export SSL_CERTS="/opt/DB4SCI/ssl"
+export DB4SCI_CERTS="/opt/DB4SCI/ssl"
 
-cd /opt/DB4SCI
 if [[ ! -f /opt/DB4SCI/mydb/conif.py ]]; then
     echo "-- Copy Config from example"
     cp mydb/config.example mydb/config.py
@@ -143,3 +150,4 @@ fi
 
 echo "-- Start the Flask App..."
 exec python /opt/DB4SCI/webui.py
+EOF
