@@ -36,9 +36,9 @@ file_key_management_filekey = secret
 
 
 def copy_tsl(con_name, db_vol):
-    """Copy TLS server keys to mairadb keys volume
+    """Copy TLS server keys to mairadb /keys directory
     Copy MariaDB encrypt.cnf to /etc/mysql/conf.d volume
-       code is run from db4sci container
+    code is run from db4sci container
     """
     files = ['server-cert.pem', 'server-key.pem', 'server-req.pem',
              'ca-cert.pem']
@@ -48,6 +48,7 @@ def copy_tsl(con_name, db_vol):
         print("copy %s %s" % (source + file_name, destination))
         shutil.copy(source + file_name, destination)
         os.chown(destination + file_name, 999, 999)
+        os.chmod(encname, 0o700)
     source = '/opt/DB4SCI/dbconfig/MariaDB/encrypt.cnf'
     destination = db_vol + '/' + con_name + '/conf.d/'
     shutil.copy(source, destination)

@@ -6,10 +6,8 @@
 # CA expires in 5 years.  remove TLS/ca-cert.pem and re-run script 
 #
 
-if [[ ! -d TLS ]]; then
-    mkdir TLS
-fi
-cd TLS 
+TLS_HOME=/opt/DB4SCI/TLS
+cd ${TLS_HOME}
 
 if [[ -e ca-cert.pem ]]; then
     echo CA exists. It should not be changed.
@@ -48,6 +46,7 @@ cat server-cert.pem client-cert.pem > ca.pem
 
 # chown to mysql (999)
 chown 999:999 *
+chmod 600 *
 
 # Copy client cert to static area for download
 echo "-- Copy certs to website"

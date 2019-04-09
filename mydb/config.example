@@ -90,7 +90,6 @@ class BaseConfig():
                               'owner': 'Your Name'}
                 }
 
-    
     # Default admin db instance name and port number
     # These do not need to change
     admindb_name = 'mydb_admin'
@@ -111,47 +110,46 @@ class BaseConfig():
     # first column is 'Display Name'
     # second column is 'image name'
     # firt row of image is default
-    info = {'Postgres': {'pub_ports': [5432],
-                         'backupdir': '/var/lib/postgresql/backup',
-                         'volumes': [
-                                ['DBVOL', '/', '/var/lib/postgresql/data'],
-                                [backupvol, '/', '/var/lib/postgresql/backup'],
-                             ],
-                         'command': 'postgres',
-                         'dbengine': 'Postgres',
-                         'images': [
-                                 ['PostgreSQL 9.6.10', 'postgres:9.6.12'],
-                                 ['PostgreSQL 10.7', 'postgres:10.7'],
-                              ]},
-            'MongoDB': {'pub_ports': [27017],
-                        'backupdir': '/var/backup',
-                        'volumes': [
-                            ['DBVOL', '/db', '/data/db'],
-                            ['DBVOL', '/configdb', '/data/configdb'],
-                            [backupvol, '/', '/var/backup'],
-                        ],
-                        'command': 'mongod',
-                        'dbengine': 'MongoDB',
-                        'images': [
-                             ['MongoDB 4.1.9', 'mongo:4.1.9'],
-                        ]},
-            'MariaDB': {'pub_ports': [3306],
-                        'volumes': [
-                                ['DBVOL', '/data', '/var/lib/mysql'],
-                                ['DBVOL', '/keys', '/etc/mysql/keys'],
-                                ['DBVOL', '/conf.d/encrypt.cnf', '/etc/mysql/conf.d/encrypt.cnf'],
-                                [backupvol, '/', '/var/backup'],
-                        ],
-                        'command': 'mysqld',
-                        'dbengine': 'MariaDB',
-                        'images': [
-                                 ['MariaDB 10.4', 'mariadb:10.4'],
-                            ]},
-            'Neo4j': {'pub_ports': [7473, 7687],  #7473:HTTPS  7687:Bolt
+    # volumes: [source
+    info = {
+        'Postgres': {
+            'pub_ports': [5432],
+            'backupdir': '/var/lib/postgresql/backup',
+            'volumes': [
+                 ['DBVOL', '/', '/var/lib/postgresql/data'],
+                 [backupvol, '/', '/var/lib/postgresql/backup'],],
+            'command': 'postgres',
+            'dbengine': 'Postgres',
+            'images': [
+                ['PostgreSQL 9.6.10', 'postgres:9.6.12'],
+                ['PostgreSQL 10.7', 'postgres:10.7'],]},
+        'MongoDB': {
+            'pub_ports': [27017],
+            'backupdir': '/var/backup',
+            'volumes': [
+                ['DBVOL', '/db/', '/data/db'],
+                ['DBVOL', '/configdb/', '/data/configdb'],
+                [backupvol, '/', '/var/backup'],],
+            'command': 'mongod',
+            'dbengine': 'MongoDB',
+            'images': [
+                ['MongoDB 4.1.9', 'mongo:4.1.9'],]},
+        'MariaDB': {
+            'pub_ports': [3306],
+            'volumes': [
+                ['DBVOL', '/data/', '/var/lib/mysql'],
+                ['DBVOL', '/keys/', '/keys'],
+                ['DBVOL', '/conf.d/encrypt.cnf', '/etc/mysql/conf.d/encrypt.cnf'],
+                [backupvol, '/', '/var/backup'],],
+            'command': 'mysqld',
+            'dbengine': 'MariaDB',
+            'images': [
+                ['MariaDB 10.4', 'mariadb:10.4'],]},
+        'Neo4j': {'pub_ports': [7473, 7687], # 7473:HTTPS  7687:Bolt
                       'backupdir': '/backup',
                       'volumes': [
-                                ['DBVOL', '/data', '/data'],
-                                ['DBVOL', '/logs', '/logs'],
+                                ['DBVOL', '/data/', '/data'],
+                                ['DBVOL', '/logs/', '/logs'],
                                 [backupvol, '/', '/backup'],
                             ],
                       'command': 'neo4j',

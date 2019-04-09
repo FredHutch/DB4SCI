@@ -278,15 +278,21 @@ def kill_con(dbname, dbuser, dbuserpass, username):
 
 def make_dirs(con_name, volumes):
     """ Create data and backup directories for new container
+    volumes is list of list from config.info[DBtype]
+    names terminated with "/" are directories
+    else names are files
     """
     for dir in volumes:
-        if not dir[0]:
-            continue
-        path = dir[0] + '/' + con_name + dir[1]
+        if dir[1][-1] == '/':
+            path = dir[0] + '/' + con_name + dir[1]
+        else:
+            dir_name = os.path.dirname(dir[1])
+            path = dir[0] + '/' + con_name + dir_name
         print("DEBUG: makedir(%s)" % path)
         try:
             os.makedirs(path)
             os.chmod(path, 0o777)
+            os.chown(path, 999, 999)
         except OSError as exc:
             if exc.errno != errno.EEXIST:
                 print("Error creating directory: %s errno: %s" % (path, exc))
