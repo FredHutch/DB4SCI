@@ -1,11 +1,11 @@
 version: '2'
 
 services:
-    dbaas:
-        image: dbaas:1.7.0
+    mydb:
+        image: mydb:1.7.0
         build:
             context: .
-        container_name: dbaas
+        container_name: mydb
 
         #  Expose ports without publishing them to the host machine
         #  they’ll only be accessible to linked services. Only the internal port can be specified.
@@ -43,10 +43,10 @@ services:
             - "443:443"
 
         links:
-            - dbaas:dbaas
+            - mydb:mydb
 
         depends_on:
-            - dbaas
+            - mydb
 
         environment:
             - "TZ=America/Los_Angeles"
