@@ -37,7 +37,7 @@ echo "-- Create docker user"
 if [[ stat=`groupadd -f --gid 999 docker` ]]; then
     echo group docker exists
 fi
-if [[ stat=`useradd -u 999 -g 999 -s /bin/nologin docker` ]]; then
+if [[ stat=`useradd -u 999 -g 999 -m -s /bin/nologin docker` ]]; then
     echo user docker exists
 fi
 
@@ -54,8 +54,6 @@ if [[ ! -d '/opt/DB4SCI/.git' ]]; then
     su -s /bin/bash docker -c "git clone https://github.com/FredHutch/DB4SCI.git"
 fi
 
-echo "-- Generate Selfsigned TLS Certs"
-/opt/DB4SCI/TLS/TLS-create.sh
 
 echo "-- Install OS packages"
 apt-get -y -qq update && apt-get -y -qq install \
@@ -117,10 +115,15 @@ docker pull postgres:10.7
 docker pull mongo:4.1.9
 docker pull nginx:1.15.10
 
-# Setup Environment 
+# Setup Environment
+su -s /bin/bash - docker
+
+echo "-- Generate Selfsigned TLS Certs"
+/opt/DB4SCI/TLS/TLS-create.sh
+cd /opt/DB4SCI
+
 # In production mode the script env_setup.sh is used to setup the environment.
-# cp env_setup.demo env_setup.sh 
-# edit env_setup.sh 
+# edit env_setup.sh
 # source ./env_setup.sh prod
 export AWS_ACCESS_KEY_ID=aws-access-key-id
 export AWS_SECRET_ACCESS_KEY=aws-secret-access-key

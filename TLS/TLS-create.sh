@@ -15,13 +15,15 @@ if [[ -e ca-cert.pem ]]; then
 fi
 
 echo '> create CA Key'
-openssl genrsa 4096 > ca-key.pem
+openssl genrsa 2048 > ca-key.pem
 
 echo '> create CA'
-openssl req -new -x509 -nodes -days 1825 -config ca.cnf -key ca-key.pem -out ca-cert.pem
+openssl req -new -x509 -nodes -days 1825 -subj '/CN=MyDb'\
+  -config ca.cnf -key ca-key.pem -out ca-cert.pem
 
 echo '> Create the server certificate'
-openssl req -newkey rsa:4096 -config server.cnf -nodes -keyout server-key.pem -out server-req.pem
+openssl req -newkey rsa:4096 -subj '/CN=MyDB-server'\
+  -config ca.cnf -nodes -keyout server-key.pem -out server-req.pem
 
 echo '> Process the server RSA key'
 openssl rsa -in server-key.pem -out server-key.pem
@@ -33,7 +35,8 @@ echo '> life of cert'
 openssl x509 -enddate -noout -in server-cert.pem
 
 echo '> Create client certificate'
-openssl req -newkey rsa:4096 -config client.cnf -nodes -keyout client-key.pem -out client-req.pem
+openssl req -newkey rsa:4096 --sub '/CN=MyDB-client'\
+  -config ca.cnf -nodes -keyout client-key.pem -out client-req.pem
 
 echo '> Process the client RSA key'
 openssl rsa -in client-key.pem -out client-key.pem

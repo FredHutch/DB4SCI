@@ -9,20 +9,39 @@
   <div class="document">
     <h2>Congratulations!</h2>
 
-<p>You have successfully downloaded and installed DB4Sci! Thanks for downing DB4Sci we hope you find this software helpful. This is a demo install and not indented for production use.  DB4Sci should be used with SSL. Your site SSL certificates need to be made part of your local instance.   After you completed local configurations for your site this instance can be put into production.
+    <p>You have successfully downloaded and installed DB4Sci! Thanks for downing
+      DB4Sci we hope you find this software helpful. This is a demo install and
+      not indented for production use.  DB4Sci should be used with SSL. Your
+      site SSL certificates need to be made part of your local instance.
+      After you completed local configurations for your site this instance can
+      be put into production.</p>
 
-<h4>Configure for Production</h4>
-Use your favorite text editor to complete the configuration of DB4Sci.  The configuration file is located at <kbd>/opt/DB4SCI/mydb/local_config.py</kbd>. You will need to know how a few things aboutyour local environment.
-<br>
-<ul>
-  <li>Adminitrative Users - Provide a list of ISIDs for staff who will have admin rights to the application. 
-<li>Active Director - A list of domain controllers and your domain name 
-<li>Email Config - SMTP server, Email alias for users to recieve DB4Sci events; like new container creation and backup notices.
-<li>Data Volumes - Path to data volumes which will be used to store the database data. More than one volume can be specified. Your site can provide users with multiple options for storage based on performance and cost. Volumes can be filtered by user and database types. Example a volume with limited capacity for administrative users which is separate from a high-performance volume for production databases. 
-<li>Database admin accounts.  A list of username and passwords for administrative access.  These accounts are independent of the accounts created by users for the purpose of backups.
-<li>AWS S3 credentials for backups
-<li>TimeZone - Your local time
-</ul>
+    <h4>Configure for Production</h4>
+    <p>Use your favorite text editor to complete the configuration of DB4Sci.  The
+    configuration file is located at <kbd>/opt/DB4SCI/mydb/config.py</kbd>. You
+    will need to know how a few things aboutyour local environment.</p>
+
+    <ul>
+      <li>Adminitrative Users - Provide a list of ISIDs for staff who will have
+        admin rights to the application.</li>
+      <li>Active Director - A list of domain controllers and your domain name</li>
+      <li>Email Config - SMTP server, Email alias for users to recieve DB4Sci
+        events; like new container creation and backup notices.</li>
+      <li>Data Volumes - Path to data volumes which will be used to store the
+        database data. More than one volume can be specified. Your site can
+        provide users with multiple options for storage based on performance
+        and cost. Volumes can be filtered by user and database types. Example a
+        volume with limited capacity for administrative users which is separate
+        from a high-performance volume for production databases.</li>
+      <li>Database admin accounts.  A list of username and passwords for
+        administrative access.  These accounts are independent of the accounts
+        created by users for the purpose of backups.</li>
+      <li>AWS S3 credentials for backups</li>
+      <li>TimeZone - Your local time</li>
+    </ul>
+    <p>Additionally edit TLS/ca.cnf, server.cnf and client.cnf files. Change the
+      distiguished name to your orgainization. Run TLS-create.sh to recreate
+    keys.</p>
 
   </div> <!-- class="document" -->
 </div> <!-- id="container" -->
