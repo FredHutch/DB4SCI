@@ -48,7 +48,7 @@ def copy_tsl(con_name, db_vol):
         print("copy %s %s" % (source + file_name, destination))
         shutil.copy(source + file_name, destination)
         os.chown(destination + file_name, 999, 999)
-        os.chmod(encname, 0o700)
+        os.chmod(destination + file_name, 0o600)
     source = '/opt/DB4SCI/dbconfig/MariaDB/encrypt.cnf'
     destination = db_vol + '/' + con_name + '/conf.d/'
     shutil.copy(source, destination)

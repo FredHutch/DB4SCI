@@ -33,19 +33,21 @@ else
     exit 1
 fi
 
-echo "-- Check for DB4Sci clone"
-if [[ ! -d '/opt/DB4SCI/.git' ]]; then
-    echo "-- Cloning DB4Sci"
-    cd /opt
-    git clone https://github.com/FredHutch/DB4SCI.git
-fi
+groupadd -f --gid 999 docker
+useradd -u 999 -g 999 -s /bin/nologin docker
 
 echo "-- Create directories"
 basedir=/opt/DB4SCI
 sudo mkdir -p ${basedir}
-mkdir -p ${basedir}{backup,data,logs}
-mkdir -p ${basedir}{uwsgi,nginx}
+chown 999:999 ${basedir}
 sudo mkdir -p /var/log/uwsgi
+
+echo "-- Check for DB4Sci clone"
+if [[ ! -d '/opt/DB4SCI/.git' ]]; then
+    echo "-- Cloning DB4Sci"
+    cd /opt
+    su -s /bin/bash docker -c "git clone https://github.com/FredHutch/DB4SCI.git"
+fi
 
 echo "-- Generate Selfsigned TLS Certs"
 /opt/DB4SCI/TLS/TLS-create.sh

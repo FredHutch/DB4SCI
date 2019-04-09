@@ -107,7 +107,7 @@ def create_mariadb(params):
     status = maria_create_account(params)
     badness = 0
     while status == 'connect error' and badness < 6:
-        time.sleep(3)
+        time.sleep(5)
         badness += 1
         status = maria_create_account(params)
     if status != 'ok':
