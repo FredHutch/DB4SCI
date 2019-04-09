@@ -32,30 +32,30 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
     apt-get -y -qq install docker-ce
 
 # Create the sttrweb user and data directory
-RUN mkdir /opt/dbaas && \
+RUN mkdir /opt/DB4SCI && \
     mkdir /mydb && \
     mkdir /mydb/db_data && \
     mkdir /mydb/db_backups && \
     mkdir -p /var/run/postgresdb
 
-RUN groupadd -f --gid 999 dbaas 
+RUN groupadd -f --gid 999 db4sci
 RUN useradd -u 999 -g 999 -s /bin/nologin docker
 
 # Install Python packages
 
-ADD requirements.txt /opt/dbaas/
-RUN pip install pip==9.0.1 && pip install -r /opt/dbaas/requirements.txt 
+ADD requirements.txt /opt/DB4SCI/
+RUN pip install pip==9.0.1 && pip install -r /opt/DB4SCI/requirements.txt
 
 # Copy files to container
 ENV env dev 
-ADD *.py /opt/dbaas/
-#ADD ${env}/neo4j /opt/dbaas/neo4j
-ADD TLS /opt/dbaas/TLS
-ADD dbconfig /opt/dbaas/dbconfig
-ADD mydb /opt/dbaas/mydb/
-ADD uwsgi.ini /opt/dbaas/
+ADD *.py /opt/DB4SCI/
+#ADD ${env}/neo4j /opt/DB4SCI/neo4j
+ADD TLS /opt/DB4SCI/TLS
+ADD dbconfig /opt/DB4SCI/dbconfig
+ADD mydb /opt/DB4SCI/mydb/
+ADD uwsgi.ini /opt/DB4SCI/
 
 # Switch to the server directory and start it up
-WORKDIR /opt/dbaas
+WORKDIR /opt/DB4SCI
 
 CMD ["uwsgi", "--ini", "uwsgi.ini"]
