@@ -28,7 +28,7 @@ def mydb_setup():
     # wait for container to startup
     print('Container Id: %s' % params['con']['Id'] )
     print('Waiting for mydb_admin to start')
-    time.sleep(5)
+    time.sleep(20)
     badness = 0
     status = False
     while (not status) and (badness < 6):
@@ -37,7 +37,7 @@ def mydb_setup():
                                           params['dbuserpass'], 
                                           params['port'])
         print('mydb_admin setup status: %s count: %d' % (status, badness))
-        time.sleep(3)
+        time.sleep(5)
     if not status:
         print('mydb_admin restart error. Could not setup db')
         return
