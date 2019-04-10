@@ -78,16 +78,16 @@ def create_mariadb(params):
     :param params: dict
     :return: Help message for end user
     """
-    dbtype = params['dbtype'] 
     con_name = params['dbname']
+    if container_util.container_exists(con_name):
+        return "Container name %s already in use" % con_name
+    dbtype = params['dbtype']
     config_dat = Config.info[params['dbtype']]
     volumes = config_dat['volumes']
     print('DEBUG: DBVOL: %s' % params['db_vol'])
     for vol in volumes:
         if vol[0] == 'DBVOL': vol[0] = params['db_vol']
         if vol[0] == 'BAKVOL': vol[0] = Config.backup_vol
-    if container_util.container_exists(con_name):
-        return "Container name %s already in use" % con_name
     container_util.make_dirs(con_name, volumes)
     #  Add key volume, encrypt.cnf file
     result = make_keys.create_mariadb_key(con_name, params)
@@ -96,42 +96,33 @@ def create_mariadb(params):
     pub_port = config_dat['pub_ports'][0]
     params['port_bindings'] = {pub_port: (Config.container_ip,str(port))}
     env = {'MYSQL_ROOT_PASSWORD': Config.accounts[dbtype]['admin_pass'],
-           'DB_USER': params['dbuser']}
+           'MYSQL_USER': params['dbuser'],
+           'MYSQL_PASSWORD': params['dbuserpass'],}
 
     # create container
     container_util.make_dirs(con_name, volumes)
     cmd = config_dat['command'] + ' --ft_min_word_len=3'
     (c_id, con) = container_util.create_con(params, env, cmd)
     print("DEBUG: MariaDB created. ID=%s\n" % con['Id'])
-    time.sleep(20)
-    status = maria_create_account(params)
-    badness = 0
-    while status == 'connect error' and badness < 6:
-        time.sleep(5)
-        badness += 1
-        status = maria_create_account(params)
-    if status != 'ok':
-        res = 'This is embarrassing. Your MariaDB container; %s ' % params['dbname']
-        res += 'has been created but I was unable to create your account.\n'
-        res += 'This unfortunate incident will be reported to the DB4SCI admin staff.'
-        send_mail("DB4SCI: Error creating account", res)
-    else:
-        res = "Your MariaDB container has been created. "
-        res += "Container name: %s\n\n" % con_name
-        res += "Use mysql command line tools to access your new MariaDB.\n\n"
-        res += "mysql --host %s --port %s --user %s --password\n\n" % (
-               Config.container_host,
-               params['port'],
-               params['dbuser'])
-        res += 'Leave the password argument blank. You will be prompted to enter '
-        res += 'the password.\n\n'
-        res += 'Encryption at Rest is enabled and TLS support is enabled.'
-        res += 'Download TLS keys from the Documentation tab. Select "TLS '
-        res += 'for MariaDB."'
+    time.sleep(10)
+    #status = maria_create_account(params)
+    res = "Your MariaDB container has been created. "
+    res += "Container name: %s\n\n" % con_name
+    res += "Use mysql command line tools to access your new MariaDB.\n\n"
+    res += "mysql --host %s --port %s --user %s --password\n\n" % (
+           Config.container_host,
+           params['port'],
+           params['dbuser'])
+    res += 'Leave the password argument blank. You will be prompted to enter '
+    res += 'the password.\n\n'
+    res += 'Encryption at Rest is enabled and TLS support is enabled.'
+    res += 'Download TLS keys from the Documentation tab. Select "TLS '
+    res += 'for MariaDB."'
+    res += 'Container Status: {}'.format(con['status'])
 
-        msg = 'MariaDB created: %s\n' % params['dbname']
-        msg += 'Created by: %s <%s>\n' % (params['owner'], params['contact'])
-        send_mail("DB4SCI: created MariaDB", msg)
+    msg = 'MariaDB created: %s\n' % params['dbname']
+    msg += 'Created by: %s <%s>\n' % (params['owner'], params['contact'])
+    send_mail("DB4SCI: created MariaDB", msg)
     return res
 
 

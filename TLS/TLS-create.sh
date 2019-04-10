@@ -18,31 +18,33 @@ echo '> create CA Key'
 openssl genrsa 2048 > ca-key.pem
 
 echo '> create CA'
-openssl req -new -x509 -nodes -days 1825 -subj '/CN=MyDb'\
-  -config ca.cnf -key ca-key.pem -out ca-cert.pem
+openssl req -new -x509 -nodes -days 1825 -config ca.cnf -key ca-key.pem \
+    -out ca-cert.pem
 
 echo '> Create the server certificate'
-openssl req -newkey rsa:4096 -subj '/CN=MyDB-server'\
-  -config ca.cnf -nodes -keyout server-key.pem -out server-req.pem
+openssl req -newkey rsa:4096 -config server.cnf -nodes -keyout server-key.pem \
+    -out server-req.pem
 
 echo '> Process the server RSA key'
 openssl rsa -in server-key.pem -out server-key.pem
 
 echo '> Sign the server certificate'
-openssl x509 -req -in server-req.pem -days 1825 -CA ca-cert.pem -CAkey ca-key.pem -CAkey ca-key.pem -set_serial 01 -out server-cert.pem
+openssl x509 -req -in server-req.pem -days 1825 -CA ca-cert.pem \
+    -CAkey ca-key.pem -CAkey ca-key.pem -set_serial 01 -out server-cert.pem
 
 echo '> life of cert'
 openssl x509 -enddate -noout -in server-cert.pem
 
 echo '> Create client certificate'
-openssl req -newkey rsa:4096 --sub '/CN=MyDB-client'\
-  -config ca.cnf -nodes -keyout client-key.pem -out client-req.pem
+openssl req -newkey rsa:4096 \
+  -config client.cnf -nodes -keyout client-key.pem -out client-req.pem
 
 echo '> Process the client RSA key'
 openssl rsa -in client-key.pem -out client-key.pem
 
 echo '> Sign the client certificate'
-openssl x509 -req -in client-req.pem -days 1825 -CA ca-cert.pem -CAkey ca-key.pem -set_serial 01 -out client-cert.pem
+openssl x509 -req -in client-req.pem -days 1825 -CA ca-cert.pem \
+    -CAkey ca-key.pem -set_serial 01 -out client-cert.pem
 
 # Combine server and client CA certificate into a single file:
 cat server-cert.pem client-cert.pem > ca.pem
