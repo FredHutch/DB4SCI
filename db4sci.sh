@@ -33,6 +33,7 @@ case $DB4SCI_MODE in
     "prod")
         ;;
     "demo")
+        export DB4SCI_HOST=${DB4SCI_IP}
         ;;
     "dev")
         export AWS_BUCKET=${AWS_BUCKET}/dev

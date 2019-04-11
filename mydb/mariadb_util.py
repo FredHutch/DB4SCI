@@ -33,7 +33,8 @@ def auth_mariadb(dbuser, dbpass, port):
 
 
 def maria_create_account(params):
-    """
+    """root user and dbuser are created at startup.
+    grant all to dbuser is all we need to do after the DB starts
     :type params: dict
     """
     error_msg = 'ERROR: mariadb_util; maria_create_account; '
@@ -49,17 +50,6 @@ def maria_create_account(params):
         return "connect error"
 
     cur = conn.cursor()
-    # Dropping a user that does not exist is MariaDB,
-    # it the use is not dropped the user create fails with existing user error
-    try:
-        cur.execute('DROP USER {0:s}@\'%\''.format(params['dbuser']))
-    except pymysql.err.InternalError as e:
-        print(error_msg % ('drop', params['dbuser'], e))
-    try:
-        cur.execute("CREATE USER '%s'@'%%' IDENTIFIED BY '%s'" % (
-                    params['dbuser'], params['dbuserpass']))
-    except pymysql.err.InternalError as e:
-        print(error_msg % ('create', params['dbuser'], e))
     sql_cmd = "GRANT ALL PRIVILEGES ON *.* TO '%s'@'%%' " % params['dbuser']
     sql_cmd += "WITH GRANT OPTION"
     try:
@@ -104,21 +94,31 @@ def create_mariadb(params):
     cmd = config_dat['command'] + ' --ft_min_word_len=3'
     (c_id, con) = container_util.create_con(params, env, cmd)
     print("DEBUG: MariaDB created. ID=%s\n" % con['Id'])
-    time.sleep(10)
-    #status = maria_create_account(params)
-    res = "Your MariaDB container has been created. "
-    res += "Container name: %s\n\n" % con_name
-    res += "Use mysql command line tools to access your new MariaDB.\n\n"
-    res += "mysql --host %s --port %s --user %s --password\n\n" % (
-           Config.container_host,
-           params['port'],
-           params['dbuser'])
-    res += 'Leave the password argument blank. You will be prompted to enter '
-    res += 'the password.\n\n'
-    res += 'Encryption at Rest is enabled and TLS support is enabled.'
-    res += 'Download TLS keys from the Documentation tab. Select "TLS '
-    res += 'for MariaDB."'
-    res += 'Container Status: {}'.format(con['status'])
+    time.sleep(25)
+    status = maria_create_account(params)
+    badness = 0
+    while status == 'connect error' and badness < 6:
+        time.sleep(10)
+        badness += 1
+        status = maria_create_account(params)
+    if status != 'ok':
+        res = 'This is embarrassing. Your MariaDB container; %s ' % params['dbname']
+        res += 'has been created but I was unable to create your account.\n'
+        res += 'This unfortunate incident will be reported to the DB4SCI admin staff.'
+        send_mail("DB4SCI: Error creating account", res)
+    else:
+      res = "Your MariaDB container has been created. "
+      res += "Container name: %s\n\n" % con_name
+      res += "Use mysql command line tools to access your new MariaDB.\n\n"
+      res += "mysql --host %s --port %s --user %s --password\n\n" % (
+             Config.container_host,
+             params['port'],
+             params['dbuser'])
+      res += 'Leave the password argument blank. You will be prompted to enter '
+      res += 'the password.\n\n'
+      res += 'Encryption at Rest is enabled and TLS support is enabled.'
+      res += 'Download TLS keys from the Documentation tab. Select "TLS '
+      res += 'for MariaDB."'
 
     msg = 'MariaDB created: %s\n' % params['dbname']
     msg += 'Created by: %s <%s>\n' % (params['owner'], params['contact'])
