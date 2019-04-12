@@ -50,6 +50,13 @@ mkdir -p /mydb/{db_data,db_backups,logs}
 mkdir -p /mydb/logs/{uwsgi,nginx}
 chown -R 999:999 /mydb
 
+echo "-- Create SourceDir"
+basedir=/opt/DB4SCI
+if [[ ! -d ${basedir} ]]; then
+    mkdir -p ${basedir}
+    chown 999:999 ${basedir}
+fi
+
 echo "-- Install OS packages"
 apt-get -y -qq update && apt-get -y -qq install \
     python \
@@ -71,23 +78,16 @@ apt-get -y -qq update && apt-get -y -qq install \
     git \
     software-properties-common
 
-# pip install --quiet --upgrade pip
-echo "-- Install Python packages"
-pip2 install -q -r /opt/DB4SCI/requirements.txt
-
-echo "-- Create SourceDir"
-basedir=/opt/DB4SCI
-if [[ ! -d ${basedir} ]]; then
-    mkdir -p ${basedir}
-    chown 999:999 ${basedir}
-fi
-
 echo "-- Check for DB4Sci clone"
 if [[ ! -d '/opt/DB4SCI/.git' ]]; then
     echo "-- Cloning DB4Sci"
     cd /opt
     su -s /bin/bash docker -c "git clone https://github.com/FredHutch/DB4SCI.git"
 fi
+
+# pip install --quiet --upgrade pip
+echo "-- Install Python packages"
+pip2 install -q -r /opt/DB4SCI/requirements.txt
 
 echo "-- Checking for Docker"
 if [[ -x "$(command -v docker)" ]]; then
