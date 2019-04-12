@@ -41,20 +41,6 @@ if [[ stat=`useradd -u 999 -g 999 -m -s /bin/nologin docker` ]]; then
     echo user docker exists
 fi
 
-echo "-- Create SourceDir"
-basedir=/opt/DB4SCI
-if [[ ! -d ${basedir} ]]; then
-    mkdir -p ${basedir}
-    chown 999:999 ${basedir}
-fi
-
-echo "-- Check for DB4Sci clone"
-if [[ ! -d '/opt/DB4SCI/.git' ]]; then
-    echo "-- Cloning DB4Sci"
-    cd /opt
-    su -s /bin/bash docker -c "git clone https://github.com/FredHutch/DB4SCI.git"
-fi
-
 echo "-- Create directories"
 mkdir -p ${basedir}/admin_db
 mkdir -p ${basedir}/admin_db/{data,backup}
@@ -69,7 +55,6 @@ apt-get -y -qq update && apt-get -y -qq install \
     python \
     python-dev \
     python-pip \
-    postgresql-server-dev-all \
     libldap2-dev \
     libsasl2-dev \
     libldap2-dev \
@@ -83,12 +68,26 @@ apt-get -y -qq update && apt-get -y -qq install \
     uwsgi \
     uwsgi-core \
     uwsgi-plugin-python \
-    curl \
+    git \
     software-properties-common
 
 # pip install --quiet --upgrade pip
 echo "-- Install Python packages"
 pip2 install -q -r /opt/DB4SCI/requirements.txt
+
+echo "-- Create SourceDir"
+basedir=/opt/DB4SCI
+if [[ ! -d ${basedir} ]]; then
+    mkdir -p ${basedir}
+    chown 999:999 ${basedir}
+fi
+
+echo "-- Check for DB4Sci clone"
+if [[ ! -d '/opt/DB4SCI/.git' ]]; then
+    echo "-- Cloning DB4Sci"
+    cd /opt
+    su -s /bin/bash docker -c "git clone https://github.com/FredHutch/DB4SCI.git"
+fi
 
 echo "-- Checking for Docker"
 if [[ -x "$(command -v docker)" ]]; then
@@ -125,7 +124,7 @@ docker pull mongo:4.1.9
 docker pull nginx:1.15.10
 
 echo "-- Generate Selfsigned TLS Certs (https)"
-sudo -u docker /opt/DB4SCI/TLS/TLS-create.sh
+sudo -u docker bash /opt/DB4SCI/TLS/TLS-create.sh
 
 # In production mode the script env_setup.sh is used to setup the environment.
 # edit env_setup.sh
