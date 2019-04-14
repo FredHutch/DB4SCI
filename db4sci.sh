@@ -8,13 +8,14 @@ if [ -z "$1" ]; then
    exit 1
 fi
 
+DB4SCI_HOME=/opt/DB4SCI
 export DB4SCI_MODE=$1
 export DB4SCI_HOST=`uname -n`
 export DB4SCI_IP=`ip route get 8.8.8.8 | head -1 | sed 's/^.*src \([0-9\.]*\).*/\1/'`
 export DB4SCI_CERTS="/opt/DB4SCI/ssl"
 
 # set AWS creds as environment variaables
-if [[ -f .aws/config ]]; then
+if [[ -f ${DB4SCI_HOME}/.aws/config ]]; then
 `./read_aws_credentials.py`
 else
     echo "-- AWS credentials not configured"
@@ -25,15 +26,18 @@ fi
 
 if [[ ! -f /opt/DB4SCI/mydb/conif.py ]]; then
     echo "-- Copy Config from example"
-    cp mydb/config.example mydb/config.py
+    cp ${DB4SCI_HOME}/mydb/config.example ${DB4SCI_HOME}/mydb/config.py
 fi
 
-
+export SQLALCHEMY_DATABASE_URI="postgresql://mydbadmin:db4docker@${DB4SCI_IP}:32009/mydb_admin"
 case $DB4SCI_MODE in
     "prod")
+        # docker compose
         ;;
     "demo")
         export DB4SCI_HOST=${DB4SCI_IP}
+        echo "-- Start the Flask App..."
+        exec python ${DB4SCI_HOME}/webui.py
         ;;
     "dev")
         export AWS_BUCKET=${AWS_BUCKET}/dev
@@ -44,7 +48,6 @@ case $DB4SCI_MODE in
         ;;
 esac
 
-export SQLALCHEMY_DATABASE_URI="postgresql://mydbadmin:db4docker@${DB4SCI_IP}:32009/mydb_admin"
 
-echo "-- Start the Flask App..."
-exec python /opt/DB4SCI/webui.py
+
+

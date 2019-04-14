@@ -38,7 +38,7 @@ neo4j-driver
 pbr
 pycodestyle
 pexpect
-psycopg2
+# psycopg2
 psycopg2-binary
 ptyprocess
 py2-ipaddress

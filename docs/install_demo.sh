@@ -126,27 +126,5 @@ docker pull nginx:1.15.10
 echo "-- Generate Selfsigned TLS Certs (https)"
 sudo -u docker bash /opt/DB4SCI/TLS/TLS-create.sh
 
-# In production mode the script env_setup.sh is used to setup the environment.
-# edit env_setup.sh
-# source ./env_setup.sh prod
-sudo -u docker bash <<EOF
-cd /opt/DB4SCI
-
-echo "-- Setup Environment"
-export AWS_ACCESS_KEY_ID=aws-access-key-id
-export AWS_SECRET_ACCESS_KEY=aws-secret-access-key
-export DB4SCI_IP=`ip route get 8.8.8.8 | head -1 | sed 's/^.*src \([0-9\.]*\).*/\1/'`
-export DB4SCI_HOST=${DB4SCI_IP}
-export DB4SCI_MODE=demo
-export SQLALCHEMY_DATABASE_URI="postgresql://mydbadmin:db4docker@${DB4SCI_IP}:32009/mydb_admin"
-export AWS_BUCKET="s3://your-aws-bucker/prod"
-export DB4SCI_CERTS="/opt/DB4SCI/ssl"
-
-if [[ ! -f /opt/DB4SCI/mydb/conif.py ]]; then
-    echo "-- Copy Config from example"
-    cp mydb/config.example mydb/config.py
-fi
-
-echo "-- Start the Flask App..."
-exec python /opt/DB4SCI/webui.py
-EOF
+# In production mode the script db4sci.sh is used to setup the environment.
+sudo -u docker bash  -c "bash /opt/DB4SCI/db4sci.sh demo"
