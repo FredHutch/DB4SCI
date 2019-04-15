@@ -22,7 +22,7 @@ openssl req -new -x509 -nodes -days 1825 -config ca.cnf -key ca-key.pem \
     -out ca-cert.pem
 
 echo '> Create the server certificate'
-openssl req -newkey rsa:4096 -config server.cnf -nodes -keyout server-key.pem \
+openssl req -newkey rsa:2048 -config server.cnf -nodes -keyout server-key.pem \
     -out server-req.pem
 
 echo '> Process the server RSA key'
@@ -36,7 +36,7 @@ echo '> life of cert'
 openssl x509 -enddate -noout -in server-cert.pem
 
 echo '> Create client certificate'
-openssl req -newkey rsa:4096 \
+openssl req -newkey rsa:2048 \
   -config client.cnf -nodes -keyout client-key.pem -out client-req.pem
 
 echo '> Process the client RSA key'
