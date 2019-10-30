@@ -16,3 +16,4 @@ prod/nginx/mydb.conf
 test/*
 requirements.docker-ce
 admin_db
+aws_buckets.py
