@@ -1,12 +1,13 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <link rel="shortcut icon" href="favicon.ico">
-    <title>DB4Sci Download Install</title>
-    <link rel="stylesheet" type="text/css" href="css/nav.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="favicon.ico">
+        <title>DB4Sci Download Install</title>
+        <link rel="stylesheet" type="text/css" href="css/nav.css">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
+    </head>
 <body>
 <div>
   <header class="app_name">
@@ -24,6 +25,9 @@
      <li ><a href="db4sci_arch.html">Architecture</a></li>
      <li ><a href="download.html">Download</a></li>
      <li><a href="install.html">Install</a></li>
+       <li><a class="github-button" href="https://github.com/FredHutch/DB4SCI"
+          data-size="large" aria-label="Fork ntkme/github-buttons on GitHub">Fork</a>
+       </li>
    </ul>
 </nav> <!-- end "nav" -->
 <div class="outerbox">
@@ -31,38 +35,48 @@
         <h4>Install</h4>
         <p>To install DB4Sci at your site start with the demo install script.
         The demo install script installs the source code to <kbd>/opt/DB4SCI</kbd>
-        and creates the administrative database in <kbd>/opt/DB4SCI/admindb</kbd>.</p>
+        and creates the administrative database in <kbd>/opt/DB4SCI/admin_db</kbd>.</p>
+
         <h4>Host and Storage</h4>
-        <p>DB4Sci is developed on Ubuntu.  Other Linuxes might work but have
-           not been tested.  Docker CE and docker-compose need to be
-           pre-installed on the host. Build a host system with storage to
-           support production databases; memory, core sizes, storage capacity,
-           and storage throughput all affect the performance of databases.
-           DB4Sci deploys databases to the same host which it runs on. Chose
-           your hardware to match the capacity and the performance required
-           to run your production databases.  </p>
+        <p>DB4Sci is developed on Ubuntu. Other Linuxes flavors might work but
+            have
+            not been tested. Build a host system with storage to
+            support production databases; memory, core sizes, storage capacity,
+            and storage throughput all affect the performance of databases.
+            DB4Sci deploys databases to the same host which it runs on. Choose
+            your hardware to match the capacity and the performance required
+            to run your production databases. 2GB RAM and 8GB disk space is the
+            bare minimum to get DB4SCI running.</p>
         <p>Changing from demo mode to production requires configuring the
            software for your site. Demo mode is not secure.  TLS keys and
            Active Directory need to be configured. Use your favorite text
            editor to complete the configuration of DB4Sci. The configuration
            file is located at /opt/DB4SCI/mydb/config.py. You will need to know
-           a few things about your local environment to complete the configuration.
+           a few things about your local environment to complete the
+            configuration.</p>
         <ul>
             <li>Database admin accounts. A list of username and passwords for
              administrative access. These accounts are independent of the accounts
-             created by users for the purpose of backups.
-            <li>Data Volumes - Path to data volumes which will be used to store the database data. More than one volume can be specified. Your site can provide users with multiple options for storage based on performance and cost. Volumes can be filtered by user and database types. Example a volume with limited capacity for administrative users which is separate from a high-performance volume for production databases.</li>
-            <li>Active Director - A list of domain controllers and your domain name</li>
+             created by users for backups.</li>
+            <li>Data Volumes - Path to data volumes which will be used to store
+                the database data. More than one volume can be specified. Your
+                site can provide users with multiple options for storage based
+                on performance and cost. Volumes can be filtered by user and
+                database types. For example, use a volume with limited capacity
+                for administrative users which is separate from a high-performance
+                volume for production databases.</li>
+            <li>Active Directoy - A list of domain controllers and your domain name</li>
             <li>AWS credentials and S3 bucket</li>
             <li>ISID of admin users</li>
             <li>Email address for admin alerts</li>
-            <li>Email address for Backup admin<li>
+            <li>Email address for Backup admin</li>
             <li>TSL Certs</li>
             <li>TimeZone</li>
+        </ul>
     </div>
 </div>
 
-<div id="footer">
+<div class="footer">
   <p id=text>Fred Hutchinson Cancer Research Center | 1100 Fairview Ave. N., Seattle, WA 98109</p>
 </div>
 </body>

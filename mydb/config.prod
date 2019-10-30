@@ -17,28 +17,25 @@ class BaseConfig():
     base_port = 32010
 
     # container_host use output from uname -n
-    container_host = os.environ.get('DB4SCI_HOST')
-    container_ip = os.environ.get('DB4SCI_IP')
+    container_host = os.environ.get('HOSTNAME') 
+    container_ip = os.environ.get('HOST_IP') 
 
     # ISID of admin users, Admin uses can view/edit meta data
-    admins = ['demo', 'admin1', 'admin2', 'admin3']
-    backup_admin_mail = ['backupadmin@yourOrganization.org']
+    admins = ['jfdey', 'bmcgough', 'petersen'] 
+    backup_admin_mail = ['jfdey@fredhutch.org']
 
     # eMail stuff
-    MAIL_FROM = "HPC_staff@yourOrganization.org"
-    MAIL_TO = ["admins@yourOrganization.org"]
-    MAIL_SERVER = "smtp.yourOrganization.org"
+    MAIL_FROM = "scicomp_srv@fredhutch.org"
+    MAIL_TO = ["mydb@fredhutch.org"]
+    MAIL_SERVER = "smtp.fhcrc.org"
 
     # Time Zone
     TZ = 'America/Los_Angeles'
 
-    # AWS CLI
-    aws = '/usr/local/bin/aws'
-
     # Local Active Directory servers and Domain
     # DCs = ['dc10.yourDomain.org', 'dc20.yourDomain.org']
-    DCs = ['dc1.yourdomain.org','dc2.yourdomain.org']
-    AD_domain = '@yourDomain.org'
+    DCs = ['dc42.fhcrc.org', 'dc152.fhcrc.org'] 
+    AD_domain = '@fhcrc.org'
 
 
     # Data Volumes for Databases
@@ -57,8 +54,6 @@ class BaseConfig():
     #          ['Postgres', 'MongoDB', 'MariaDB', 'Neo4j']
     # col[3] = List of uses authorized to use the volume.  
     data_volumes = [['Standard',  '/mydb/db_data', ['ALL'], ['ALL']],
-                    ['Admin',     '/mydb/admin_vol', ['Postgres'], ['Admin', 'dbUser']],
-                    ['Encrypted', '/mydb/encrypted/', ['Postgres'], ['hippaAdmin']],
                     ['Example',   '/dev/null', ['ALL'], ['nobody']],
                     ]
 
@@ -73,23 +68,24 @@ class BaseConfig():
     # containter, don't change 'admin', just the admin_pass.
     # 
     accounts = {'Postgres': {'admin': 'pgdba',
-                             'admin_pass': 'pgSecret'},
+                             'admin_pass': 'fhpsqladmin'},
                 'MongoDB': {'admin': 'dbaas', 'admin_pass': 'mongoSecret'},
                 'MariaDB': {'admin': 'root', 'admin_pass': 'mariaSecret'},
                 'Neo4j':   {'admin': 'neo4j', 'admin_pass': 'neoSecret'},
                 # DB4Sci uses a database to maintain history and state of the application
                 # set a username/password for the application database admin account.
                 'admindb': {'admin': 'db4sci',
-                            'admin_pass': 'admSecret',
-                            'contact': 'admin@yourDomain.org',
-                            'owner': 'Your Name'},
+                            'admin_pass': 'Docker4Sci',
+                            'contact': 'jfdey@fredhutch.org',
+                            'owner': 'John Dey'},
                 # Define a user information used by test scripts
                 'test_user': {'admin': 'tester',
                               'admin_pass': 'testSecret',
-                              'contact': 'dev_gal@yourDomain.org',
-                              'owner': 'Your Name'}
+                              'contact': 'jfdey@fredhutch.org',
+                              'owner': 'John Dey'}
                 }
 
+    
     # Default admin db instance name and port number
     # These do not need to change
     admindb_name = 'mydb_admin'
@@ -104,52 +100,52 @@ class BaseConfig():
     SQLALCHEMY_DATABASE_URI += admindb_name
 
     # AWS bucket for backups
-    bucket = "s3://yourOrg-DB4Sci-backups/prod"
+    bucket = "s3://fh-div-adm-scicomp-mydb-backup/prod"
 
     # images: List of Docker Images
     # first column is 'Display Name'
     # second column is 'image name'
     # firt row of image is default
-    # volumes: [source
-    info = {
-        'Postgres': {
-            'pub_ports': [5432],
-            'backupdir': '/var/lib/postgresql/backup',
-            'volumes': [
-                 ['DBVOL', '/', '/var/lib/postgresql/data'],
-                 [backupvol, '/', '/var/lib/postgresql/backup'],],
-            'command': 'postgres',
-            'dbengine': 'Postgres',
-            'images': [
-                ['PostgreSQL 9.6.10', 'postgres:9.6.12'],
-                ['PostgreSQL 10.7', 'postgres:10.7'],]},
-        'MongoDB': {
-            'pub_ports': [27017],
-            'backupdir': '/var/backup',
-            'volumes': [
-                ['DBVOL', '/db/', '/data/db'],
-                ['DBVOL', '/configdb/', '/data/configdb'],
-                [backupvol, '/', '/var/backup'],],
-            'command': 'mongod',
-            'dbengine': 'MongoDB',
-            'images': [
-                ['MongoDB 4.1.9', 'mongo:4.1.9'],]},
-        'MariaDB': {
-            'pub_ports': [3306],
-            'volumes': [
-                ['DBVOL', '/data/', '/var/lib/mysql'],
-                ['DBVOL', '/keys/', '/keys'],
-                ['DBVOL', '/conf.d/encrypt.cnf', '/etc/mysql/conf.d/encrypt.cnf'],
-                [backupvol, '/', '/var/backup'],],
-            'command': 'mysqld',
-            'dbengine': 'MariaDB',
-            'images': [
-                ['MariaDB 10.4', 'mariadb:10.4'],]},
-        'Neo4j': {'pub_ports': [7473, 7687], # 7473:HTTPS  7687:Bolt
+    info = {'Postgres': {'pub_ports': [5432],
+                         'backupdir': '/var/lib/postgresql/backup',
+                         'volumes': [
+                                ['DBVOL', '/', '/var/lib/postgresql/data'],
+                                [backupvol, '/', '/var/lib/postgresql/backup'],
+                             ],
+                         'command': 'postgres',
+                         'dbengine': 'Postgres',
+                         'images': [
+                                 ['Postgres 9.6.10', 'postgres:9.6.10'],
+                                 ['Postgres 10.5', 'postgres:10.5'],
+                              ]},
+            'MongoDB': {'pub_ports': [27017],
+                        'backupdir': '/var/backup',
+                        'volumes': [
+                            ['DBVOL', '/db', '/data/db'],
+                            ['DBVOL', '/configdb', '/data/configdb'],
+                            [backupvol, '/', '/var/backup'],
+                        ],
+                        'command': 'mongod',
+                        'dbengine': 'MongoDB',
+                        'images': [
+                             ['MongoDB 4.1.5', 'mongo:4.1.5'],
+                        ]},
+            'MariaDB': {'pub_ports': [3306],
+                        'backupdir': '/var/backup',
+                        'volumes': [
+                                ['DBVOL', '/', '/var/lib/mysql'],
+                                [backupvol, '/', '/var/backup'],
+                        ],
+                        'command': 'mysqld',
+                        'dbengine': 'MariaDB',
+                        'images': [
+                                 ['MariaDB 10.1', 'mariadb:10.1.21'],
+                            ]},
+            'Neo4j': {'pub_ports': [7473, 7687],  #7473:HTTPS  7687:Bolt
                       'backupdir': '/backup',
                       'volumes': [
-                                ['DBVOL', '/data/', '/data'],
-                                ['DBVOL', '/logs/', '/logs'],
+                                ['DBVOL', '/data', '/data'],
+                                ['DBVOL', '/logs', '/logs'],
                                 [backupvol, '/', '/backup'],
                             ],
                       'command': 'neo4j',
@@ -166,31 +162,41 @@ class BaseConfig():
             }
 
 class ProdConfig(BaseConfig):
-    def __init__(self, mode):
+    def __init__(self, env):
         BaseConfig()
-        self.mode = mode 
+        self.env = env
 
 
 class DevConfig(BaseConfig):
-    def __init__(self, mode):
-        self.mode = mode 
+    def __init__(self, env):
+        self.env = env
 
     # Mail stuff
-    MAIL_FROM = "valid_user@yourDomain.org"
-    MAIL_TO = ["developer@yourDomain.org"]
-    MAIL_SERVER = "smtp.yourDomain.org"
+    MAIL_FROM = "scicomp_srv@fredhutch.org"
+    MAIL_TO = ["jfdey@fredhutch.org"]
+    MAIL_SERVER = "smtp.fhcrc.org"
     # AWS stuff
-    bucket = "s3://yourOrg-DB4Sci-backups/dev"
+    bucket = "s3://fh-div-adm-scicomp-mydb-backup/dev"
 
 
-mode = os.environ.get('DB4SCI_MODE')
-if mode == 'dev':
-    Config = DevConfig(mode)
-elif mode == 'prod' or mode == 'demo':
-    Config = ProdConfig(mode)
-elif mode == 'test':
-    Config = TestConfig(mode)
+class TestConfig(DevConfig):
+    def __init__(self, env):
+        self.env = env
+        self.info['Neo4j']['volumes'][3] = [
+                '', '/mydb/repos/dbaas/dev/neo4j/ssl', '/ssl']
+
+    dbaas_path = '/mydb/repos/dbaas/'
+
+
+
+env = os.environ.get('DBAAS_ENV')
+if env == 'dev':
+    Config = DevConfig(env)
+elif env == 'prod' or env == 'demo':
+    Config = ProdConfig(env)
+elif env == 'test':
+    Config = TestConfig(env)
 else:
-    print('Error: The environment varaible DB4SCI_MODE must be set to one of'),
+    print('Error: The environment varaible DBAAS_ENV must be set to one of'),
     print("these values: ['prod', 'dev', 'test', 'demo']")
     sys.exit(1)

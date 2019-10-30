@@ -16,7 +16,7 @@ import mydb.postgres_util as postgres
 import mydb.mariadb_util as mariadb
 import mydb.mongodb_util as mongodb
 import mydb.neo4j_util as neo4j
-import mydb.mydb_config as config
+from config import Config
 from mydb.send_mail import send_mail
 
 """Database backup module for Postgres DBaaS.
@@ -97,17 +97,17 @@ def backup_all(weekly):
 
     send_mail("MyDB: backup_all db",
               "Backup_all has completed the database backups",
-              config.var.backup_admin_mail)
+              config.backup_admin_mail)
 
 
 def offsite_backup():
     """Sends the DB Dumps to an S3 bucket"""
     msg = "%s --only-show-errors  s3 sync %s %s --sse"
-    cmd = msg % (config.var.aws, config.var.backupvol, config.var.bucket)
+    cmd = msg % (config.aws, config.backupvol, config.bucket)
     logging.info("Sending backups to the Cloud. cmd: (%s)" % cmd)
     backup_id = datetime.datetime.now().strftime("%Y%m%d")
     admin_db.backup_log(0, 'offsite', 'start', backup_id, 'AWS S3',
-                        config.var.bucket, cmd, "")
+                        config.bucket, cmd, "")
     print("AWS backup command:", cmd)
     start = time.time()
     out = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
@@ -118,11 +118,11 @@ def offsite_backup():
         logging.error(msg, processed)
         send_mail("PostgresDB: AWS backup error",
                   "AWS syn backup errors ocurred. Error: %s" % processed,
-                  config.var.backup_admin_mail)
+                  config.backup_admin_mail)
     else:
         duration = ('duration: %s seconds' % str(round(end - start)))
         admin_db.backup_log(0, 'offsite', 'end', backup_id, 'AWS S3',
-                            config.var.bucket, duration, "")
+                            config.bucket, duration, "")
         logging.info("AWS backup complete. %s", duration)
 
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     log.addHandler(handler)
 
     logging.basicConfig(level=logging.DEBUG, format=FORMAT,
-                        filename=config.var.backup_log)
+                        filename=config.backup_log)
     msg = 'perform database backups for all containers'
     parser = argparse.ArgumentParser(description=msg)
 
@@ -155,4 +155,4 @@ if __name__ == "__main__":
     logging.info("mydb backups complete")
     send_mail("MyDB: backup_all complete",
               "backup_all has run",
-              config.var.backup_admin_mail)
+              config.backup_admin_mail)

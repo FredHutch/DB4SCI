@@ -111,10 +111,10 @@ def create(params):
     else:
         port = container_util.get_max_port()
         params['port'] = port
-    Ports = {config_dat['pub_ports'][0]: (Config.container_ip, port)}
+    Ports = {config_dat['pub_ports'][0]: (Config.container_host, port)}
     params['port_bindings'] = Ports
     params['longpass'] = generate_password()
-    env = {'POSTGRES_DB': params['dbname'],
+    env = {'POSTGRES_DB': params['dbname'], # default database that is created when the image is first started
            'POSTGRES_USER': params['dbuser'],
            'POSTGRES_PASSWORD': params['dbuserpass']}
 
@@ -133,8 +133,8 @@ def create(params):
     if status != 'ok':
         res = 'This is embarrassing. Your Postgres container; %s ' % params['dbname']
         res += 'has been created but I was unable to create your account.\n'
-        res += 'This unfortunate incident will be reported to the MyDB admin staff.'
-        send_mail("MyDB: Error creating account", res)
+        res += 'This unfortunate incident will be reported to the DB4SCI admin staff.'
+        send_mail("DB4SCI: Error creating account", res)
         return res
     # restart the container
     container_util.restart(con['Id'])
@@ -154,10 +154,10 @@ def create(params):
     res += " module.\n"
     res += "module load PostgreSQL\n\n"
 
-    message = 'Mydb created a new %s database called: %s\n' % (
+    message = 'DB4SCI created a new %s database called: %s\n' % (
        dbtype, params['dbname'])
     message += 'Created by: %s <%s>\n' % (params['owner'], params['contact'])
-    send_mail("MyDB: created %s" % dbtype, message)
+    send_mail("DB4SCI: created %s" % dbtype, message)
     return res
 
 
@@ -207,7 +207,7 @@ def backup(params, tag=None):
     try:
         connection = psycopg2.connect(connect)
     except Exception as e:
-        message = "Error: MyDB Postgres Backup; "
+        message = "Error: DB4SCI Postgres Backup; "
         message += "psycopg2 connect:  container: %s, " % con_name
         message += "message: %s," % e
         message += "connect string: %s" % connect

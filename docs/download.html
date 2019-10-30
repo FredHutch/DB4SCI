@@ -3,9 +3,10 @@
   <head>
     <meta charset="UTF-8">
     <title>DB4Sci Download Install</title>
-    <link rel="icon" type="image/png" href="images/fredhutch.ico">    
+    <link rel="icon" type="image/png" href="images/fredhutch.ico">
     <link rel="stylesheet" type="text/css" href="css/nav.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
 </head>
 <body>
 <div>
@@ -24,20 +25,45 @@
      <li ><a href="db4sci_arch.html">Architecture</a></li>
      <li ><a href="download.html">Download</a></li>
      <li><a href="install.html">Install</a></li>
+     <li>
+        <a class="github-button" href="https://github.com/FredHutch/DB4SCI"
+          data-size="large" aria-label="Fork ntkme/github-buttons on GitHub">Fork</a>
+     </li>
    </ul>
 </nav> <!-- end "nav" -->
 <div class="outerbox">
     <div id="content" class="boxed-group">
         <h3>Demo Install</h3>
-        <p>DB4SCI requires a lot of configuration. To get the application up and running quickly, a demo mode is available for Linux. Demo mode functions just like a production instance but is not secure for production use.  Demo mode removes TLS encryption and authentication.  Demo mode requires a Docker CE version 18 and docker-compose to be installed.
-Install can take 20 minutes or longer depending on your internet connection.  The install script downloads all the Docker containers needed. 
+        <p>To get the application up
+            and running quickly, a demo mode is available for Linux. Demo mode
+            functions just like a production instance but is not secure for
+            production use. Demo mode removes TLS encryption and authentication.
+            Run the install script on Ubuntu 16.04 or 18.04 with at least 2GB
+            RAM and 8 GB free disk space.
+            Install can take 20 minutes or longer depending on your internet
+            connection. The install script downloads all needed Docker
+            containers and clones the Git repo. Production and demo use the
+            code. To configure for production, please take a few extra steps
+            to secure DB4SCI. See: <a href="install.html">Install</a>
         </p>
-        <a id=content href='install_demo.sh' download="install_demo.sh">Demo Install</a>
+        <p>
+        <a id=content href='install_demo.sh' download="install_demo.sh">
+            Download Install Script</a>
+        </p>
+        <code><pre>
+Install dbi4sci demo on a Ubuntu host as root.
+curl http://db4sci.org/install_demo.sh | bash
+        </pre>
+        </code>
     </div>
 </div>
 
-<div id="footer">
-  <p id=text>Fred Hutchinson Cancer Research Center | 1100 Fairview Ave. N., Seattle, WA 98109</p>
+<div class="footer">
+    <p>Fred Hutchinson Cancer Research Center | 1100 Fairview Ave. N., Seattle, WA 98109</p>
+    <div class="right_footer">
+        <a href="https://github.com/FredHutch/DB4SCI">GitHub Repo</a></li>
+    </div>
+    </ul>
 </div>
 </body>
 </html>

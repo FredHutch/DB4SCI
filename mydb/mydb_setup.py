@@ -15,10 +15,10 @@ mydb_setup.mydb_setup()
 
 def mydb_setup():
     """Create mydb_admin database if it does not exist.
-    DBAAS depends on mydb_admin database.
+    DB4SCI depends on mydb_admin database.
     """
     if container_util.container_exists('mydb_admin'):
-        print('MyDB Administrative DB is running.\nStarting DBAAS')
+        print('Administrative DB is running.\nStarting DB4Sci')
         return
     print('Create Administrative DB')
     params = setup_data()
@@ -28,7 +28,7 @@ def mydb_setup():
     # wait for container to startup
     print('Container Id: %s' % params['con']['Id'] )
     print('Waiting for mydb_admin to start')
-    time.sleep(5)
+    time.sleep(20)
     badness = 0
     status = False
     while (not status) and (badness < 6):
@@ -37,7 +37,7 @@ def mydb_setup():
                                           params['dbuserpass'], 
                                           params['port'])
         print('mydb_admin setup status: %s count: %d' % (status, badness))
-        time.sleep(3)
+        time.sleep(5)
     if not status:
         print('mydb_admin restart error. Could not setup db')
         return
@@ -60,8 +60,8 @@ def setup_data():
               'port': Config.admin_port,
               'dbuser': Config.accounts['admindb']['admin'],
               'dbuserpass': Config.accounts['admindb']['admin_pass'],
-              'db_vol': "/opt/DB4SCI/admin_db/data",
-              'bak_vol': "/opt/DB4SCI/admin_db/backup",
+              'db_vol': "/opt/DB4SCI/",
+              'bak_vol': "/opt/DB4SCI/backup",
               'support': 'Basic',
               'owner': Config.accounts['admindb']['owner'],
               'description': 'Test the Dev',

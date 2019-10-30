@@ -3,8 +3,8 @@
 All flask API calls go here.
 """
 
-__version__ = '1.7.1.0'
-__date__ = 'Oct 30 2018'
+__version__ = '1.7.4'
+__date__ = 'Apr 6 2019'
 __author__ = 'John Dey'
 
 import os
@@ -27,17 +27,20 @@ import volumes
 
 @app.before_first_request
 def activate_job():
+    if 'level' in session:
+        print("DEBUG: before_first_request, level is set: {}".format(
+            session['level']))
     session['logged_in'] = False
-    level = os.environ.get('DBAAS_ENV')
+    level = os.environ.get('DB4SCI_MODE')
+    print("DEBUG: before_first_request: {}".format(level))
     if level:
         session['level'] = level
     else:
-        print("DEBUG: level not set. DBAAS_ENV must be set") 
+        print("DEBUG: level not set. DB4SCI_MODE must be set") 
     if session['level'] == "demo":
-        print("DEBUG: dbaas running in demo mode.") 
+        print("DEBUG: DB4Sci running in demo mode.") 
         session['logged_in'] = True
         session['username'] = 'demo'
-    return
 
 
 @app.route('/index')
@@ -64,20 +67,19 @@ def demo():
 def login():
     if session['level'] == 'demo':
         return redirect(url_for('demo'))
+    if session['logged_in']:
+        return redirect(url_for('index'))
     if request.method == 'POST':
-        username = request.form['username'] + '@fhcrc.org'
+        username = request.form['username']
+        username += Config.AD_domain
         password = request.form['password']
-
+        auth = None
         for DC in Config.DCs:
-            if DC == 'demo':
-                auth = 1
-                break
             auth = ad_auth.ad_auth(username, password, DC)
             if auth == 2 or auth == 3:
                 continue
             elif auth == 1 or auth == 0:
                 break
-
         if auth == 1:
             session['logged_in'] = True
             session['username'] = request.form['username']
@@ -109,7 +111,7 @@ def list_containers():
     if session['logged_in']:
         (db_header, db_list) = container_util.display_containers()
         return render_template('dblist.html',
-                               title='MyDB Database Containers',
+                               title='DB4SCI Database Containers',
                                dbheader=db_header, dbs=db_list)
     else:
         return redirect(url_for('login'))
@@ -177,72 +179,79 @@ def manage_container():
     if not session['logged_in']:
         return redirect(url_for('login'))
     print('lets manage\n')
-    dbaction = request.args['bbaction']
-    select_title='Select Container Name to %s' % dbaction.capitalize()
+    dbaction = request.args['dbaction']
+    select_title = 'Select Container Name to %s' % dbaction.capitalize()
     container_names = admin_db.list_container_names()
     container_names.sort()
     return render_template('manage_container.html',
                            title=select_title, 
                            header='',
                            labela='Container Name:',
-                           dbaction = dbaction,
+                           dbaction=dbaction,
                            items=container_names)
 
 
-@app.route('/cloudbackups/', methods=['GET'])
-def cloudbackups():
+@app.route('/s3_list/', methods=['POST'])
+def s3_list():
     if not session['logged_in']:
         return redirect(url_for('login'))
-    container_name = request.args['container_name']
-    print('cloudbackups: container: %s' % container_name)
+    container_name = request.form['container_name']
+    print('S3_list: level: %s container: %s' % (
+          session['level'], container_name))
     cmd = "%s s3 ls --recursive %s/%s" % (Config.aws,
                                           Config.bucket,
                                           container_name)
-    backups = os.popen(cmd).read().strip()
-    return render_template('cloudbackups.html', con_name=container_name,
-                           backups=backups)
+    if session['level'] == "demo":
+        result = "Unable to run AWS commands in demo mode.\n"
+    else:
+        result = os.popen(cmd).read().strip()
+    return render_template('results.html', title='S3 Backup',
+                           container_name=container_name,
+                           result=result)
 
 
-@app.route('/restarted/', methods=['POST'])
-def restarted():
+@app.route('/restart/', methods=['POST'])
+def restart():
     if not session['logged_in']:
         return redirect(url_for('login'))
-    dbname = request.form['dbname'].replace(';', '').replace('&', '').strip()
+    dbname = request.form['container_name']
     dbuser = request.form['dbuser'].replace(';', '').replace('&', '').strip()
     dbuserpass = request.form['dbuserpass'].replace(';', '').\
         replace('&', '').strip()
     username = session['username']
     result = container_util.restart_con(dbname, dbuser, dbuserpass, username)
-    return render_template('restarted.html', result=result)
+    return render_template('results.html', title='Restarted Container',
+                           container_name=dbname,
+                           result=result)
 
 
-@app.route('/deleted/', methods=['POST'])
-def deleted():
+@app.route('/delete/', methods=['POST'])
+def delete():
     if not session['logged_in']:
         return redirect(url_for('login'))
-    dbname = request.form['dbname'].replace(';', '').replace('&', '').strip()
+    dbname = request.form['container_name']
     dbuser = request.form['dbuser'].replace(';', '').replace('&', '').strip()
     dbuserpass = request.form['dbuserpass'].replace(';', '').\
         replace('&', '').strip()
     username = session['username']
     result = container_util.kill_con(dbname, dbuser, dbuserpass, username)
-    return render_template('deleted.html', result=result)
+    return render_template('results.html', title='Delete Container',
+                           container_name=dbname,
+                           result=result)
 
 
-@app.route('/backup/')
+@app.route('/backup/', methods=['POST'])
 def backup():
-    if session['logged_in']:
-        container_names = admin_db.list_container_names()
-        container_names.sort()
-        return render_template('backup.html', items=container_names)
-    else:
-        return redirect(url_for('login'))
-
-
-@app.route('/backedup/', methods=['POST'])
-def backedup():
     if not session['logged_in']:
         return redirect(url_for('login'))
+    dbname = request.form['container_name']
+    if session['level'] == "demo":
+        result = "Backup not supported in demo mode."
+        return render_template('results.html',
+                               title='Database Backup',
+                               container_name=dbname,
+                               result=result)
+
     # backtag
     params = {}
     for item in request.form:
@@ -250,10 +259,6 @@ def backedup():
                                           replace('&', '').strip()
     params['username'] = session['username']
     params['backup_type'] = 'User'
-    if 'backuptag' in params:
-        backuptag = params['backuptag']
-    else:
-        backuptag = None
 
     (c_id, dbengine) = admin_db.get_container_type(params['dbname'])
     if c_id is None:
@@ -271,11 +276,27 @@ def backedup():
     else:
         (cmd, mesg) = postgres_util.backup(params, params['backuptag'])
         result = "Postgres dump comand:\n" + cmd + "\nResult: %s" % mesg
-    return render_template('backedup.html', result=result)
+    return render_template('results.html',
+                           title='Database Backup',
+                           result=result)
 
+@app.route('/restore/', methods=['POST'])
+def restore():
+    if not session['logged_in']:
+        return redirect(url_for('login'))
+    dbname = request.form['container_name']
+    if session['level'] == "demo":
+        result = "Restore not supported in demo mode."
+    else:
+        pass
+        # TODO
+    return render_template('results.html',
+                           title='Database Restore',
+                           container_name=dbname,
+                           result=result)
 
 def admin_help():
-        body = 'MyDB administrators must be added to Config.admins.\n'
+        body = 'DB4SCI administrators must be added to Config.admins.\n'
         body += 'append admin commands to URL\n'
         body += '/admin/help/   Your reading it.\n'
         body += '/admin/state/  Display all records in State table\n'
@@ -306,7 +327,7 @@ def admin(cmd):
     username = session['username']
     if cmd == 'help':
         body = admin_help()
-        title = 'MyDB Administrative Features\n'
+        title = 'DB4SCI Administrative Features\n'
         return render_template('dblist.html', title=title,
                                dbheader='', dbs=body)
     elif cmd == 'state':
@@ -381,7 +402,7 @@ def admin(cmd):
 
 @app.route('/certs/<filename>', methods=['GET'])
 def certs(filename):
-    return send_from_directory(directory=Config.dbaas_path + '/TLS',
+    return send_from_directory('/opt/DB4SCI/TLS',
                                as_attachment=True, 
                                filename=filename + '.pem')
 
@@ -389,4 +410,7 @@ def certs(filename):
 def doc_page():
     doc_name = request.args['doc']
     doc_name += '.html'
-    return render_template(doc_name)
+    return render_template(doc_name,
+                           level=session['level'],
+                           version=__version__
+                           )

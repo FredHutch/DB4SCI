@@ -4,7 +4,7 @@ body {
 }
 .logo { padding: 15px 25px 10px 15px;}
 .app_name {font-size: 2.5em; font-weight: bold; margin: 0 10px .5em 20px; }
-#footer {
+.footer {
   height: 40px;
   position: fixed;
   bottom:0%;
@@ -15,6 +15,10 @@ body {
   opacity: 1;
 }
 
+.footer .footer_right {
+    position: fixed;
+    right; 10px;
+}
 .app_name {
   color: #89c348;  /* Hutch Green */
   font-family: "Calibri",Helvetica,Arial,"Lucida Grande",sans-serif;

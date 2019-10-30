@@ -4,33 +4,40 @@
 The production instance of DBaaS application uses Nginx for web proxy. 
 The Nginx web proxy is deployed as a separate Docker container. Nginx listens on ports 80 and 443. 
 Nginx proxies web requests to dbaas via uWSGI on port 5000. Nginx maintains the SSL certificates.
-uWSGI is installed in the same container as the DBaas flask application. The link between Nginx and uWSGI is defined in the file: <docker-compose.yml>. 
+uWSGI is installed in the same container as the DBaas flask application. The link
+between Nginx and uWSGI is defined in the file: <docker-compose.yml>.
 The dbaas Flask application listens on port 5000 using the uWSGI protocol.
 
 ### Prodution and Development
-Production and development instance run on seperate systems. The differances between production and development effect the Nginx web interface and not the application code.  Nginx configurations are defined in two subdirectories <prod> and <dev>.  The environment variable DBAAS_ENV must be set to [prod, dev, demo] for docker build to work.
+Switching to development on VM's. For development I use a different AWS bucket
+for testing backups.
 
 ```bash
-export DBAAS_ENV=prod
+export DB4SCI_MODE=prod
 # OR
-export DBAAS_ENV=dev
+export DB4SCI_MODE=dev
 ```
 
 ### SSL
-The SSL certs can be different between production and development. Place production certs in prod/nginx/ssl
-and development
-certs in dev/nginx/ssl directories.
-Production and developemnt domains are seperated by folder name for nginx. 
+The SSL certs can be different between production and development. Place
+production certs in prod/nginx/ssl and development
+certs in dev/nginx/ssl directories. Production and developemnt domains are
+seperated by folder name for nginx.
 
 ### DBaas
-All differences between produciton and development for DBaas are contained in the config.py file.
-Prod and Dev are defined as classes in the config file. 
+All differences between produciton and development for DBaas are contained in
+the config.py file.vProd and Dev are defined as classes in the config file.
 
 ### Database Container Management 
-The need to support multible different versions of database containers is supported. 
-Docker images used by the application are configured in mydb/config.py. 
+The need to support multible different versions of database containers is
+supported. Docker images used by the application are defined in mydb/config.py.
+Database containers are configured by mapping config files to the container.
+Additional mappings are defined in the config.py for each DB type.
+Config files can be stored in the */dbconfig* directory with subdirectories
+for each database type.
 
 ```python
+file: mydb/config.py
 # images: List of Docker Images
 # first column is 'Display Name'
 # second column is 'image name'
@@ -62,10 +69,9 @@ it be harmmed the database should be recovered.
 
 ### History
 Robert McDermott created the initial application in one weekend during the
-spring of 2016. The initial
-application was called 'postgres_container_mgmt'.  Mija Lee supported all the
-the early Postgres support and coding for creating, configuring and backups
-for Postgres. John Dey is the current maintainer.
+spring of 2016. The initial application was called 'postgres_container_mgmt'.
+Mija Lee supported all the the early Postgres support and coding for creating,
+configuring and backups for Postgres. John Dey is the current maintainer.
 
 The primary Flask daemon is called dbaas (Data Base as a service).
 The applacation was renamed from postgres_contianer_mgmt to mydb. This name

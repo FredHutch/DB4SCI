@@ -1,11 +1,11 @@
 version: '2'
 
 services:
-    dbaas:
-        image: dbaas:1.7.0
+    mydb:
+        image: mydb:1.7.0
         build:
             context: .
-        container_name: dbaas
+        container_name: mydb
 
         #  Expose ports without publishing them to the host machine
         #  they’ll only be accessible to linked services. Only the internal port can be specified.
@@ -14,7 +14,7 @@ services:
 
         environment:
             - "TZ=America/Los_Angeles"
-            - DBAAS_ENV=${DBAAS_ENV}
+            - DB4SCI_MODE=${DB4SCI_MODE}
             - HOSTNAME=${HOSTNAME}
             - HOST_IP=${HOST_IP}
             - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -25,7 +25,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
             - /var/log/uwsgi:/var/log/uwsgi
 
-            - /mydb/db_data:/mydb_data
+            - /mydb/db_data:/mydb/db_data
             - /mydb/db_backups:/mydb/db_backups
 
 
@@ -35,7 +35,7 @@ services:
     web:
         image: mydb-web:1.0
         build:
-            context: ${DBAAS_ENV}/nginx
+            context: ${DB4SCI_MODE}/nginx
 
         container_name: mydb-web 
         ports:
@@ -43,10 +43,10 @@ services:
             - "443:443"
 
         links:
-            - dbaas:dbaas
+            - mydb:mydb
 
         depends_on:
-            - dbaas
+            - mydb
 
         environment:
             - "TZ=America/Los_Angeles"

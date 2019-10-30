@@ -5,7 +5,6 @@ import errno
 import stat
 import OpenSSL
 import subprocess
-
 from config import Config
 import shutil
 from hashlib import md5
@@ -37,24 +36,26 @@ file_key_management_filekey = secret
 
 
 def copy_tsl(con_name, db_vol):
-    """Copy TLS server keys to mairadb keys volume
+    """Copy TLS server keys to mairadb /keys directory
     Copy MariaDB encrypt.cnf to /etc/mysql/conf.d volume
+    code is run from db4sci container
     """
     files = ['server-cert.pem', 'server-key.pem', 'server-req.pem',
              'ca-cert.pem']
-    source = Config.dbaas_path + '/TLS/' 
+    source = '/opt/DB4SCI/TLS/'
     destination = db_vol + '/' + con_name + '/keys/'
-    for file in files:
-        print("copy %s %s" % (source + file, destination))
-        shutil.copy(source + file, destination)
-        os.chown(destination + file, 999, 999)
-    source = Config.dbaas_path + '/dbconfig/MariaDB/encrypt.cnf'
+    for file_name in files:
+        print("copy %s %s" % (source + file_name, destination))
+        shutil.copy(source + file_name, destination)
+        os.chown(destination + file_name, 999, 999)
+        os.chmod(destination + file_name, 0o600)
+    source = '/opt/DB4SCI/dbconfig/MariaDB/encrypt.cnf'
     destination = db_vol + '/' + con_name + '/conf.d/'
     shutil.copy(source, destination)
                  
 
 def encrypt_key_file(key_file, enc_file, password):
-    ''' Encrypt contents of <key_file> and write to <enc_file> '''
+    """Encrypt contents of <key_file> and write to <enc_file>"""
     cmd_template = 'openssl enc -aes-256-cbc -md sha1 -k %s -in %s -out %s'
     cmd = cmd_template % (password, key_file, enc_file)
     print('encrypting keys: %s' % cmd)
@@ -68,7 +69,7 @@ def derive_key_and_iv(password):
     salt = Random.new().read(iv_length - len('Salted__'))
     d = d_i = ''
     while len(d) < key_length + iv_length:
-        d_i = md5(d_i + password.encode('ascii','ignore') + salt).digest()
+        d_i = md5(d_i + password.encode('ascii', 'ignore') + salt).digest()
         d += d_i
     return salt, d[:key_length], d[key_length:key_length+iv_length]
 

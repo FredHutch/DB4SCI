@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="images/fredhutch.ico">
     <link rel="stylesheet" type="text/css" href="css/nav.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    </style>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
 </head>
 <body>
 <div>
@@ -25,6 +25,9 @@
      <li ><a href="db4sci_arch">Architecture</a></li>
      <li ><a href="download">Download</a></li>
      <li><a href="install.html">Install</a></li>
+     <li><a class="github-button" href="https://github.com/FredHutch/DB4SCI"
+          data-size="large" aria-label="Fork ntkme/github-buttons on GitHub">Fork</a>
+       </li>
    </ul>
 </nav> <!-- end "nav" -->
 <div class="outerbox">
@@ -32,26 +35,30 @@
         <h3>DB4SCI Design Goals</h3>
   <ul>
     <li>Fast, easy way to create database instances. Zero barriers, no request forms, no ticket system.</li>
-    <li>Container-centric. No software installs, just pull PostgreSQL from Docker hub.</li>
+    <li>Container-centric. No software installs, just pull PostgreSQL or other
+        databases from Docker hub.</li>
     <li>Get out of the DBA business.  Give uses full admin rights to manage their own
 databases, but, at the same time provide nightly backups.</li>
-    <li>Encourage database usage for scientific data and work-flow management. Databases can be
-shared and offer current access. Influence the culture and offer a better alternative to spreadsheets.
-</li>
-    <li> DB4SCI is easily extensible. At present MyDB supports four major DB platforms.
-    To add additional platforms just update the configuration file and define the name, image and version
+    <li>Encourage database usage for scientific data and work-flow management.
+        Databases can be shared and offer current access. Influence the culture
+        and offer a better alternative to spreadsheets.</li>
+      <li>Sufficient performance to use relational databases to aggregate
+          results of HPC workflows.</li>
+      <li> DB4SCI is easily extensible. At present MyDB supports four major DB
+          platforms. To add additional platforms just update the configuration
+          file and define the name, image and version
     of the DB container.  On the backend you need to write Python code to implement a few methods: 
     db_create, db_backup, create_user, check_user.
     </li>
   </ul>
 <h3>Deployment</h3>
     <p>
-    Docker install is the main requirement for DB4SCI. At the Hutch DB4SCI runs on a dedicated
-    physical server with a few hundred terabytes of NVMe SSD storage.
-    The system runs Ubuntu 16.04 and storage is configured with ZFS.
-    This configuration is supports more than 50 database instances.
-    DB4SCI could also be deployed in AWS with EC2 instance. 
-    </p>
+        Docker install is the main requirement for DB4SCI. At the Hutch DB4SCI
+        runs on a dedicated physical server with a few hundred terabytes of NVMe
+        SSD storage. The system runs Ubuntu 16.04 and storage is configured with
+        ZFS. This configuration is supports more than 50 database instances.
+        DB4SCI could also be deployed on EC2 instances in AWS or in other
+        clouds.</p>
     </div>
 </div>
 <nav>
@@ -62,7 +69,7 @@ shared and offer current access. Influence the culture and offer a better altern
       <img src="images/Mongodb_logo.jpeg" title="Mongodb_log">
     </ul>
 </nav>
-  <div id="footer">
+  <div class="footer">
     <p id=text>Fred Hutchinson Cancer Research Center</p>
   </div>
 </body>
