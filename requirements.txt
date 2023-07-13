@@ -34,7 +34,7 @@ mock
 #MySQL-python
 mysqlclient
 ndg-httpsclient
-neo4j-driver
+neo4j-driver==1.7.6
 pbr
 pycodestyle
 pexpect
@@ -45,7 +45,7 @@ py2-ipaddress
 pyasn1
 pycrypto
 pymongo
-PyMySQL
+PyMySQL==0.7.5
 python-dateutil
 python-editor
 python-ldap
