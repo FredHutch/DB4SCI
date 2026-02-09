@@ -2,6 +2,9 @@ version: '3.3'
 services:
   db4sci:
     image: sc-registry.fredhutch.org/db4sci:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - mydb_dbaas:/app/data
     networks:
       - sc-swarm-net
     deploy:
@@ -20,3 +23,11 @@ services:
 networks:
   sc-swarm-net:
     external: true
+
+volumes:
+  mydb_dbaas:
+    driver: local
+    driver_opts:
+      type: nfs
+      device: "${PERSISTENT_VOLUME_MYDB_DBAAS}"
+      o: addr=${NFS_SERVER},rw
