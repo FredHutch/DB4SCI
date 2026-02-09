@@ -71,6 +71,16 @@ s3_prefix_dev = "mydb-dev"
 s3_prefix_migrate = "prod"
 FQDN_host = container_host + "." + container_domain
 
+# NFS configuration
+# Docker volumes are backed by an NFS store. We need to know the 
+# name of the NFS host and the root path where volumes should be 
+# created.
+
+# fully qualified host name:
+NFS_HOST = "nfshost.yourorg.edu"
+# root path minus leading colon and trailing slash:
+NFS_ROOT_PATH = "/root/volumes"
+
 # =============================================================================
 # Active Directory / LDAP Authentication
 # =============================================================================

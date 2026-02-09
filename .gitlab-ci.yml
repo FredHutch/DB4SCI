@@ -1,0 +1,47 @@
+variables:
+  CI_DEBUG_SERVICES: "true"
+
+before_script:
+  - apk update
+  - apk --no-cache add py3-pip python3 curl
+  - python3 -m venv $HOME/.venv
+  - export PATH=$HOME/.venv/bin:$PATH
+  - pip3 install pyyaml
+  - curl -O https://raw.githubusercontent.com/FredHutch/swarm-build-helper/main/build_helper.py
+  # below is from https://stackoverflow.com/a/65810302/470769
+  - mkdir -p $HOME/.docker
+  - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+  - set -x
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker build -t sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA .
+
+test:
+  stage: test
+  services:
+    - name: sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA
+      alias: db4sci
+  script:
+    - sleep 15 && curl -sI  http://db4sci:5008  |head -1|grep -q "200 OK"
+    - if [[ -n "$CI_COMMIT_BRANCH" ]] && [[ "$CI_COMMIT_BRANCH" != "main" ]]; then docker rmi sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA ; fi
+
+deploy:
+  stage: deploy
+  only:
+    refs:
+        - main
+  script:
+    - docker tag sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA sc-registry.fredhutch.org/db4sci:latest
+    - docker push sc-registry.fredhutch.org/db4sci:latest
+    - docker rmi sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA
+    - sleep 15
+    - echo $SC_SWARM_CICD_SSH_KEY | base64 -d > ./sc_swarm_cicd_ssh_key
+    - chmod 0400 ./sc_swarm_cicd_ssh_key
+    - python3 build_helper.py docker-compose.yml | ssh -i ./sc_swarm_cicd_ssh_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@sc-swarm-mgr.fhcrc.org docker stack deploy --with-registry-auth -c - db4sci

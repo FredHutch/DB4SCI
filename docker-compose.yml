@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+  db4sci:
+    image: sc-registry.fredhutch.org/db4sci:latest
+    networks:
+      - sc-swarm-net
+    deploy:
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "org.fredhutch.app.owner=jfdey@fredhutch.org"
+        - "org.fredhutch.github.repo=db4sci"
+        - "traefik.enable=true"
+        - "traefik.http.routers.db4sci.rule=Host(`db4sci.fredhutch.org`)"
+        - "traefik.http.routers.db4sci-secured.rule=Host(`db4sci.fredhutch.org`)"
+        - "traefik.http.routers.db4sci.entrypoints=web,web-secured"
+        - "traefik.http.services.db4sci.loadbalancer.server.port=5008" # it seems you always need to give traefik a port so it 'notices' the service
+        - "traefik.http.routers.db4sci.tls=true"
+
+networks:
+  sc-swarm-net:
+    external: true

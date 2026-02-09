@@ -48,6 +48,35 @@ def volume_list():
     return volume_info
 
 
+def create_volume_directory(vname):
+    """
+    When creating an NFS-backed volume, the directory
+    that it points to must exist. This will create a container
+    that points to the parent of the desired volume, and
+    create the directory inside it.
+    """
+    # First, see if the parent volume already exists:
+    parent_vol = [x for x in client.volumes.list() if x.name == "nfs_root"]
+    if not parent_vol:
+        # Otherwise, create it:
+        parent_vol = client.volumes.create(
+            name="nfs_root",
+            driver="local",
+            driver_opts={
+                "type": "nfs",
+                "o": f"addr={mydb_config.NFS_HOST},rw",
+                "device": f":{mydb_config.NFS_ROOT_PATH}/",  # Mount the root
+            },
+        )
+
+    client.containers.run(
+        "alpine",
+        f"mkdir -p /mnt/{vname}",
+        volumes={"nfs_root": {"bind": "/mnt", "mode": "rw"}},
+        remove=True,
+    )
+
+
 def create_docker_volume(vname):
     """create a volume if it does not exist
     Returns: (volume_id, error) tuple
@@ -59,7 +88,16 @@ def create_docker_volume(vname):
         return volume.id, None  # Volume already exists, no error
     except docker.errors.NotFound:
         try:
-            volume = client.volumes.create(vname)
+            create_volume_directory(vname)
+            volume = client.volumes.create(
+                name=vname,
+                driver="local",
+                driver_opts={
+                    "type": "nfs",
+                    "o": f"addr={mydb_config.NFS_HOST},rw",
+                    "device": f":{mydb_config.NFS_ROOT_PATH}/{vname}",
+                },
+            )
             return volume.id, None  # Volume created successfully, no error
         except docker.errors.APIError as e:
             return None, f"Error creating volume: {e}"
@@ -73,6 +111,8 @@ def volume_remove(vname):
     """Remove a docker volume
     volume remove typically fails until the service if fully removed.
     Try to remove for a few times before giving up"""
+    # TODO should we also remove the underlying directory on NFS storage?
+    # i.e., the opposite of create_volume_directory()?
     try:
         volume = client.volumes.get(vname)
     except NotFound:
@@ -84,7 +124,7 @@ def volume_remove(vname):
             mesg = f"Docker Volume {vname} removed."
             break
         except APIError as e:
-            print(f"Error volume_remove: {vname}: {e}, tring again")
+            print(f"Error volume_remove: {vname}: {e}, trying again")
             time.sleep(2)
             count += 1
             mesg = f"Issues removing {vname}. Errors {e}"
