@@ -29,7 +29,11 @@ test:
     - name: sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA
       alias: db4sci
   script:
-    - sleep 15 && curl -sI  http://db4sci:5008  |head -1|grep -q "200 OK"
+    - sleep 15
+    - response=$(curl -si http://db4sci:5008 )
+    - echo "result of curl is $?"
+    - echo $response
+    - echo $response|head -1 |grep -q "200 OK"
     - if [[ -n "$CI_COMMIT_BRANCH" ]] && [[ "$CI_COMMIT_BRANCH" != "main" ]]; then docker rmi sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA ; fi
 
 deploy:
