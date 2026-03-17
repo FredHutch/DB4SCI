@@ -206,7 +206,7 @@ def create(params):
         return f"{error} {mydb_config.supportOrganization} has been notified"
     res = "Your database server has been created. Use the following command "
     res += "to connect from the Linux command line.\n\n"
-    res += f"psql -h {mydb_config.container_host} "
+    res += f"psql -h {mydb_config.FQDN_host} "
     res += f"-p {params['Port']} -d {params['dbname']} "
     res += f"-U {params['dbuser']} --password\n\n"
     res += "If you would like to connect to the database without entering a "

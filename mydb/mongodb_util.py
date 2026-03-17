@@ -288,7 +288,7 @@ def create_mongodb(params):
     # Build response message
     res = "Your MongoDB database server has been created.\n\n"
     res += f'MongoDB URI: "mongodb://{params["dbuser"]}:{params["dbuserpass"]}@'
-    res += f'{mydb_config.container_host}:{params["Port"]}/{params["dbname"]}"\n\n'
+    res += f'{mydb_config.FQDN_host}:{params["Port"]}/{params["dbname"]}"\n\n'
     res += "Use the mongo shell to connect:\n"
     connection = f"mongosh -u {params['dbuser']} --host {mydb_config.container_host} "
     connection += f"--port {params['Port']} "

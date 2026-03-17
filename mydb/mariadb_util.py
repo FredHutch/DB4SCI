@@ -361,7 +361,7 @@ def create(params):
 
     res = "Your MariaDB database server has been created. Use the following command "
     res += "to connect from the Linux command line.\n\n"
-    res += f"mariadb -h {mydb_config.container_host} "
+    res += f"mariadb -h {mydb_config.FQDN_host} "
     res += f"-P {params['Port']} -D {params['dbname']} "
     res += f"-u {params['dbuser']} -p\n\n"
     res += "You will be prompted to enter your password.\n\n"
