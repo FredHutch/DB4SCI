@@ -26,9 +26,9 @@ dbengine = "Postgres"
 
 def pg_connection_string(user, password, port):
     """Create a PostgreSQL connection string to use with psycopg.connect()"""
-    return "".join(
+    return " ".join(
         [
-            f"host={mydb_config['host']}",
+            f"host={mydb_config.FQDN_host}",
             f"port={port}",
             "dbname=postgres",
             f"user={user}",
@@ -357,9 +357,9 @@ def pg_audit(Info):
     """
     report = []
     report.append("=" * 80)
-    report.append(f"PostgreSQL Audit Report")
+    report.append("PostgreSQL Audit Report")
     report.append(f"Container: {Info.get('Name', 'unknown')}")
-    report.append(f"Host: {mydb_config.container_host}")
+    report.append(f"Host: {mydb_config.FQDN_host}")
     report.append(f"Port: {Info['Port']}")
     report.append("=" * 80)
     report.append("")
@@ -367,8 +367,8 @@ def pg_audit(Info):
     try:
         # Connect to postgres database to get system info
         conn_string = pg_connection_string(
-            mydb_config.accounts[dbengine]["user"],
-            mydb_config.accounts[dbengine]["password"],
+            Info["username"],
+            Info["dbuserpass"],
             Info["Port"],
         )
         conn = psycopg.connect(conn_string)
@@ -420,8 +420,8 @@ def pg_audit(Info):
                 conn.close()
 
                 connect = pg_connection_string(
-                    mydb_config.accounts[dbengine]["user"],
-                    mydb_config.accounts[dbengine]["password"],
+                    Info["username"],
+                    Info["dbuserpass"],
                     Info["Port"],
                 )
                 db_conn = psycopg.connect(connect)
@@ -608,8 +608,7 @@ def recover_admin_db():
     pg_restore = "".join(
         [
             f"PGPASSWORD='{mydb_config.accounts['admindb']['v1_admin_pass']}' ",
-            f"pg_restore -h {mydb_config.container_host} ",
-            "-p 32008 ",
+            "pg_restore -h admin_db ",
             "-d mydb_admin ",
             f"-U {mydb_config.accounts['admindb']['admin']}",
         ]
@@ -619,8 +618,8 @@ def recover_admin_db():
     if len(prefixs) == 0:
         return "No S3 backups found for mydb_admin."
     x, last_backup = prefixs[-1].split()
-    print(f"DEBUG: recover_admin_db: {aws_bucket}/prod/mydb_admin/{last_backup}")
     aws_bucket = mydb_config.AWS_BUCKET_NAME
+    print(f"DEBUG: recover_admin_db: {aws_bucket}/prod/mydb_admin/{last_backup}")
     S3_prefix = f"{aws_bucket}/prod/mydb_admin/{last_backup}"
     backup_files = aws_util.list_s3_files(S3_prefix)
     dump_file = None

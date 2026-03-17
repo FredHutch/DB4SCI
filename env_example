@@ -90,6 +90,7 @@ AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
 # AWS secret access key (keep this secure!)
 AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
+AWS_DEFAULT_REGION=us-west-2
 # =============================================================================
 # Email Configuration (Optional)
 # =============================================================================
