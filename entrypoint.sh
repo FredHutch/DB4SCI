@@ -21,4 +21,11 @@ printenv | grep -v "no_proxy" > /etc/environment
 
 # Execute the main command (Flask app)
 echo "Starting Flask application..."
-exec "$@"
+
+if [[ "$FLASK_DEBUG" = "0" ]]
+then
+  gunicorn app:app --bind 0.0.0.0:5000 --workers 5
+else
+  exec "$@"
+fi
+
