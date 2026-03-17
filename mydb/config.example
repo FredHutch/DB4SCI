@@ -65,7 +65,7 @@ SQLALCHEMY_MIGRATE_URI = get_secret("sqlalchemy_migrate_uri", "SQLALCHEMY_MIGRAT
 # Users will connect to databases at: container_host.container_domain:PORT
 
 container_host = "db4sci"
-container_domain = "yourorg.edu"
+container_domain = "fredhutch.org"
 s3_prefix_prod = "mydb"
 s3_prefix_dev = "mydb-dev"
 s3_prefix_migrate = "prod"

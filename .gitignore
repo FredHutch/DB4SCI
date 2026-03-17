@@ -1,6 +1,7 @@
 *.pyc
 .aws
 .env
+.env2
 nohup.out
 *.key
 *.cert
@@ -28,3 +29,5 @@ mydb/compose_templates/
 mydb/dbinit_scripts/
 mydb/test_params.py
 setup.cfg
+
+deploy.sh

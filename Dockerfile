@@ -51,11 +51,17 @@ RUN chmod 0644 /etc/cron.d/backup-cron && \
 
 # Switch to the server directory and start it up
 COPY entrypoint.sh /app/
+# from https://github.com/vishnubob/wait-for-it
+COPY wait-for-it.sh /app/
 RUN chmod +x /app/entrypoint.sh
+RUN chmod +x /app/wait-for-it.sh
 RUN chown -R dbaas:dbaas /app
 
 # Expose port and run
 EXPOSE 5008
+EXPOSE 5000
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["flask", "run", "--host=0.0.0.0"]
+
+
 

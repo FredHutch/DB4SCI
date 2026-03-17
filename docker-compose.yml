@@ -4,7 +4,7 @@ services:
     image: sc-registry.fredhutch.org/db4sci:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - mydb_dbaas:/app/data
+      - db4sci_dbaas:/data
     networks:
       - sc-swarm-net
     deploy:
@@ -17,17 +17,114 @@ services:
         - "traefik.http.routers.db4sci.rule=Host(`db4sci.fredhutch.org`)"
         - "traefik.http.routers.db4sci-secured.rule=Host(`db4sci.fredhutch.org`)"
         - "traefik.http.routers.db4sci.entrypoints=web,web-secured"
-        - "traefik.http.services.db4sci.loadbalancer.server.port=5008" # it seems you always need to give traefik a port so it 'notices' the service
+        - "traefik.http.services.db4sci.loadbalancer.server.port=5000" # it seems you always need to give traefik a port so it 'notices' the service
         - "traefik.http.routers.db4sci.tls=true"
+        - "DESCRIPTION=MyDB DBaaS Application"
+        - "Contact=${supportAdmin}"
+
+    environment:
+        TZ: "America/Los_Angeles"
+        PYTHONUNBUFFERED: "1"
+        FLASK_DEBUG: "${FLASK_DEBUG}"
+        aws_access_key_id: "${aws_access_key_id}"
+        aws_secret_access_key: "${aws_secret_access_key}"
+        AWS_BUCKET_NAME: "${AWS_BUCKET_NAME}"
+        aws_bucket_name: "${AWS_BUCKET_NAME}"
+        flask_secret: "${flask_secret}"
+        sqlalchemy_admin_uri: "${sqlalchemy_admin_uri}"
+        SQLALCHEMY_ADMIN_URI: "${sqlalchemy_admin_uri}"
+        sqlalchemy_migrate_uri: "${sqlalchemy_migrate_uri}"
+        SQLALCHEMY_MIGRATE_URI: "${sqlalchemy_migrate_uri}"
+
+
+  admin_db:
+    networks:
+      - sc-swarm-net
+    image: postgres:17.4
+    hostname: admin_db
+    volumes:
+      - db4sci_admin_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "${MYDB_ADMIN_USER}"
+      POSTGRES_PASSWORD: "${MYDB_ADMIN_PASSWORD}"
+      POSTGRES_DB: 'mydb_admin'
+    labels:
+      'BACKUP_FREQ': 'Daily'
+      'CONTACT': ${CONTACT_MAIL}
+      'DB_NAME': 'mydb_admin'
+      'DB_USER': 'mydbadmin'
+      'DBaaS': 'true'
+      'DESCRIPTION': 'MyDB DBaaS administrative DB'
+      'OWNER': '${supportPerson}'
+    tmpfs:
+      - /dev/shm:size=1g
+    ports:
+      - '32009:5432'
+    deploy:
+      restart_policy:
+        condition: any
+
+  migrate_db:
+    networks:
+      - sc-swarm-net
+    image: postgres:17.4
+    hostname: migrate_db
+    volumes:
+      - db4sci_migrate_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "${MYDB_ADMIN_USER}"
+      POSTGRES_PASSWORD: "${MYDB_MIGRATE_PASSWORD}"
+      POSTGRES_DB: 'mydb_admin'
+    labels:
+      'BACKUP_FREQ': 'Daily'
+      'CONTACT': ${CONTACT_MAIL} 
+      'DB_NAME': 'mydb_admin'
+      'DB_USER': 'mydbadmin'
+      'DBaaS': 'true'
+      'DESCRIPTION': 'MyDB DBaaS Migration Data'
+      'OWNER': '${supportPerson}'
+    tmpfs:
+      - /dev/shm:size=1g
+    ports:
+      - '32008:5432'
+    deploy:
+      restart_policy:
+        condition: any
+
+
+# secrets:
+#     aws_access_key_id:
+#         external: true
+#     aws_secret_access_key:
+#         external: true
+#     flask_secret:
+#         external: true
+#     sqlalchemy_admin_uri:
+#         external: true
+#     sqlalchemy_migrate_uri:
+#         external: true
 
 networks:
   sc-swarm-net:
     external: true
 
 volumes:
-  mydb_dbaas:
+  db4sci_dbaas:
     driver: local
     driver_opts:
       type: nfs
       device: "${PERSISTENT_VOLUME_MYDB_DBAAS}"
       o: addr=${NFS_SERVER},rw
+  db4sci_admin_db:
+    driver: local
+    driver_opts:
+      type: nfs
+      device: "${PERSISTENT_VOLUME_MYDB_ADMIN_DB}"
+      o: addr=${NFS_SERVER},rw
+  db4sci_migrate_db:
+    driver: local
+    driver_opts:
+      type: nfs
+      device: "${PERSISTENT_VOLUME_MYDB_MIGRATE_DB}"
+      o: addr=${NFS_SERVER},rw
+
