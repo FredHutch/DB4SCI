@@ -174,7 +174,7 @@ def created():
     elif params["dbengine"] == "Neo4j":
         result = neo4j_util.create(params)
     elif params["dbengine"] == "MariaDB":
-        result = mariadb_util.create_mariadb(params)
+        result = mariadb_util.create(params)
     else:
         result = "Error: file=postgres_view, def=created(), "
         result += 'message="dbengine not set in general_form.html"'
