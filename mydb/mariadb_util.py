@@ -38,7 +38,7 @@ def auth_mariadb(dbuser, dbpass, port):
     iport = int(port)
     try:
         conn = mariadb.connect(
-            host=mydb_config.container_host, port=iport, user=dbuser, password=dbpass
+            host=mydb_config.FQDN_host, port=iport, user=dbuser, password=dbpass
         )
     except mariadb.Error as e:
         print("ERROR: auth_mariadb: %s" % e)
