@@ -25,9 +25,10 @@ from . import (
 dbengine = "MongoDB"
 
 
-def auth_mongodb(dbuser, dbpass, port):
+def auth_mongodb(dbuser, dbpass, port, db_name):
     connection_string = (
-        f"mongodb://{dbuser}:{dbpass}@{mydb_config.container_host}:{port}/admin"
+        # TODO urlcode db_name? Probably won't have any bad characters in it.
+        f"mongodb://{dbuser}:{dbpass}@{mydb_config.FQDN_host}:{port}/admin?authSource={db_name}"
     )
     client = MongoClient(connection_string, serverSelectionTimeoutMS=5000)
     try:

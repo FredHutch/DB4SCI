@@ -186,7 +186,7 @@ def restart_con(con_name, dbuser, dbuserpass, username, admin_log=True):
     elif dbengine == "MariaDB":
         auth = mariadb_util.auth_mariadb(dbuser, dbuserpass, port)
     elif dbengine == "MongoDB":
-        auth = mongodb_util.auth_mongodb(dbuser, dbuserpass, port)
+        auth = mongodb_util.auth_mongodb(dbuser, dbuserpass, port, info['Name'])
     else:
         return "Error: Container type not found."
     if auth:
@@ -220,7 +220,7 @@ def auth_delete(Name, dbuser, dbuserpass, username):
     elif dbengine == "MariaDB":
         auth = mariadb_util.auth_mariadb(dbuser, dbuserpass, port)
     elif dbengine == "MongoDB":
-        auth = mongodb_util.auth_mongodb(dbuser, dbuserpass, port)
+        auth = mongodb_util.auth_mongodb(dbuser, dbuserpass, port, Name)
     else:
         return "Error: Container type not found"
     if auth:
