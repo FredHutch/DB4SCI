@@ -46,11 +46,10 @@ def create_init_script(params):
     automatically when the container starts for the first time (when data directory is empty).
     """
     init_user_js = """// Create the user's database and user account
-use {{dbname}};
+db = db.getSiblingDB("{{dbname}}");
 db.collectionName.insertOne({ message: "Hello from MyDB", dbname: "{{dbname}}" });
 
 // Create user with dbOwner role - full admin rights to this database
-use admin;
 db.createUser({
     user: '{{dbuser}}',
     pwd: '{{dbuserpass}}',
@@ -287,10 +286,11 @@ def create_mongodb(params):
 
     # Build response message
     res = "Your MongoDB database server has been created.\n\n"
+    # TODO FIXME do we want to display the password in cleartext here?
     res += f'MongoDB URI: "mongodb://{params["dbuser"]}:{params["dbuserpass"]}@'
     res += f'{mydb_config.FQDN_host}:{params["Port"]}/{params["dbname"]}"\n\n'
     res += "Use the mongo shell to connect:\n"
-    connection = f"mongosh -u {params['dbuser']} --host {mydb_config.container_host} "
+    connection = f"mongosh -u {params['dbuser']} --host {mydb_config.FQDN_host} "
     connection += f"--port {params['Port']} "
     connection += f"--authenticationDatabase {params['dbname']} -p\n\n"
     print(f"DEBUG: mongodb_util: {connection}  password({params['dbuserpass']})")
