@@ -29,9 +29,10 @@ def list_s3(Name):
     in the PIT
     """
     cmd = (
-        f"{mydb_config.aws} s3 ls --recursive {mydb_config.AWS_BUCKET_NAME}/prod/{Name}"
+        # TODO FIXME adjust prefix if we are running in dev?
+        f"{mydb_config.aws} s3 ls --recursive {mydb_config.AWS_BUCKET_NAME}/{mydb_config.s3_prefix_prod}/{Name}"
     )
-    print(f"DEBUG: {__file__}.selecte list_s3 cmd: {cmd}")
+    print(f"DEBUG: {__file__}.select list_s3 cmd: {cmd}")
     backups = os.popen(cmd).read().strip()
     return backups
 

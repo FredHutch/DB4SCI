@@ -54,15 +54,16 @@ def connection_cmd(dbengine, info):
     admin_user = mydb_config.accounts[dbengine]["admin"]
     admin_pass = mydb_config.accounts[dbengine]["admin_pass"]
     if dbengine == "MariaDB":
-        cmd = f"MYSQL_PWD={admin_pass} mariadb -h {mydb_config.container_host} "
+        cmd = f"MYSQL_PWD={admin_pass} mariadb -h {mydb_config.FQDN_host} "
         cmd += f"-P {info['Port']}  -D {info['dbname']} -u root"
         print(f"DEBUG connection_cmd: {cmd}")
         return cmd
     elif dbengine == "Postgres":
-        cmd = f"PGPASSWORD={admin_pass} psql -h {mydb_config.container_host} "
+        cmd = f"PGPASSWORD={admin_pass} psql -h {mydb_config.FQDN_host} "
         cmd += f"-p {info['Port']}  -d {info['dbname']} -U {admin_user}"
         print(f"DEBUG connection_cmd: {cmd}")
         return cmd
+    # TODO FIXME implement for mongo
     else:
         return "not implemented"
 

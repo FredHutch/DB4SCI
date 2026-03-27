@@ -9,8 +9,6 @@ from pathlib import Path
 import psycopg
 from jinja2 import Template
 
-import sh
-
 from mydb import migrate_db
 
 from . import (
@@ -422,6 +420,7 @@ def pg_audit(Info):
                     Info["dbuserpass"],
                     Info["Port"],
                 )
+                connect = connect.replace("dbname=postgres", f"dbname={dbname}")
                 db_conn = psycopg.connect(connect)
                 db_cur = db_conn.cursor()
 
