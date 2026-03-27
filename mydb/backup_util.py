@@ -1,5 +1,6 @@
+import os
 import sys
-import time
+import subprocess as sp
 import datetime
 from . import mydb_config
 from . import admin_db
@@ -130,6 +131,58 @@ def backup_audit(name=None, c_id=None):
         (header, body) = backup_audit_all()
     return (header, body)
 
+
+def backup_to_s3(dump_cmd, s3_uri, env):
+    """
+    Streams a database dump directly to S3.
+    :param dump_cmd: List of strings (e.g., ['pg_dump', 'mydb'])
+    :param s3_uri: String (e.g., 's3://bucket/path/file.sql')
+    :env the environment to pass to commands
+    """
+    print(f"--- Starting backup to {s3_uri} ---")
+    full_env = os.environ.copy()
+    full_env.update(env)
+
+    try:
+        # 1. Start the Dump Process
+        p1 = sp.Popen(dump_cmd, stdout=sp.PIPE, stderr=sp.PIPE, text=True, env=full_env)
+        assert p1.stdout is not None
+
+        # 2. Start the AWS Process (reads from p1.stdout)
+        p2 = sp.Popen(
+            ['aws', 's3', 'cp', '-', s3_uri],
+            stdin=p1.stdout,
+            stdout=sp.PIPE,
+            stderr=sp.PIPE,
+            text=True,
+            env=full_env,
+        )
+
+        # Allow p1 to receive a SIGPIPE if p2 exits early
+        p1.stdout.close()
+
+        # 3. Capture results
+        # communicate() waits for the process to finish
+        stdout_aws, stderr_aws = p2.communicate()
+        _, stderr_dump = p1.communicate()
+
+        # 4. Error Checking
+        if p1.returncode != 0:
+            print(f"CRITICAL: Dump command failed (Code {p1.returncode})")
+            print(f"Dump Error: {stderr_dump}")
+            return False, stderr_dump
+
+        if p2.returncode != 0:
+            print(f"CRITICAL: AWS Upload failed (Code {p2.returncode})")
+            print(f"AWS Error: {stderr_aws}")
+            return False, stderr_aws
+
+        print(f"SUCCESS: {stdout_aws.strip()}")
+        return True, stdout_aws.strip()
+
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return False, str(e)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

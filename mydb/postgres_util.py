@@ -9,6 +9,8 @@ from pathlib import Path
 import psycopg
 from jinja2 import Template
 
+import sh
+
 from mydb import migrate_db
 
 from . import (
@@ -18,6 +20,7 @@ from . import (
     mydb_config,
     swarm_util,
     touched,
+    backup_util,
 )
 from .send_mail import send_mail
 
@@ -147,12 +150,13 @@ def migrate(info):
     if swarm_util.service_exists(dbname):
         return f"Container name {dbname} already in use"
     volume_name = f"mydb_{dbname}"
-    volume_id, error = swarm_util.create_docker_volume(volume_name)
+    _, error = swarm_util.create_docker_volume(volume_name)
     if error:
-        return r"Error creatinge docker volume {volume_name}. Error: {error}"
+        return r"Error creating docker volume {volume_name}. Error: {error}"
     params = build_params_postgres(info)
     params["service_name"] = f"mydb_{dbname}"
     params["volume_name"] = volume_name
+    params['mapped_db_vol'] = "/var/lib/postgresql/data"
     S3_prefix = migrate_db.lastbackup_s3_prefix(dbname)
     # params["S3_prefix"] = S3_prefix
     config_ref = create_init_script(params)
@@ -186,7 +190,7 @@ def create(params):
         return f"Container name {params['service_name']} already in use"
     volume_id, error = swarm_util.create_docker_volume(params["volume_name"])
     if error:
-        return f"Error creatinge docker volume {params['volume_name']}. Error: {error}"
+        return f"Error creating docker volume {params['volume_name']}. Error: {error}"
     config_ref = create_init_script(params)
     if config_ref is None:
         return "Error: creating Docker Config"
@@ -215,7 +219,7 @@ def create(params):
         "Set permissions to 600. Format is hostname:port:database:username:password.\n"
     )
     res += "Cut/paste this line and place in your /home/user/.pgpass file.\n\n"
-    res += f"{mydb_config.container_host}:{params['Port']}:{params['dbname']}"
+    res += f"{mydb_config.FQDN_host}:{params['Port']}:{params['dbname']}"
     res += f":{params['dbuser']}:PASSWORD\n\n"
     res += "To use psql on the linux command line load the PostgreSQL module.\n"
     res += "module load PostgreSQL\n\n"
@@ -234,17 +238,15 @@ def backup(info, backup_type):
     type: str ['User', 'Admin']
     """
     Name = info["Name"]
-    backup_id, prefix = mydb_actions.create_backup_prefix(Name)
+    backup_id, prefix = aws_util.create_backup_prefix(Name)
 
     aws_bucket = mydb_config.AWS_BUCKET_NAME
     s3_url = f"{aws_bucket}{prefix}{Name}.sql"
-
-    # Dump postgres globals (roles, tablespaces, etc.)
-    dbpassword = f"PGPASSWORD='{mydb_config.accounts[dbengine]['admin_pass']}' "
-    command = f"pg_dumpall -g -w --lock-wait-timeout=8000 "
-    command += f"--host {mydb_config.container_host} --port {info['Port']} "
-    command += f"-U {mydb_config.accounts[dbengine]['admin']} "
-    s3_pipe = f"| aws s3 cp - {s3_url}"
+   
+    dump_command = ["pg_dumpall", "-g", "-w", "--lock-wait-timeout=8000",
+                    "--host", mydb_config.FQDN_host, "--port", str(info['Port']),
+                    "-U", mydb_config.accounts[dbengine]['admin']]
+    env = {"PGPASSWORD": mydb_config.accounts[dbengine]['admin_pass']}
 
     # Log backup start
     admin_db.backup_log(
@@ -254,24 +256,26 @@ def backup(info, backup_type):
         backup_id,
         backup_type,
         url=s3_url,
-        command=command,
+        command=' '.join(dump_command),
         err_msg="",
     )
 
     message = f"\nExecuting Postgres backup to S3: {aws_bucket}\n"
-    message += f"Executing Postgres dump_all globals command: {command}\n"
+    message += f"Executing Postgres dump_all globals command: pg_dumpall {' '.join(dump_command)}\n"
     message += f"     to: {prefix}{Name}_globals.sql\n"
-    result = subprocess.run(
-        dbpassword + command + s3_pipe, shell=True, capture_output=True, text=True
-    )
-    if result.returncode != 0:
-        message += f"Error: {result.stderr}"
+
+    result, output = backup_util.backup_to_s3(dump_command, s3_url, env)
+
+    if not result:
+        message += f"Error: {output}"
         return message
-    message += f"Result: {result.stdout}\n"
+    message += output
 
     # Get list of user databases to be backed up
     conn_string = pg_connection_string(
-        mydb_config[dbengine].accinfo["Port"], "postgres"
+        mydb_config.accounts[dbengine]['admin'],
+        mydb_config.accounts[dbengine]['admin_pass'],
+        info['Port'],
     )
     try:
         connection = psycopg.connect(conn_string)
@@ -290,36 +294,30 @@ def backup(info, backup_type):
     dbs = cur.fetchall()
     connection.close()
 
+
     message += f"\nBacking up {len(dbs)} database(s):\n"
     # Back up each database
     for db in dbs:
         dbname = db[0]
         s3_dump_url = f"{aws_bucket}{prefix}{Name}_{dbname}.dump"
 
-        # Build pg_dump command that streams directly to S3
-        command = f"PGPASSWORD='{mydb_config.accounts[dbengine]['admin_pass']}' "
-        command += f"pg_dump --dbname {dbname} "
-        command += f"--lock-wait-timeout=5000 "
-        command += f"--host {mydb_config.container_host} "
-        command += f"--port {info['Port']} "
-        command += f"--username {mydb_config.accounts[dbengine]['admin']} "
-        command += f"-F c "
-        command += f"| aws s3 cp - {s3_dump_url}"
-
-        print(f"DEBUG: backup command: {command}")
-
-        result = subprocess.run(
-            command, shell=True, capture_output=True, text=True, timeout=1800
-        )
-
-        if result.returncode != 0:
+        dump_command = [
+            "pg_dump", "--dbname", dbname, "--lock-wait-timeout=5000", "--host",
+            mydb_config.FQDN_host, "--port", str(info['Port']), "--username",
+            mydb_config.accounts[dbengine]['admin']
+        ]
+        
+        result, output = backup_util.backup_to_s3(dump_command, s3_dump_url, env)
+        if not result:
             message += f"\nDatabase: {dbname}\n"
-            message += f"Command: {command}\n"
-            message += f"Error: {result.stderr}\n"
+            message += f"Command: pg_dump {' '.join(dump_command)}\n"
+            message += f"Error: {output}\n"
         else:
-            message += (
-                f"\nDatabase: {dbname} written to: {prefix}{Name}_{dbname}.dump\n"
-            )
+            message += "No errors in dump command."
+
+        message += output
+
+        print(f"DEBUG: backup command: {' '.join(dump_command)}")
 
     admin_db.add_container_log(
         info["cid"], Name, "GUI backup", f"user: {info.get('username', 'unknown')}"
@@ -333,10 +331,10 @@ def backup(info, backup_type):
         backup_id,
         backup_type,
         url=url,
-        command=command,
+        command=' '.join(dump_command),
         err_msg=message,
     )
-
+    print(f"DEBUG: message is:\n{message}")
     return message
 
 
@@ -509,7 +507,7 @@ def pg_command(cmd, port, dbname):
     return "".join(
         [
             f"PGPASSWORD='{mydb_config.accounts[dbengine]['admin_pass']}' ",
-            f"{cmd} -h {mydb_config.container_host} ",
+            f"{cmd} -h {mydb_config.FQDN_host} ",
             f"-p {port} ",
             f"-d {dbname} ",
             f"-U {mydb_config.accounts[dbengine]['admin']}",
@@ -604,8 +602,13 @@ def recover_admin_db():
     Once Version 2 goes live the version 1 DBs will need to be archived.
     So maybe change the prefix to /archive once V2 is live and copy the
     prod to /archive - Nov 2025
+
+    This is where the migrate database is populated. 
+
+    Currently this function times out when run in the web app context.
     """
     pg_restore = "".join(
+        # TODO specify port? FIXME
         [
             f"PGPASSWORD='{mydb_config.accounts['admindb']['v1_admin_pass']}' ",
             "pg_restore -h admin_db ",
@@ -617,7 +620,7 @@ def recover_admin_db():
     prefixs = aws_util.list_s3_prefixes("mydb_admin")
     if len(prefixs) == 0:
         return "No S3 backups found for mydb_admin."
-    x, last_backup = prefixs[-1].split()
+    _, last_backup = prefixs[-1].split()
     aws_bucket = mydb_config.AWS_BUCKET_NAME
     print(f"DEBUG: recover_admin_db: {aws_bucket}/prod/mydb_admin/{last_backup}")
     S3_prefix = f"{aws_bucket}/prod/mydb_admin/{last_backup}"

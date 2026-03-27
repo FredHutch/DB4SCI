@@ -366,7 +366,7 @@ def create(params):
     res += f"-u {params['dbuser']} -p\n\n"
     res += "You will be prompted to enter your password.\n\n"
     res += "Alternatively, you can use the mariadb client:\n"
-    res += f"mariadb -h {mydb_config.container_host} "
+    res += f"mariadb -h {mydb_config.FQDN_host} "
     res += f"-P {params['Port']} -D {params['dbname']} "
     res += f"-u {params['dbuser']} -p\n\n"
 
@@ -383,7 +383,7 @@ def backup(info, backup_type):
     mariadb-dump is run from the dbaas container and piped to S3
     """
     Name = info["Name"]
-    backup_id, prefix = mydb_actions.create_backup_prefix(Name)
+    backup_id, prefix = aws_util.create_backup_prefix(Name)
 
     aws_bucket = mydb_config.AWS_BUCKET_NAME
     s3_url = f"{aws_bucket}{prefix}{Name}.sql"

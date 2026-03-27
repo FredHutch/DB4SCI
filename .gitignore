@@ -20,7 +20,7 @@ secrets/
 
 # Organization-specific branding (replace with your own)
 # Keep db4sci-logo.svg as default, add your own custom logos here
-mydb/static/favicon.ico
+#mydb/static/favicon.ico
 dbaas_resolved.yml
 
 # Organization-specific container templates and scripts

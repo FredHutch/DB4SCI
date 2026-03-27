@@ -11,7 +11,7 @@ import time
 
 import docker
 from docker.errors import APIError, NotFound
-from docker.types import ConfigReference, EndpointSpec, Mount, RestartPolicy
+from docker.types import ConfigReference, EndpointSpec, Mount, RestartPolicy, DriverConfig
 
 from . import admin_db, mydb_config
 from .human import human_uptime
@@ -75,6 +75,36 @@ def create_volume_directory(vname):
         volumes={"nfs_root": {"bind": "/mnt", "mode": "rw"}},
         remove=True,
     )
+    print(f"create_volume_directory: Created directory {vname}....")
+
+def remove_volume_data(vname):
+    """
+    The "opposite" of create_volume_directory().
+    Removes the data on the NFS-backed store.
+    Should be called after the volume has been removed.
+    """
+    # First, see if the parent volume already exists:
+    parent_vol = [x for x in client.volumes.list() if x.name == "nfs_root"]
+    if not parent_vol:
+        # Otherwise, create it:
+        parent_vol = client.volumes.create(
+            name="nfs_root",
+            driver="local",
+            driver_opts={
+                "type": "nfs",
+                "o": f"addr={mydb_config.NFS_HOST},rw",
+                "device": f":{mydb_config.NFS_ROOT_PATH}/",  # Mount the root
+            },
+        )
+
+    client.containers.run(
+        "alpine",
+        f"rm -rf  /mnt/{vname}",
+        volumes={"nfs_root": {"bind": "/mnt", "mode": "rw"}},
+        remove=True,
+    )
+    return f"remove_volume_data: Removed directory {vname}...."
+
 
 
 def create_docker_volume(vname):
@@ -83,6 +113,9 @@ def create_docker_volume(vname):
         - If successful: (volume_id, None)
         - If error: (None, error_message)
     """
+    # TODO FIXME stop calling me!
+    if True:
+        return None, None
     try:
         volume = client.volumes.get(vname)
         return volume.id, None  # Volume already exists, no error
@@ -109,25 +142,35 @@ def create_docker_volume(vname):
 
 def volume_remove(vname):
     """Remove a docker volume
-    volume remove typically fails until the service if fully removed.
+    volume remove typically fails until the service is fully removed.
     Try to remove for a few times before giving up"""
     # TODO should we also remove the underlying directory on NFS storage?
     # i.e., the opposite of create_volume_directory()?
-    try:
-        volume = client.volumes.get(vname)
-    except NotFound:
-        return f"Docker volume {vname} not found"
-    count = 0
-    while count < 5:
-        try:
-            volume.remove()
-            mesg = f"Docker Volume {vname} removed."
-            break
-        except APIError as e:
-            print(f"Error volume_remove: {vname}: {e}, trying again")
-            time.sleep(2)
-            count += 1
-            mesg = f"Issues removing {vname}. Errors {e}"
+    # ---
+    client = docker.from_env()
+
+    # 1. Define a 'Task' to remove the specific volume
+    # We use a shell command to check if it exists first to avoid exit errors
+    cleanup_cmd = f"sh -c 'docker volume rm {vname} || true'"
+
+    print(f"Deploying global cleanup for {vname}...")
+
+    client.services.create(
+        image="docker:latest", # Use the docker CLI image
+        name="volume-cleanup-global",
+        command=cleanup_cmd,
+        mounts=[
+            # This gives the container on EACH node access to its own local engine
+            Mount(target='/var/run/docker.sock', source='/var/run/docker.sock', type='bind')
+        ],
+        mode={'global': {}} # Runs on EVERY node in the cluster
+    )
+
+    # 2. Wait for the tasks to complete
+    # In a global service, it starts one task per node.
+    # We'll wait a few seconds for them to pull the image and run the command.
+    time.sleep(15)
+    mesg = f"Docker Volume {vname} removed."
     return mesg
 
 
@@ -171,6 +214,17 @@ def start_service(params, config_ref):
     # Create docker service
     params_json = json.dumps(params, indent=4)
     print(f"====DEBUG: swarm_util.start_service: params: {params_json}")
+    nfs_config = DriverConfig(
+        name='local',
+        options={
+            'type': 'nfs',
+            'o': f'addr={mydb_config.NFS_HOST}',
+            'device': f':{mydb_config.NFS_ROOT_PATH}/{params["volume_name"]}',
+        }
+    )
+    print(f"Creating volume directory {params['volume_name']}")
+    create_volume_directory(params['volume_name'])
+
     service = client.services.create(
         image=params["image"],
         name=params["service_name"],
@@ -181,6 +235,7 @@ def start_service(params, config_ref):
                 target=params["mapped_db_vol"],
                 source=f"{params['volume_name']}",
                 type="volume",
+                driver_config=nfs_config,
             ),
             {  # ← Use dict for tmpfs
                 "Target": "/dev/shm",
@@ -337,11 +392,16 @@ def admin_delete(name, username):
         return result + status + "\n"
     result += status
 
-    status = volume_remove(data["Info"]["volume_name"])
-    result += "\n" + status
 
     status = docker_config_remove(data["Info"]["config_name"])
     result += f"\n{status}"
+
+    status = volume_remove(data["Info"]["volume_name"])
+    result += "\n" + status
+
+    status = remove_volume_data(data["Info"]["volume_name"])
+    result += "\n" + status
+
     send_mail("DBaaS: service removed", result, mydb_config.supportAdmin)
 
     return result

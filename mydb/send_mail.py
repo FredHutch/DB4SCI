@@ -1,28 +1,24 @@
 #!/usr/bin/env python3
-import sys
+import logging
 import smtplib
-from smtplib import SMTPRecipientsRefused
+
+from envelopes import Envelope
+
 from . import mydb_config
 
+smtplib.SMTP.debuglevel = 1
 
 def send_mail(subject, message, TO):
     """send email """
-    SERVER = mydb_config.MAIL_SERVER
     FROM = mydb_config.MAIL_FROM
-    message = """\
-From: %s
-To: %s
-Subject: %s
-
-%s
-""" % (FROM, ", ".join(TO), subject, message)
-
-    server = smtplib.SMTP(SERVER)
-    try:
-        server.sendmail(FROM, TO, message)
-    except SMTPRecipientsRefused as e:
-        return 'user unknown'
-    server.quit()
+    envelope = Envelope(
+        from_addr=(FROM, 'DB4SCI'),
+        to_addr=(TO),
+        subject=subject,
+        text_body=message
+    )
+    SERVER = mydb_config.MAIL_SERVER
+    envelope.send(SERVER)
     return None
 
 if __name__ == "__main__":
