@@ -323,7 +323,7 @@ def backup(info, type):
     message = f"\nExecuting Mongo backup to S3: {mydb_config.AWS_BUCKET_NAME}\n"
     message += f"Executing: {safe_command}\n"
     message += f"     to: {s3_url}archive\n"
-    admin_db.backup_log(info["cid"], Name, "start", backup_id, type, url="", command=command, err_msg="")
+    admin_db.backup_log(info["c_id"], Name, "start", backup_id, type, url="", command=command, err_msg="")
     full_command = command + s3_pipe + "archive"
     result = subprocess.run(full_command, shell=True, capture_output=True)
     if result.returncode != 0:
@@ -333,7 +333,7 @@ def backup(info, type):
         message += f"Backup exit code {result.returncode}"
     else:
         message += f"\nDatabase: {Name} written to: {s3_url}archive\n"
-    admin_db.backup_log(info["cid"], Name, "end", backup_id, type, s3_url, command, msg)
+    admin_db.backup_log(info["c_id"], Name, "end", backup_id, type, s3_url, command, message)
     return message
 
 

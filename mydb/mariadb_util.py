@@ -412,7 +412,7 @@ def backup(info, backup_type):
     )
     # Log backup start
     admin_db.backup_log(
-        info["cid"],
+        info["c_id"],
         Name,
         "start",
         backup_id,
@@ -452,7 +452,7 @@ def backup(info, backup_type):
         print(f"DEBUG: mariadb_util.backup Error: {message}")
         send_mail("MyDB: MariaDB backup exception", message, mydb_config.supportAdmin)
     admin_db.backup_log(
-        info["cid"],
+        info["c_id"],
         Name,
         "end",
         backup_id,

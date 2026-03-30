@@ -246,6 +246,9 @@ def backup(info, backup_type):
                     "-U", mydb_config.accounts[dbengine]['admin']]
     env = {"PGPASSWORD": mydb_config.accounts[dbengine]['admin_pass']}
 
+    if 'c_id' in info and not 'cid' in info:
+        info['cid'] = info['c_id']
+
     # Log backup start
     admin_db.backup_log(
         info["cid"],

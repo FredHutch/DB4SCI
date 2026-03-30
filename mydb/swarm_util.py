@@ -399,8 +399,9 @@ def admin_delete(name, username):
     status = volume_remove(data["Info"]["volume_name"])
     result += "\n" + status
 
+    # dante
     status = remove_volume_data(data["Info"]["volume_name"])
-    result += "\n" + status
+    result += "\n"
 
     send_mail("DBaaS: service removed", result, mydb_config.supportAdmin)
 

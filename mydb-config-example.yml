@@ -167,8 +167,8 @@ mydb_v1_meta_data:
 # Log File Paths
 # =============================================================================
 
-backup_log: "/mydb/logs/backup.log"
-admindb_log: "/mydb/logs/admindb.log"
+backup_log: "/data/logs/backup.log"
+admindb_log: "/data/logs/admindb.log"
 
 # =============================================================================
 # Database Admin Accounts
