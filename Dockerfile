@@ -40,6 +40,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy files to container
 ENV env=prod
 ADD *.py /app
+ADD *.yml /app
 ADD mydb /app/mydb/
 
 # Setup cron for backups

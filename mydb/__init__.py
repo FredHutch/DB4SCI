@@ -1,6 +1,9 @@
 from flask import Flask, g
 import os
 
+# import config before anything else:
+from . import mydb_config
+
 # Create app instance at module level
 app = Flask(__name__)
 
