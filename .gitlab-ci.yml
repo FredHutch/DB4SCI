@@ -24,12 +24,14 @@ build:
     - set -e
     - echo $DOTENV_BASE64_ENCODED | base64 -d > .env
     - echo $DOTENV2_BASE64_ENCODED | base64 -d > .env2
+    - git clone https://github.com/bashup/dotenv.git
     - set +x
-    - set -a
-    - source .env
-    - set +a
+    - source dotenv/dotenv
+    - .env --file .env export
+    - env | grep MYDB
     - source .env2
     - set -x
+    - rm -rf dotenv
     - docker build -t sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA .
 
 # TODO figure this out
