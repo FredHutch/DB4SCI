@@ -25,7 +25,9 @@ build:
     - echo $DOTENV_BASE64_ENCODED | base64 -d > .env
     - echo $DOTENV2_BASE64_ENCODED | base64 -d > .env2
     - set +x
+    - set -a
     - . .env
+    - set +a
     - . .env2
     - set -x
     - env | grep MYDB
