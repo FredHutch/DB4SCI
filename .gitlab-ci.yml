@@ -29,7 +29,7 @@ build:
     - source dotenv/dotenv
     - .env --file .env export
     - env | grep MYDB
-    - source .env2
+    - . .env2
     - set -x
     - rm -rf dotenv
     - docker build -t sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA .
