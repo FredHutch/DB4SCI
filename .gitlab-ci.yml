@@ -24,10 +24,12 @@ build:
     - set -e
     - echo $DOTENV_BASE64_ENCODED | base64 -d > .env
     - echo $DOTENV2_BASE64_ENCODED | base64 -d > .env2
+    - set +x
     - set -a
     - source .env
     - set +a
     - source .env2
+    - set -x
     - docker build -t sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA .
 
 # TODO figure this out
@@ -55,4 +57,5 @@ deploy:
     - sleep 15
     - echo $SC_SWARM_CICD_SSH_KEY | base64 -d > ./sc_swarm_cicd_ssh_key
     - chmod 0400 ./sc_swarm_cicd_ssh_key
+    - cat docker-compose.yml | envsubst && exit 1
     - cat docker-compose.yml | envsubst | python3 build_helper.py --fluentd-logging - | ssh -i ./sc_swarm_cicd_ssh_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@sc-swarm-mgr.fhcrc.org docker stack deploy --with-registry-auth -c - db4sci
