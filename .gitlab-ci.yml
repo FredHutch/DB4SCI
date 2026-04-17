@@ -12,6 +12,7 @@ before_script:
   - mkdir -p $HOME/.docker
   - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
   - set -x
+  - set -e
 
 stages:
   - build
@@ -21,7 +22,7 @@ stages:
 build:
   stage: build
   script:
-    - set -e
+    - echo $MYDB_CONFIG_PROD_BASE64_ENCODED | base64 -d > mydb-config-prod.yml
     - docker build -t sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA .
 
 # TODO figure this out
@@ -57,5 +58,4 @@ deploy:
     - set +a
     - . .env2
     - set -x
-    - env | grep MYDB
     - cat docker-compose.yml | envsubst | python3 build_helper.py --fluentd-logging - | ssh -i ./sc_swarm_cicd_ssh_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@sc-swarm-mgr.fhcrc.org docker stack deploy --with-registry-auth -c - db4sci
