@@ -1,7 +1,8 @@
 
 # MyDB Configuration Example
-# Copy this file to mydb-config.yml and customize for your environment:
-# cp mydb-config-example.yml mydb-config.yml
+# Copy this file to mydb-config-ENV.yml and customize for your environment:
+# cp mydb-config-example.yml mydb-config-ENV.yml
+# (where ENV = dev or prod)
 
 
 # =============================================================================
@@ -87,6 +88,7 @@ admins:
 
 # Timezone for container operations
 #TZ = os.getenv("TZ", "America/Los_Angeles")
+TZ: "America/Los_Angeles"
 
 # AWS CLI path
 aws: "aws"

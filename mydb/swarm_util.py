@@ -159,6 +159,7 @@ def volume_remove(vname):
         image="docker:latest", # Use the docker CLI image
         name="volume-cleanup-global",
         command=cleanup_cmd,
+        restart_policy={"Condition": "none"},
         mounts=[
             # This gives the container on EACH node access to its own local engine
             Mount(target='/var/run/docker.sock', source='/var/run/docker.sock', type='bind')
@@ -166,10 +167,14 @@ def volume_remove(vname):
         mode={'global': {}} # Runs on EVERY node in the cluster
     )
 
-    # 2. Wait for the tasks to complete
-    # In a global service, it starts one task per node.
-    # We'll wait a few seconds for them to pull the image and run the command.
-    time.sleep(15)
+    while True:
+        tasks = client.tasks(filters={"service": "volume-cleanup-global"})
+        if tasks:
+            state = tasks[0]["Status"]["State"]
+            if state in {"complete", "failed", "shutdown", "orphaned", "rejected"}:
+                break
+        time.sleep(2)
+
     mesg = f"Docker Volume {vname} removed."
     return mesg
 

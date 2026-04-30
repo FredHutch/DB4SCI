@@ -25,7 +25,7 @@ build:
     - echo $MYDB_CONFIG_PROD_BASE64_ENCODED | base64 -d > mydb-config-prod.yml
     - docker build -t sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA .
 
-# TODO figure this out
+# TODO FIXME figure out what to put here
 #   stage: test
 #   services:
 #     - name: sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA
@@ -42,6 +42,7 @@ deploy:
   stage: deploy
   only:
     refs:
+      # TODO FIXME note that we are deploying from deployment-prep here, not main
         - deployment-prep
   script:
     - docker tag sc-registry.fredhutch.org/db4sci:$CI_COMMIT_SHORT_SHA sc-registry.fredhutch.org/db4sci:latest
