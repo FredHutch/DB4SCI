@@ -61,4 +61,4 @@ deploy:
     - set +a
     - . .env2
     - set -x
-    - cat docker-compose.yml | envsubst | python3 build_helper.py --fluentd-logging - | ssh -i ./sc_swarm_cicd_ssh_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@sc-swarm-mgr.fhcrc.org docker stack deploy --with-registry-auth -c - db4sci
+    - cat docker-compose.yml | envsubst | python3 build_helper.py - | ssh -i ./sc_swarm_cicd_ssh_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@sc-swarm-mgr.fhcrc.org docker stack deploy --with-registry-auth -c - db4sci
