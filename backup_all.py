@@ -39,6 +39,10 @@ def backup_container(con_name, weekly):
         return "%s: container Not Running" % con_name
     data = admin_db.get_container_data("", state.c_id)
     info = data["Info"]
+    # It seems some container metadata does not contain the backup_freq key
+    # So set it to Daily in that case.
+    if not 'backup_freq' in info:
+        info['backup_freq'] = 'Daily'
     backup_type = info["backup_freq"]
     info["backup_type"] = backup_type
     info["c_id"] = state.c_id
