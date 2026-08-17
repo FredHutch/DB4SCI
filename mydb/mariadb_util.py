@@ -66,7 +66,7 @@ def mariadb_audit(Info):
     report.append("=" * 80)
     report.append(f"MariaDB Audit Report")
     report.append(f"Container: {Info.get('Name', 'unknown')}")
-    report.append(f"Host: {mydb_config.container_host}")
+    report.append(f"Host: {mydb_config.FQDN_host}")
     report.append(f"Port: {Info['Port']}")
     report.append("=" * 80)
     report.append("")
@@ -77,7 +77,7 @@ def mariadb_audit(Info):
         admin_pass = mydb_config.accounts[dbengine]["admin_pass"]
 
         conn = mariadb.connect(
-            host=mydb_config.container_host,
+            host=mydb_config.FQDN_host,
             port=int(Info["Port"]),
             user=admin_user,
             password=admin_pass,
@@ -394,7 +394,7 @@ def backup(info, backup_type):
     command = [
         "mariadb-dump",
         "-h",
-        f"{mydb_config.container_host}",
+        f"{mydb_config.FQDN_host}",
         "-P",
         f"{info['Port']}",
         "-u",
@@ -533,7 +533,7 @@ def mariadb_restore(source, dest, S3_prefix):
 
     # Build restore command
     # Don't specify a database - the dump file contains CREATE DATABASE statements
-    maria_cmd = f"mariadb -h {mydb_config.container_host} "
+    maria_cmd = f"mariadb -h {mydb_config.FQDN_host} "
     maria_cmd += f"-P {dest['Port']} "
     maria_cmd += f"-u {mydb_config.accounts[dbengine]['admin']} "
     maria_cmd += f"-p{mydb_config.accounts[dbengine]['admin_pass']}"
