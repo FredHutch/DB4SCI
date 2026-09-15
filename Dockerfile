@@ -62,6 +62,7 @@ RUN chown -R dbaas:dbaas /app
 EXPOSE 5008
 EXPOSE 5000
 ENTRYPOINT ["/app/entrypoint.sh"]
+RUN touch /foo
 CMD ["flask", "run", "--host=0.0.0.0"]
 
 
