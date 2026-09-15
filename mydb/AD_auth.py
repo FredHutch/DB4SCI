@@ -9,6 +9,7 @@ from ldap3.core.exceptions import (
     LDAPInvalidCredentialsResult,
     LDAPSocketOpenError,
     LDAPSocketSendError,
+    LDAPOperationsErrorResult,
 )
 
 from . import mydb_config
@@ -75,7 +76,7 @@ def is_valid(username: str, password: str):
             search_scope=SUBTREE,
             attributes=Attrs,
         )
-    except (LDAPSocketOpenError, LDAPSocketSendError) as e:
+    except (LDAPSocketOpenError, LDAPSocketSendError, LDAPOperationsErrorResult) as e:
         print(f"LDAP search error: {e}", file=sys.stderr)
         return "Error", info
     if not sync or ldap_conn.result["result"] != 0:
