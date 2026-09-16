@@ -2,6 +2,7 @@ import json
 from functools import wraps
 
 from flask import (
+    flash,
     redirect,
     render_template,
     request,
@@ -95,6 +96,8 @@ def login():
                 session["admin_user"] = False
 
             return redirect(url_for("index"))
+        else:
+            flash("Invalid username or password.", "error")
     return render_template("login.html")
 
 
